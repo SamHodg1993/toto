@@ -1,10 +1,16 @@
 package cmd
 
 import (
+	"database/sql"
+	"fmt"
 	"os"
+
+	"github.com/samhodg1993/todo-cli/db"
 
 	"github.com/spf13/cobra"
 )
+
+var database *sql.DB
 
 var rootCmd = &cobra.Command{
 	Use:   "todo",
@@ -13,8 +19,17 @@ var rootCmd = &cobra.Command{
 }
 
 func Execute() {
-	err := rootCmd.Execute()
+	// Initialize database
+	var err error
+	database, err = db.InitDB()
 	if err != nil {
+		fmt.Fprintf(os.Stderr, "Error initializing database: %v\n", err)
+		os.Exit(1)
+	}
+	defer database.Close()
+
+	// Execute the root command
+	if err := rootCmd.Execute(); err != nil {
 		os.Exit(1)
 	}
 }
