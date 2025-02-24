@@ -2,10 +2,28 @@ package db
 
 import (
 	"database/sql"
+	"fmt"
+	"os"
+
 	_ "github.com/mattn/go-sqlite3"
+	"path/filepath"
 )
 
-const dbPath = "todo.db"
+var devMode = os.Getenv("IS_DEV_MODE")
+var dbPath string
+
+func init() {
+	devMode := os.Getenv("IS_DEV_MODE")
+	if devMode != "" {
+		dbPath = "./todos.db"
+	} else {
+		homeDir, err := os.UserHomeDir()
+		if err != nil {
+			fmt.Errorf("Could not find home directory: %v", err)
+		}
+		dbPath = filepath.Join(homeDir, ".todos.db")
+	}
+}
 
 func InitDB() (*sql.DB, error) {
 	db, err := sql.Open("sqlite3", dbPath)
