@@ -18,11 +18,11 @@ var deleteTodo = &cobra.Command{
 
 		_, err := database.Exec(sql_delete_todos, id)
 		if err != nil {
-			fmt.Printf("There was an error deleting the todo from the database: %v\n", err)
+			fmt.Printf("There was an error deleting the todo from the database: %v.\n", err)
 			return
 		}
 
-		fmt.Printf("Todo with id: %v deleted successfully", id)
+		fmt.Printf("Todo with id: %v deleted successfully.\n", id)
 	},
 }
 
@@ -36,11 +36,11 @@ var delTodo = &cobra.Command{
 
 		_, err := database.Exec(sql_delete_todos, id)
 		if err != nil {
-			fmt.Printf("There was an error deleting the todo from the database: %v\n", err)
+			fmt.Printf("There was an error deleting the todo from the database: %v.\n", err)
 			return
 		}
 
-		fmt.Printf("Todo with id: %v deleted successfully", id)
+		fmt.Printf("Todo with id: %v deleted successfully.\n", id)
 	},
 }
 
