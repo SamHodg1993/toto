@@ -66,5 +66,6 @@ var resetTodos = &cobra.Command{
 
 func init() {
 	resetTodos.Flags().BoolVarP(&confirmFlag, "confirm", "c", false, "Skip confirmation prompt")
+
 	rootCmd.AddCommand(resetTodos)
 }
