@@ -9,12 +9,12 @@ mkdir -p ~/bin
 # Move the binary to ~/bin
 mv toto ~/bin/
 
-# Move the database file to home directory if it exists
-if [ -f "todo.db" ]; then
-    mv todo.db ~/.toto.db
+# Move the todo database file to home directory if it exists
+if [ -f "todos.db" ]; then
+    mv todos.db ~/.todos.db
 else
     # If no database exists, create an empty one in home directory
-    touch ~/.toto.db
+    touch ~/.todos.db
 fi
 
 # Check if PATH already contains ~/bin
@@ -28,5 +28,4 @@ fi
 
 # Source the bashrc
 source ~/.bashrc
-
 echo "Installation of the toto todo package has been completed! Enjoy!"

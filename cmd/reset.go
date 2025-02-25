@@ -8,7 +8,9 @@ import (
 )
 
 var sqlDeleteAllTodos string = "DELETE FROM todos"
-var sqlResetAutoIncrement string = "DELETE FROM sqlite_sequence WHERE name='todos'"
+var sqlDeleteAllProjects string = "DELETE FROM projects"
+var sqlResetAutoIncrementTodos string = "DELETE FROM sqlite_sequence WHERE name='todos'"
+var sqlResetAutoIncrementProjects string = "DELETE FROM sqlite_sequence WHERE name='projects'"
 var confirmFlag bool
 
 var resetTodos = &cobra.Command{
@@ -41,12 +43,28 @@ var resetTodos = &cobra.Command{
 		_, err = tx.Exec(sqlDeleteAllTodos)
 		if err != nil {
 			tx.Rollback()
-			fmt.Printf("Error clearing the database: %v\n", err)
+			fmt.Printf("Error clearing the todo database: %v\n", err)
 			return
 		}
 
-		// Reset the auto-increment counter
-		_, err = tx.Exec(sqlResetAutoIncrement)
+		// Delete all projects
+		_, err = tx.Exec(sqlDeleteAllProjects)
+		if err != nil {
+			tx.Rollback()
+			fmt.Printf("Error clearing the projects database: %v\n", err)
+			return
+		}
+
+		// Reset the auto-increment counter for todos
+		_, err = tx.Exec(sqlResetAutoIncrementTodos)
+		if err != nil {
+			tx.Rollback()
+			fmt.Printf("Error resetting ID sequence: %v\n", err)
+			return
+		}
+
+		// Reset the auto-increment counter for projects
+		_, err = tx.Exec(sqlResetAutoIncrementProjects)
 		if err != nil {
 			tx.Rollback()
 			fmt.Printf("Error resetting ID sequence: %v\n", err)

@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"fmt"
 	"os"
+	"time"
 
 	_ "github.com/mattn/go-sqlite3"
 	"path/filepath"
@@ -31,21 +32,52 @@ func InitDB() (*sql.DB, error) {
 		return nil, err
 	}
 
-	const sql_create_table = `
+	const sql_create_todo_table = `
 	CREATE TABLE IF NOT EXISTS todos (
 	id INTEGER PRIMARY KEY AUTOINCREMENT,
 	title VARCHAR(255) NOT NULL,
 	description TEXT,
+	project_id INTEGER NOT NULL,
 	completed BOOLEAN NOT NULL DEFAULT FALSE,
+	completed_at DATETIME,
 	created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
 	updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
 	)
 	`
 
-	_, err = db.Exec(sql_create_table)
+	const sql_create_project_table = `
+	CREATE TABLE IF NOT EXISTS projects (
+	id INTEGER PRIMARY KEY AUTOINCREMENT,
+	title VARCHAR(255) NOT NULL,
+	description TEXT,
+	archived BOOLEAN NOT NULL DEFAULT FALSE,
+	filepath VARCHAR(255) NOT NULL DEFAULT '~/',
+	created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+	updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
+	)
+	`
+
+	const sql_insert_initial_project = `
+	INSERT INTO projects (title, created_at, updated_at) 
+	SELECT "Global list", ?, ?
+	WHERE NOT EXISTS (SELECT 1 FROM projects)
+	`
+
+	_, err = db.Exec(sql_create_todo_table)
+	if err != nil {
+		return nil, err
+	}
+
+	_, err = db.Exec(sql_create_project_table)
+	if err != nil {
+		return nil, err
+	}
+
+	_, err = db.Exec(sql_insert_initial_project, time.Now(), time.Now())
 	if err != nil {
 		return nil, err
 	}
 
 	return db, nil
+
 }

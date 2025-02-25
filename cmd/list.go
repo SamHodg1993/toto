@@ -162,6 +162,14 @@ var lsCmd = &cobra.Command{
 		}
 		defer rows.Close()
 
+		currentDir, err := os.Getwd()
+		if err != nil {
+			fmt.Printf("Error getting current directory: %v\n", err)
+			return
+		}
+
+		fmt.Printf("Working dir: %s.\n", currentDir)
+
 		table := tablewriter.NewWriter(os.Stdout)
 		table.SetHeader([]string{"ID", "Todo", "Status"})
 		table.SetBorder(true)
