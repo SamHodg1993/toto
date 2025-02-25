@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"fmt"
 	"os"
+	"time"
 
 	"github.com/fatih/color"
 	"github.com/olekukonko/tablewriter"
@@ -12,6 +13,8 @@ import (
 
 var sql_get_todos string = "SELECT id, title, completed FROM todos"
 var sql_get_todos_LONG string = "SELECT id, title, description, created_at, updated_at, completed FROM todos"
+
+var fullDate bool = false
 
 var getCmd = &cobra.Command{
 	Use:   "list",
@@ -97,8 +100,8 @@ var getCmdLong = &cobra.Command{
 				title       string
 				completed   bool
 				description sql.NullString
-				createdAt   string
-				updatedAt   string
+				createdAt   time.Time
+				updatedAt   time.Time
 			)
 
 			err := rows.Scan(&id, &title, &description, &createdAt, &updatedAt, &completed)
@@ -117,14 +120,25 @@ var getCmdLong = &cobra.Command{
 				status = "Done"
 			}
 
-			table.Append([]string{
-				fmt.Sprintf("%d", id),
-				title,
-				description.String,
-				createdAt,
-				updatedAt,
-				status,
-			})
+			if fullDate {
+				table.Append([]string{
+					fmt.Sprintf("%d", id),
+					title,
+					description.String,
+					createdAt.Format(time.RFC3339),
+					updatedAt.Format(time.RFC3339),
+					status,
+				})
+			} else {
+				table.Append([]string{
+					fmt.Sprintf("%d", id),
+					title,
+					description.String,
+					createdAt.Format("02-01-2006"),
+					updatedAt.Format("02-01-2006"),
+					status,
+				})
+			}
 		}
 
 		table.Render()
@@ -219,8 +233,8 @@ var lsCmdLong = &cobra.Command{
 				title       string
 				completed   bool
 				description sql.NullString
-				createdAt   string
-				updatedAt   string
+				createdAt   time.Time
+				updatedAt   time.Time
 			)
 
 			err := rows.Scan(&id, &title, &description, &createdAt, &updatedAt, &completed)
@@ -239,14 +253,25 @@ var lsCmdLong = &cobra.Command{
 				status = "Done"
 			}
 
-			table.Append([]string{
-				fmt.Sprintf("%d", id),
-				title,
-				description.String,
-				createdAt,
-				updatedAt,
-				status,
-			})
+			if fullDate {
+				table.Append([]string{
+					fmt.Sprintf("%d", id),
+					title,
+					description.String,
+					createdAt.Format(time.RFC3339),
+					updatedAt.Format(time.RFC3339),
+					status,
+				})
+			} else {
+				table.Append([]string{
+					fmt.Sprintf("%d", id),
+					title,
+					description.String,
+					createdAt.Format("02-01-2006"),
+					updatedAt.Format("02-01-2006"),
+					status,
+				})
+			}
 		}
 
 		table.Render()
@@ -258,6 +283,9 @@ var lsCmdLong = &cobra.Command{
 }
 
 func init() {
+	lsCmdLong.Flags().BoolVarP(&fullDate, "Full-Date", "D", false, "Return the dates as full timestamps")
+	getCmdLong.Flags().BoolVarP(&fullDate, "Full-Date", "D", false, "Return the dates as full timestamps")
+
 	rootCmd.AddCommand(getCmd)
 	rootCmd.AddCommand(lsCmd)
 	rootCmd.AddCommand(getCmdLong)
