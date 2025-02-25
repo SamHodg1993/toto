@@ -46,6 +46,26 @@ cd toto-todo-cli
 ./install.sh
 ```
 
+## Uninstallation
+
+### Windows
+- Powershell
+```powershell
+# Run the install script 
+./uninstall.ps1
+```
+- Git Bash 
+```bash
+# Run the install script
+./uninstall.sh
+```
+
+### Linux
+```bash
+# Run the install script
+./uninstall.sh
+```
+
 ## Usage
 
 ```bash
