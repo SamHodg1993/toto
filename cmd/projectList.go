@@ -12,7 +12,7 @@ import (
 var sql_get_projects string = "SELECT id, title, filepath, archived FROM projects"
 
 var projectLsCmd = &cobra.Command{
-	Use:   "pjls",
+	Use:   "prls",
 	Short: "List project's",
 	Long:  "Get a list of all the projects titles",
 	Args:  cobra.NoArgs,
@@ -133,4 +133,5 @@ var projectListCmd = &cobra.Command{
 
 func init() {
 	rootCmd.AddCommand(projectLsCmd)
+	rootCmd.AddCommand(projectListCmd)
 }
