@@ -12,7 +12,7 @@ import (
 var sql_get_projects string = "SELECT id, title, filepath, archived FROM projects"
 
 var projectLsCmd = &cobra.Command{
-	Use:   "prls",
+	Use:   "proj-ls",
 	Short: "List project's",
 	Long:  "Get a list of all the projects titles",
 	Args:  cobra.NoArgs,

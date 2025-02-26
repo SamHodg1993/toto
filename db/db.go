@@ -32,9 +32,10 @@ func InitDB() (*sql.DB, error) {
 		return nil, err
 	}
 
+	// Autoincrement missing is intentional to allow sqlite to reuse deleted id's
 	const sql_create_todo_table = `
 	CREATE TABLE IF NOT EXISTS todos (
-	id INTEGER PRIMARY KEY AUTOINCREMENT,
+	id INTEGER PRIMARY KEY,
 	title VARCHAR(255) NOT NULL,
 	description TEXT,
 	project_id INTEGER NOT NULL,
@@ -45,9 +46,10 @@ func InitDB() (*sql.DB, error) {
 	)
 	`
 
+	// Autoincrement missing is intentional to allow sqlite to reuse deleted id's
 	const sql_create_project_table = `
 		CREATE TABLE IF NOT EXISTS projects (
-	id INTEGER PRIMARY KEY AUTOINCREMENT,
+	id INTEGER PRIMARY KEY,
 	title VARCHAR(255) NOT NULL,
 	description TEXT,
 	archived BOOLEAN NOT NULL DEFAULT FALSE,
