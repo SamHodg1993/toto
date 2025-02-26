@@ -10,7 +10,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
-var database *sql.DB
+var Database *sql.DB
 
 var rootCmd = &cobra.Command{
 	Use:   "todo",
@@ -21,12 +21,12 @@ var rootCmd = &cobra.Command{
 func Execute() {
 	// Initialize database
 	var err error
-	database, err = db.InitDB()
+	Database, err = db.InitDB()
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "Error initializing database: %v\n", err)
 		os.Exit(1)
 	}
-	defer database.Close()
+	defer Database.Close()
 
 	// Execute the root command
 	if err := rootCmd.Execute(); err != nil {

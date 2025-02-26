@@ -38,7 +38,7 @@ var projectAddCmd = &cobra.Command{
 
 		if projectFilepath == "" {
 			filepath = currentDir
-			fmt.Printf("Filepath not provided defaulting to working directory: %s", currentDir)
+			fmt.Printf("Filepath not provided defaulting to working directory: %s\n", currentDir)
 		} else {
 			filepath = projectFilepath
 		}
@@ -60,7 +60,7 @@ var projectAddCmd = &cobra.Command{
 		}
 
 		// Update the todo
-		_, err = database.Exec(sql_insert_project, projectTitle, projectDescription, projectArchived, filepath, createdAt, updatedAt)
+		_, err = Database.Exec(sql_insert_project, projectTitle, projectDescription, projectArchived, filepath, createdAt, updatedAt)
 		if err != nil {
 			fmt.Printf("There was an error adding the todo: %v\n", err)
 			return

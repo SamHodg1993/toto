@@ -16,7 +16,7 @@ var deleteTodo = &cobra.Command{
 	Run: func(cmd *cobra.Command, args []string) {
 		id := args[0]
 
-		_, err := database.Exec(sql_delete_todos, id)
+		_, err := Database.Exec(sql_delete_todos, id)
 		if err != nil {
 			fmt.Printf("There was an error deleting the todo from the database: %v.\n", err)
 			return
@@ -34,7 +34,7 @@ var delTodo = &cobra.Command{
 	Run: func(cmd *cobra.Command, args []string) {
 		id := args[0]
 
-		_, err := database.Exec(sql_delete_todos, id)
+		_, err := Database.Exec(sql_delete_todos, id)
 		if err != nil {
 			fmt.Printf("There was an error deleting the todo from the database: %v.\n", err)
 			return

@@ -17,7 +17,7 @@ var projectLsCmd = &cobra.Command{
 	Long:  "Get a list of all the projects titles",
 	Args:  cobra.NoArgs,
 	Run: func(cmd *cobra.Command, args []string) {
-		rows, err := database.Query(sql_get_projects)
+		rows, err := Database.Query(sql_get_projects)
 		if err != nil {
 			fmt.Printf("There was an error getting the project's from the database: %v\n", err)
 			return
@@ -77,7 +77,7 @@ var projectListCmd = &cobra.Command{
 	Long:  "Get a list of all the projects titles",
 	Args:  cobra.NoArgs,
 	Run: func(cmd *cobra.Command, args []string) {
-		rows, err := database.Query(sql_get_projects)
+		rows, err := Database.Query(sql_get_projects)
 		if err != nil {
 			fmt.Printf("There was an error getting the project's from the database: %v\n", err)
 			return

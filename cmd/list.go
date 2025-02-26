@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"fmt"
 	"os"
+	"strconv"
 	"time"
 
 	"github.com/fatih/color"
@@ -12,22 +13,22 @@ import (
 )
 
 var sql_get_todos string = "SELECT id, title, completed FROM todos"
-var sql_get_todos_LONG string = "SELECT id, title, description, created_at, updated_at, completed FROM todos"
+var sql_get_todos_LONG string = "SELECT id, title, description, project_id, created_at, updated_at, completed FROM todos"
 
 var fullDate bool = false
 
 var getCmd = &cobra.Command{
 	Use:   "list",
-	Short: "List todo's",
-	Long:  "Get a list of all the todo titles and completed status.",
+	Short: "List todo's for current project",
+	Long:  "Get a list of all the todo's for the current project (defined by the current directory).",
 	Args:  cobra.NoArgs,
 	Run: func(cmd *cobra.Command, args []string) {
-		rows, err := database.Query(sql_get_todos)
+
+		rows, err := GetTodosForFilepath()
 		if err != nil {
-			fmt.Printf("There was an error getting the todo's from the database: %v\n", err)
+			fmt.Printf("%v", err)
 			return
 		}
-		defer rows.Close()
 
 		table := tablewriter.NewWriter(os.Stdout)
 		table.SetHeader([]string{"ID", "Todo", "Status"})
@@ -76,19 +77,19 @@ var getCmd = &cobra.Command{
 
 var getCmdLong = &cobra.Command{
 	Use:   "list-long",
-	Short: "List todo's with more data",
-	Long:  "Get a list of all the todo titles, descriptions, completed status, created at and upated at timestamps",
+	Short: "List todo's with more data for the current project.",
+	Long:  "Get a more detailed list of all the todo's for the current project (defined by the current directory)",
 	Args:  cobra.NoArgs,
 	Run: func(cmd *cobra.Command, args []string) {
-		rows, err := database.Query(sql_get_todos_LONG)
+
+		rows, err := GetTodosForFilepath_LONG()
 		if err != nil {
-			fmt.Printf("There was an error getting the todo's from the database: %v\n", err)
+			fmt.Printf("%v.\n", err)
 			return
 		}
-		defer rows.Close()
 
 		table := tablewriter.NewWriter(os.Stdout)
-		table.SetHeader([]string{"ID", "Todo", "Description", "Created At", "Updated At", "Status"})
+		table.SetHeader([]string{"ID", "Todo", "Description", "Project Id", "Created At", "Updated At", "Status"})
 		table.SetBorder(true)
 		table.SetRowLine(true)
 
@@ -100,11 +101,12 @@ var getCmdLong = &cobra.Command{
 				title       string
 				completed   bool
 				description sql.NullString
+				projectId   int
 				createdAt   time.Time
 				updatedAt   time.Time
 			)
 
-			err := rows.Scan(&id, &title, &description, &createdAt, &updatedAt, &completed)
+			err := rows.Scan(&id, &title, &description, &projectId, &createdAt, &updatedAt, &completed)
 			if err != nil {
 				fmt.Printf("Error reading row: %v\n", err)
 				return
@@ -125,6 +127,7 @@ var getCmdLong = &cobra.Command{
 					fmt.Sprintf("%d", id),
 					title,
 					description.String,
+					strconv.Itoa(projectId),
 					createdAt.Format(time.RFC3339),
 					updatedAt.Format(time.RFC3339),
 					status,
@@ -134,6 +137,7 @@ var getCmdLong = &cobra.Command{
 					fmt.Sprintf("%d", id),
 					title,
 					description.String,
+					strconv.Itoa(projectId),
 					createdAt.Format("02-01-2006"),
 					updatedAt.Format("02-01-2006"),
 					status,
@@ -155,20 +159,12 @@ var lsCmd = &cobra.Command{
 	Long:  "Get a list of all the todo titles that are outstanding",
 	Args:  cobra.NoArgs,
 	Run: func(cmd *cobra.Command, args []string) {
-		rows, err := database.Query(sql_get_todos)
+
+		rows, err := GetTodosForFilepath()
 		if err != nil {
-			fmt.Printf("There was an error getting the todo's from the database: %v\n", err)
+			fmt.Printf("%v", err)
 			return
 		}
-		defer rows.Close()
-
-		currentDir, err := os.Getwd()
-		if err != nil {
-			fmt.Printf("Error getting current directory: %v\n", err)
-			return
-		}
-
-		fmt.Printf("Working dir: %s.\n", currentDir)
 
 		table := tablewriter.NewWriter(os.Stdout)
 		table.SetHeader([]string{"ID", "Todo", "Status"})
@@ -216,20 +212,20 @@ var lsCmd = &cobra.Command{
 }
 
 var lsCmdLong = &cobra.Command{
-	Use:   "lsla",
+	Use:   "lsl",
 	Short: "List todo's with more data",
-	Long:  "Get a list of all the todo titles, descriptions, completed status, created at and upated at timestamps",
+	Long:  "Get a more detailed list of all the todo's for the current project (defined by the current directory)",
 	Args:  cobra.NoArgs,
 	Run: func(cmd *cobra.Command, args []string) {
-		rows, err := database.Query(sql_get_todos_LONG)
+
+		rows, err := GetTodosForFilepath_LONG()
 		if err != nil {
-			fmt.Printf("There was an error getting the todo's from the database: %v\n", err)
+			fmt.Printf("%v.\n", err)
 			return
 		}
-		defer rows.Close()
 
 		table := tablewriter.NewWriter(os.Stdout)
-		table.SetHeader([]string{"ID", "Todo", "Description", "Created At", "Updated At", "Status"})
+		table.SetHeader([]string{"ID", "Todo", "Description", "ProjectId", "Created At", "Updated At", "Status"})
 		table.SetBorder(true)
 		table.SetRowLine(true)
 
@@ -241,11 +237,12 @@ var lsCmdLong = &cobra.Command{
 				title       string
 				completed   bool
 				description sql.NullString
+				projectId   int
 				createdAt   time.Time
 				updatedAt   time.Time
 			)
 
-			err := rows.Scan(&id, &title, &description, &createdAt, &updatedAt, &completed)
+			err := rows.Scan(&id, &title, &description, &projectId, &createdAt, &updatedAt, &completed)
 			if err != nil {
 				fmt.Printf("Error reading row: %v\n", err)
 				return
@@ -266,6 +263,7 @@ var lsCmdLong = &cobra.Command{
 					fmt.Sprintf("%d", id),
 					title,
 					description.String,
+					strconv.Itoa(projectId),
 					createdAt.Format(time.RFC3339),
 					updatedAt.Format(time.RFC3339),
 					status,
@@ -275,6 +273,7 @@ var lsCmdLong = &cobra.Command{
 					fmt.Sprintf("%d", id),
 					title,
 					description.String,
+					strconv.Itoa(projectId),
 					createdAt.Format("02-01-2006"),
 					updatedAt.Format("02-01-2006"),
 					status,

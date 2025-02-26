@@ -1,6 +1,6 @@
 # Todo CLI App
 
-A simple command-line interface (CLI) application for managing your daily tasks and todo items. 
+A simple command-line interface (CLI) application for managing your daily tasks and todo items. This is currently and will always be (while under my control) be a FOSS (Free and Open Source Software) application.
 
 ## Why?
 - Why toto?
@@ -16,6 +16,7 @@ I just kinda wanted to. None of the other tools really fitted what I wanted it t
 - Delete tasks
 - Edit title and description information
 - Reset the database
+- Projects based on the current working directory
 - Simple and intuitive command-line interface
 
 ## Installation
@@ -68,6 +69,8 @@ cd toto-todo-cli
 
 ## Usage
 
+When using these commands, by default, they will only get the todo's that exist for a project which has been linked to the current working directory.
+
 ```bash
 # Add a new task
 toto add -t <"Title of the todo" (required)> -d <"Description of the todo" (optional)> -c <"Created time" (optional)> -u <"updated time" (optional)>
@@ -80,7 +83,7 @@ toto ls
 # List all tasks with more detail
 toto list-long
 # OR the shorthand version 
-toto lsla
+toto lsl
 
 # Edit a todo
 toto edit -i <todo-id (required)> -t <"New title" (optional)> -d <"New description" (optional)> 
@@ -115,9 +118,29 @@ toto --help
 | `delete` | `del`    | Remove a task |
 | `help`   | -        | Show help information |
 | `reset`  | -        | Reset the database to its initial state |
+| `project-list` | `prls` | Show all projects |
+| `project-add` | -    | Add a new project |
+
+
+## Examples
+
+Add a new task with a description:
+```bash
+toto add -t "Implement login feature" -d "Add user authentication to the API"
+```
+
+List tasks in current project:
+```bash
+toto ls
+```
+
+Mark task as complete:
+```bash
+toto comp 1
+```
 
 ## Roadmap 
-- Introduce projects/workspaces
+- Complete projects/workspaces
 - Add monday.com integration 
 - Add Jira integration
 
@@ -125,6 +148,7 @@ toto --help
 
 - Go 1.x or higher
 - Git
+- SQLite3
 
 ## Contributing
 

@@ -46,7 +46,7 @@ func InitDB() (*sql.DB, error) {
 	`
 
 	const sql_create_project_table = `
-	CREATE TABLE IF NOT EXISTS projects (
+		CREATE TABLE IF NOT EXISTS projects (
 	id INTEGER PRIMARY KEY AUTOINCREMENT,
 	title VARCHAR(255) NOT NULL,
 	description TEXT,

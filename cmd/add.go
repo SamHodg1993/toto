@@ -51,6 +51,13 @@ var addCmd = &cobra.Command{
 		// If project id flag has value, update the projectId
 		if todoProjectId != 0 {
 			releventProject = todoProjectId
+		} else {
+			directoryProject, err := GetProjectIdByFilepath()
+			if err != nil {
+				fmt.Printf("%v.\n", err)
+				return
+			}
+			releventProject = directoryProject
 		}
 
 		// If updated at flag has value, update the created at value
@@ -62,7 +69,7 @@ var addCmd = &cobra.Command{
 		}
 
 		// Update the todo
-		_, err = database.Exec(sql_insert_todo, todoTitle, todoDescription, createdAt, updatedAt, releventProject)
+		_, err = Database.Exec(sql_insert_todo, todoTitle, todoDescription, createdAt, updatedAt, releventProject)
 		if err != nil {
 			fmt.Printf("There was an error adding the todo: %v\n", err)
 			return

@@ -45,7 +45,7 @@ var editTodo = &cobra.Command{
 			todoId          int
 		)
 
-		err := database.QueryRow(sql_select_single_todo_for_update, targetId).Scan(&todoId, &todoTitle, &todoDescription)
+		err := Database.QueryRow(sql_select_single_todo_for_update, targetId).Scan(&todoId, &todoTitle, &todoDescription)
 		if err == sql.ErrNoRows {
 			fmt.Printf("There is no todo with the id of %d.\n", targetId)
 			return
@@ -72,7 +72,7 @@ var editTodo = &cobra.Command{
 		}
 
 		// Update todo
-		_, err = database.Exec(sql_update_todos, finalTitle, finalDesc, time.Now(), targetId)
+		_, err = Database.Exec(sql_update_todos, finalTitle, finalDesc, time.Now(), targetId)
 		if err != nil {
 			fmt.Printf("Error updating todo: %v\n", err)
 			return

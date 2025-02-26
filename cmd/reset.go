@@ -33,7 +33,7 @@ var resetTodos = &cobra.Command{
 		}
 
 		// Use a transaction to ensure both operations complete
-		tx, err := database.Begin()
+		tx, err := Database.Begin()
 		if err != nil {
 			fmt.Printf("Error starting transaction: %v\n", err)
 			return

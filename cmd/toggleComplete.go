@@ -21,7 +21,7 @@ var toggleComplete = &cobra.Command{
 		completed := false
 
 		// Query the current status
-		err := database.QueryRow(sql_select_single_todo, id).Scan(&id, &completed)
+		err := Database.QueryRow(sql_select_single_todo, id).Scan(&id, &completed)
 		if err == sql.ErrNoRows {
 			fmt.Printf("There is no todo with the id of %s\n", id)
 			return
@@ -35,7 +35,7 @@ var toggleComplete = &cobra.Command{
 		newStatus := !completed
 
 		// Update the todo
-		result, err := database.Exec(sql_toggle_complete, newStatus, id)
+		result, err := Database.Exec(sql_toggle_complete, newStatus, id)
 		if err != nil {
 			fmt.Printf("There was an error updating the todo in the database: %v\n", err)
 			return
@@ -58,7 +58,7 @@ var toggleComp = &cobra.Command{
 		completed := false
 
 		// Query the current status
-		err := database.QueryRow(sql_select_single_todo, id).Scan(&id, &completed)
+		err := Database.QueryRow(sql_select_single_todo, id).Scan(&id, &completed)
 		if err == sql.ErrNoRows {
 			fmt.Printf("There is no todo with the id of %s\n", id)
 			return
@@ -72,7 +72,7 @@ var toggleComp = &cobra.Command{
 		newStatus := !completed
 
 		// Update the todo
-		result, err := database.Exec(sql_toggle_complete, newStatus, id)
+		result, err := Database.Exec(sql_toggle_complete, newStatus, id)
 		if err != nil {
 			fmt.Printf("There was an error updating the todo in the database: %v\n", err)
 			return
