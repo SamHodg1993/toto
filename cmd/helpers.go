@@ -207,6 +207,10 @@ func DeleteProject(id int) error {
 		return fmt.Errorf("invalid project id")
 	}
 
+	if id == 1 {
+		return fmt.Errorf("Please do not remove the global project. Other functionality relies upon it. A fix to this is in the roadmap, but for right now, please allow the global project to remain.\n")
+	}
+
 	// Start a transaction to make sure no queries error out
 	tx, err := Database.Begin()
 	if err != nil {
