@@ -201,3 +201,48 @@ func AddNewProject(project models.NewProject) {
 	}
 	fmt.Printf("New project added: %s.\n", project.Title)
 }
+
+func DeleteProject(id int) error {
+	if id <= 0 {
+		return fmt.Errorf("invalid project id")
+	}
+
+	// Start a transaction to make sure no queries error out
+	tx, err := Database.Begin()
+	if err != nil {
+		return fmt.Errorf("failed to begin transaction: %v", err)
+	}
+
+	// Delete todos
+	result, err := tx.Exec("DELETE FROM todos WHERE project_id = ?", id)
+	if err != nil {
+		tx.Rollback()
+		return fmt.Errorf("error deleting project todos: %v", err)
+	}
+
+	// Delete project
+	result, err = tx.Exec("DELETE FROM projects WHERE id = ?", id)
+	if err != nil {
+		tx.Rollback()
+		return fmt.Errorf("error deleting project: %v", err)
+	}
+
+	// Check if project existed
+	rowsAffected, err := result.RowsAffected()
+	if err != nil {
+		tx.Rollback()
+		return fmt.Errorf("error checking rows affected: %v", err)
+	}
+	if rowsAffected == 0 {
+		tx.Rollback()
+		return fmt.Errorf("project with ID %d not found", id)
+	}
+
+	// Commit the transaction
+	if err = tx.Commit(); err != nil {
+		return fmt.Errorf("error committing transaction: %v", err)
+	}
+
+	fmt.Printf("Project with ID %d and all associated todos deleted successfully.\n", id)
+	return nil
+}

@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"fmt"
+	"strconv"
 
 	"github.com/spf13/cobra"
 )
@@ -15,12 +16,13 @@ var deleteProject = &cobra.Command{
 	Args:  cobra.ExactArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {
 		id := args[0]
-
-		_, err := Database.Exec(sql_delete_projects, id)
+		projectId, err := strconv.Atoi(id)
 		if err != nil {
-			fmt.Printf("There was an error deleting the project from the database: %v.\n", err)
+			fmt.Printf("Invalid project ID format: %v\n", err)
 			return
 		}
+
+		DeleteProject(projectId)
 
 		fmt.Printf("Project with id: %v deleted successfully.\n", id)
 	},
@@ -34,13 +36,16 @@ var delProj = &cobra.Command{
 	Run: func(cmd *cobra.Command, args []string) {
 		id := args[0]
 
-		_, err := Database.Exec(sql_delete_projects, id)
+		projectId, err := strconv.Atoi(id)
 		if err != nil {
-			fmt.Printf("There was an error deleting the project from the database: %v.\n", err)
+			fmt.Printf("Invalid project ID format: %v\n", err)
 			return
 		}
 
-		fmt.Printf("Project with id: %v deleted successfully.\n", id)
+		err = DeleteProject(projectId)
+		if err != nil {
+			fmt.Printf("%v", err)
+		}
 	},
 }
 
