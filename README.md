@@ -7,17 +7,21 @@ A simple command-line interface (CLI) application for managing your daily tasks 
 The reason is simple really, every developer at some point will write a todo app, probably more than one. For some reason, whenever I want to write todo, my fingers type toto. It's simple, it's (probably) unique, so I went with it. 
 - Why another todo cli tool?
 I just kinda wanted to. None of the other tools really fitted what I wanted it to be, plus, I wanted another Golang project.
+- What makes toto special?
+Right now, just that we base projects around the current working directory. Soon though, we will be adding Monday.com and Jira integrations!!!
 
 ## Features
 
 - Add new tasks
 - List all tasks
+- List project tasks
 - Mark tasks as complete
 - Delete tasks
 - Edit title and description information
 - Reset the database
 - Projects based on the current working directory
 - Simple and intuitive command-line interface
+- Build so you spend less time planning...
 
 ## Installation
 
@@ -33,17 +37,14 @@ cd toto-todo-cli
 - Powershell
 ```powershell
 # Run the install script 
+cd toto-todo-cli
 ./install.ps1
-```
-- Git Bash 
-```bash
-# Run the install script
-./install.sh
 ```
 
 ### Linux
 ```bash
 # Run the install script
+cd toto-todo-cli
 ./install.sh
 ```
 
@@ -55,11 +56,6 @@ cd toto-todo-cli
 # Run the install script 
 ./uninstall.ps1
 ```
-- Git Bash 
-```bash
-# Run the install script
-./uninstall.sh
-```
 
 ### Linux
 ```bash
@@ -69,7 +65,7 @@ cd toto-todo-cli
 
 ## Usage
 
-When using these commands, by default, they will only get the todo's that exist for a project which has been linked to the current working directory.
+When using these commands, by default, they will only get the todo's that exist for a project which has been linked to the current working directory unless you use either the lsla command or the list-long command with the -A flag!
 
 ```bash
 # Add a new task
@@ -81,9 +77,11 @@ toto list
 toto ls
 
 # List all tasks with more detail
-toto list-long
+toto list-long (with optional -A flag)
 # OR the shorthand version 
 toto lsl
+# OR for all todos regardless of project 
+toto lsla
 
 # Edit a todo
 toto edit -i <todo-id (required)> -t <"New title" (optional)> -d <"New description" (optional)> 
@@ -102,6 +100,16 @@ toto del <task-id>
 # the confirm flag is optional, if it does not exist, you will be prompted to confirm the action
 toto reset -confirm(optional) 
 
+# List projects 
+toto proj-ls 
+# Or the shorthand 
+toto prls 
+
+# Add a new project 
+toto project-add -t <title (required)> -d <description (optional)>
+# Or the shorthand
+toto proj-add -t <title (required)> -d <description (optional)>
+
 # Show help
 toto --help
 ```
@@ -112,14 +120,14 @@ toto --help
 |---------|-----------|-------------|
 | `add`   | -         | Add a new task |
 | `list`  | `ls`      | Show all tasks |
-| `list-long` | `lsla` | Show detailed task list |
+| `list-long` | `lsl` | Show detailed task list |
 | `edit`  | -        | Edit an existing task's title or description |
 | `toggle-complete` | `comp` | Mark a task as complete |
 | `delete` | `del`    | Remove a task |
 | `help`   | -        | Show help information |
 | `reset`  | -        | Reset the database to its initial state |
 | `project-list` | `prls` | Show all projects |
-| `project-add` | -    | Add a new project |
+| `project-add` | `proj-add`    | Add a new project |
 
 
 ## Examples
@@ -163,6 +171,10 @@ Contributions are welcome! Please feel free to submit a Pull Request.
 ## Author
 
 Sam Hodgkinson- [samhodg1993](https://github.com/samhodg1993)
+
+## Contributors 
+
+- You could be the first!
 
 ## Acknowledgments
 
