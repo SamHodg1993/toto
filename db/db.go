@@ -4,10 +4,11 @@ import (
 	"database/sql"
 	"fmt"
 	"os"
+	"os/user"
+	"path/filepath"
 	"time"
 
 	_ "github.com/mattn/go-sqlite3"
-	"path/filepath"
 )
 
 var devMode = os.Getenv("IS_DEV_MODE")
@@ -27,6 +28,14 @@ func init() {
 }
 
 func InitDB() (*sql.DB, error) {
+	// Get current user
+	currentUser, err := user.Current()
+	if err != nil {
+		return nil, err
+	}
+
+	homeDir := currentUser.HomeDir
+
 	db, err := sql.Open("sqlite3", dbPath)
 	if err != nil {
 		return nil, err
@@ -46,14 +55,13 @@ func InitDB() (*sql.DB, error) {
 	)
 	`
 
-	// Autoincrement missing is intentional to allow sqlite to reuse deleted id's
-	const sql_create_project_table = `
-		CREATE TABLE IF NOT EXISTS projects (
+	sql_create_project_table := `
+	CREATE TABLE IF NOT EXISTS projects (
 	id INTEGER PRIMARY KEY,
 	title VARCHAR(255) NOT NULL,
 	description TEXT,
 	archived BOOLEAN NOT NULL DEFAULT FALSE,
-	filepath VARCHAR(255) NOT NULL DEFAULT '~/',
+	filepath VARCHAR(255) NOT NULL DEFAULT '` + filepath.Clean(homeDir) + `',
 	created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
 	updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
 	)

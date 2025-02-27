@@ -92,6 +92,30 @@ func GetTodosForFilepath() (*sql.Rows, error) {
 	return rows, nil
 }
 
+func GetAllTodos_LONG() (*sql.Rows, error) {
+	rows, err := Database.Query(
+		`SELECT 
+			id, 
+			title, 
+			description, 
+			project_id, 
+			created_at, 
+			updated_at, 
+			completed 	
+		FROM todos 
+		`)
+	if err != nil {
+		fmt.Printf("%v\n", err)
+		return nil, err
+	}
+
+	if err = rows.Err(); err != nil {
+		return nil, err
+	}
+
+	return rows, nil
+}
+
 func GetTodosForFilepath_LONG() (*sql.Rows, error) {
 	var projectId int = 0
 

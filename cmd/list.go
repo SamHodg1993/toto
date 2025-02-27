@@ -16,6 +16,7 @@ var sql_get_todos string = "SELECT id, title, completed FROM todos"
 var sql_get_todos_LONG string = "SELECT id, title, description, project_id, created_at, updated_at, completed FROM todos"
 
 var fullDate bool = false
+var allTodos bool = false
 
 var getCmd = &cobra.Command{
 	Use:   "list",
@@ -81,12 +82,20 @@ var getCmdLong = &cobra.Command{
 	Long:  "Get a more detailed list of all the todo's for the current project (defined by the current directory)",
 	Args:  cobra.NoArgs,
 	Run: func(cmd *cobra.Command, args []string) {
+		var rows *sql.Rows
+		var err error
 
-		rows, err := GetTodosForFilepath_LONG()
+		if allTodos {
+			rows, err = GetAllTodos_LONG()
+		} else {
+			rows, err = GetTodosForFilepath_LONG()
+		}
+
 		if err != nil {
 			fmt.Printf("%v.\n", err)
 			return
 		}
+		defer rows.Close()
 
 		table := tablewriter.NewWriter(os.Stdout)
 		table.SetHeader([]string{"ID", "Todo", "Description", "Project Id", "Created At", "Updated At", "Status"})
@@ -112,7 +121,6 @@ var getCmdLong = &cobra.Command{
 				return
 			}
 
-			// If todo is completed, apply strikethrough to the title
 			if completed {
 				title = strikethrough(title)
 			}
@@ -122,27 +130,20 @@ var getCmdLong = &cobra.Command{
 				status = "Done"
 			}
 
+			dateFormat := "02-01-2006"
 			if fullDate {
-				table.Append([]string{
-					fmt.Sprintf("%d", id),
-					title,
-					description.String,
-					strconv.Itoa(projectId),
-					createdAt.Format(time.RFC3339),
-					updatedAt.Format(time.RFC3339),
-					status,
-				})
-			} else {
-				table.Append([]string{
-					fmt.Sprintf("%d", id),
-					title,
-					description.String,
-					strconv.Itoa(projectId),
-					createdAt.Format("02-01-2006"),
-					updatedAt.Format("02-01-2006"),
-					status,
-				})
+				dateFormat = time.RFC3339
 			}
+
+			table.Append([]string{
+				fmt.Sprintf("%d", id),
+				title,
+				description.String,
+				strconv.Itoa(projectId),
+				createdAt.Format(dateFormat),
+				updatedAt.Format(dateFormat),
+				status,
+			})
 		}
 
 		table.Render()
@@ -292,12 +293,92 @@ var lsCmdLong = &cobra.Command{
 	},
 }
 
+var lslCmdLong = &cobra.Command{
+	Use:   "lsla",
+	Short: "List todo's with more data regardless of project",
+	Long:  "Get a more detailed list of all the todo's for all projects",
+	Args:  cobra.NoArgs,
+	Run: func(cmd *cobra.Command, args []string) {
+
+		rows, err := GetAllTodos_LONG()
+		if err != nil {
+			fmt.Printf("%v.\n", err)
+			return
+		}
+
+		table := tablewriter.NewWriter(os.Stdout)
+		table.SetHeader([]string{"ID", "Todo", "Description", "ProjectId", "Created At", "Updated At", "Status"})
+		table.SetBorder(true)
+		table.SetRowLine(true)
+
+		strikethrough := color.New(color.CrossedOut).SprintFunc()
+
+		for rows.Next() {
+			var (
+				id          int
+				title       string
+				completed   bool
+				description sql.NullString
+				projectId   int
+				createdAt   time.Time
+				updatedAt   time.Time
+			)
+
+			err := rows.Scan(&id, &title, &description, &projectId, &createdAt, &updatedAt, &completed)
+			if err != nil {
+				fmt.Printf("Error reading row: %v\n", err)
+				return
+			}
+
+			// If todo is completed, apply strikethrough to the title
+			if completed {
+				title = strikethrough(title)
+			}
+
+			status := "Pending"
+			if completed {
+				status = "Done"
+			}
+
+			if fullDate {
+				table.Append([]string{
+					fmt.Sprintf("%d", id),
+					title,
+					description.String,
+					strconv.Itoa(projectId),
+					createdAt.Format(time.RFC3339),
+					updatedAt.Format(time.RFC3339),
+					status,
+				})
+			} else {
+				table.Append([]string{
+					fmt.Sprintf("%d", id),
+					title,
+					description.String,
+					strconv.Itoa(projectId),
+					createdAt.Format("02-01-2006"),
+					updatedAt.Format("02-01-2006"),
+					status,
+				})
+			}
+		}
+
+		table.Render()
+
+		if err := rows.Err(); err != nil {
+			fmt.Printf("Error iterating over rows: %v\n", err)
+		}
+	},
+}
+
 func init() {
 	lsCmdLong.Flags().BoolVarP(&fullDate, "Full-Date", "D", false, "Return the dates as full timestamps")
 	getCmdLong.Flags().BoolVarP(&fullDate, "Full-Date", "D", false, "Return the dates as full timestamps")
+	getCmdLong.Flags().BoolVarP(&allTodos, "All-Todos", "A", false, "Return all todo's regardless of project")
 
 	rootCmd.AddCommand(getCmd)
 	rootCmd.AddCommand(lsCmd)
 	rootCmd.AddCommand(getCmdLong)
 	rootCmd.AddCommand(lsCmdLong)
+	rootCmd.AddCommand(lslCmdLong)
 }
