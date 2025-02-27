@@ -26,7 +26,7 @@ var getCmd = &cobra.Command{
 
 		rows, err := GetTodosForFilepath()
 		if err != nil {
-			fmt.Printf("%v", err)
+			fmt.Printf("%v.\n", err)
 			return
 		}
 
@@ -162,7 +162,10 @@ var lsCmd = &cobra.Command{
 
 		rows, err := GetTodosForFilepath()
 		if err != nil {
-			fmt.Printf("%v", err)
+			if err.Error() == "operation cancelled by user" {
+				return
+			}
+			fmt.Printf("%v\n", err)
 			return
 		}
 
