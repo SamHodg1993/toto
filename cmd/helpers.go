@@ -34,8 +34,8 @@ func GetProjectIdByFilepath() (int, error) {
 
 	err = row.Scan(&projectId)
 	if err != nil {
-		fmt.Printf("%v", err)
-		return 0, err
+
+		return 0, fmt.Errorf("No project exists for this filepath")
 	}
 
 	return projectId, nil
@@ -54,23 +54,12 @@ func GetTodosForFilepath() (*sql.Rows, error) {
 
 	err = row.Scan(&projectId)
 	if err != nil {
-		var cancel string
-		fmt.Println(`There is currently no project for this filepath. 
-			Would you like to 
-			0 - Cancel 
-			1 - Add to the global todo list? 
-			OR 
-			2 - Create a new project for this filepath?`)
-		fmt.Scanf("%s", &cancel)
-		if cancel == "1" {
-			projectId = 1
-			err = nil
-		} else if cancel == "2" {
-			AddNewProject_WITH_PROMPT()
-			return GetTodosForFilepath()
-		} else {
-			fmt.Println("Aborting.")
-			return nil, fmt.Errorf("operation cancelled by user")
+		choice, err := HandleNoExistingProject()
+		if err != nil {
+			return nil, err
+		}
+		if choice == 2 {
+			GetTodosForFilepath()
 		}
 	}
 
@@ -273,4 +262,59 @@ func DeleteProject(id int) error {
 
 	fmt.Printf("Project with ID %d and all associated todos deleted successfully.\n", id)
 	return nil
+}
+
+func HandleNoExistingProject() (int, error) {
+	// Return choice so that we can handle the option on other side of the function easier. This can then be used in add.go too!
+	var cancel string
+
+	fmt.Println(`There is currently no project for this filepath. 
+			Would you like to 
+			0 - Cancel 
+			1 - Add to the global todo list? 
+			OR 
+			2 - Create a new project for this filepath?`)
+	fmt.Scanf("%s", &cancel)
+	if cancel == "1" {
+		return 1, nil
+	} else if cancel == "2" {
+		return 2, nil
+	} else {
+		fmt.Println("Aborting.")
+		return 0, fmt.Errorf("operation cancelled by user")
+	}
+}
+
+func HandleAddNewProject(projectTitle string, projectDescription string) {
+	var project models.NewProject
+	var reader = bufio.NewReader(os.Stdin)
+
+	if projectTitle == "" {
+		fmt.Println("Please enter the title of your new project...")
+		projectTitle, _ := reader.ReadString('\n')
+		project.Title = strings.TrimSpace(projectTitle)
+	} else {
+		project.Title = projectTitle
+	}
+
+	if projectDescription == "" {
+		fmt.Println("Please enter the description of your new project...")
+		projectDescription, _ := reader.ReadString('\n')
+		project.Description = strings.TrimSpace(projectDescription)
+	} else {
+		project.Description = projectDescription
+	}
+
+	currentDir, err := os.Getwd()
+	if err != nil {
+		fmt.Printf("Error getting current directory: %v\n", err)
+		return
+	}
+	// Set the filepath
+	project.Filepath = currentDir
+
+	// Add the new project
+	AddNewProject(project)
+
+	fmt.Printf("New project added: %s\n", projectTitle)
 }

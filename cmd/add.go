@@ -2,7 +2,6 @@ package cmd
 
 import (
 	"fmt"
-	"os"
 	"time"
 
 	"github.com/spf13/cobra"
@@ -32,13 +31,41 @@ var addCmd = &cobra.Command{
 		updatedAt := time.Now()
 		releventProject := 1
 
-		currentDir, err := os.Getwd()
-		if err != nil {
-			fmt.Printf("Error getting current directory: %v\n", err)
-			return
-		}
+		// Does this directory have a project?
+		if todoProjectId != 0 {
+			releventProject = todoProjectId
+		} else {
 
-		fmt.Printf("Working dir: %s", currentDir)
+			row, err := GetProjectIdByFilepath()
+			if err.Error() == "No project exists for this filepath" {
+				if row == 0 {
+					choice, err := HandleNoExistingProject()
+					if err != nil {
+						fmt.Printf("%v.\n", err)
+					}
+
+					switch choice {
+					case 0:
+						return // User has aborted
+					case 1:
+						releventProject = 1 // This is the global project
+					case 2:
+						// Create new project and get its ID
+						HandleAddNewProject("", "")
+						row, err := GetProjectIdByFilepath()
+						if err != nil {
+							fmt.Printf("Error getting project ID: %v\n", err)
+							return
+						}
+						releventProject = row
+					}
+				}
+			} else if err != nil {
+				return
+			} else {
+				releventProject = row
+			}
+		}
 
 		// If created at flag has value, update the created at value
 		if todoCreatedAt != "" {
@@ -46,18 +73,6 @@ var addCmd = &cobra.Command{
 			if err == nil {
 				createdAt = parsed
 			}
-		}
-
-		// If project id flag has value, update the projectId
-		if todoProjectId != 0 {
-			releventProject = todoProjectId
-		} else {
-			directoryProject, err := GetProjectIdByFilepath()
-			if err != nil {
-				fmt.Printf("%v.\n", err)
-				return
-			}
-			releventProject = directoryProject
 		}
 
 		// If updated at flag has value, update the created at value
@@ -69,7 +84,7 @@ var addCmd = &cobra.Command{
 		}
 
 		// Update the todo
-		_, err = Database.Exec(sql_insert_todo, todoTitle, todoDescription, createdAt, updatedAt, releventProject)
+		_, err := Database.Exec(sql_insert_todo, todoTitle, todoDescription, createdAt, updatedAt, releventProject)
 		if err != nil {
 			fmt.Printf("There was an error adding the todo: %v\n", err)
 			return

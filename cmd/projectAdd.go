@@ -1,11 +1,6 @@
 package cmd
 
 import (
-	"fmt"
-	"os"
-
-	"github.com/samhodg1993/todo-cli/models"
-
 	"github.com/spf13/cobra"
 )
 
@@ -21,24 +16,7 @@ var projectAddCmd = &cobra.Command{
 	Long:  "Add a new project to the list of stored projects.",
 	Args:  cobra.NoArgs,
 	Run: func(cmd *cobra.Command, args []string) {
-		var project models.NewProject
-
-		// Set the project details
-		project.Title = projectTitle
-		project.Description = projectDescription
-
-		currentDir, err := os.Getwd()
-		if err != nil {
-			fmt.Printf("Error getting current directory: %v\n", err)
-			return
-		}
-		// Set the filepath
-		project.Filepath = currentDir
-
-		// Add the new project
-		AddNewProject(project)
-
-		fmt.Printf("New project added: %s\n", projectTitle)
+		HandleAddNewProject(projectTitle, projectDescription)
 	},
 }
 
@@ -48,29 +26,7 @@ var projAddCmd = &cobra.Command{
 	Long:  "Add a new project to the list of stored projects.",
 	Args:  cobra.NoArgs,
 	Run: func(cmd *cobra.Command, args []string) {
-		var project models.NewProject
-
-		// Set the project details
-		project.Title = projectTitle
-		project.Description = projectDescription
-
-		// Get the current working directory
-		currentDir, err := os.Getwd()
-		if err != nil {
-			fmt.Printf("Error getting current directory: %v\n", err)
-			return
-		}
-
-		// Set the project filepath
-		if projectFilepath == "" {
-			project.Filepath = currentDir
-			fmt.Printf("Filepath not provided defaulting to working directory: %s\n", currentDir)
-		} else {
-			project.Filepath = projectFilepath
-		}
-
-		// Add the project
-		AddNewProject(project)
+		HandleAddNewProject(projectTitle, projectDescription)
 	},
 }
 
