@@ -1,8 +1,8 @@
 package projects
 
 import (
-	"github.com/samhodg1993/todo-cli/cmd"
-	"github.com/samhodg1993/todo-cli/internal/projects"
+	"github.com/samhodg1993/toto-todo-cli/cmd"
+	"github.com/samhodg1993/toto-todo-cli/internal/projects"
 
 	"github.com/spf13/cobra"
 )
