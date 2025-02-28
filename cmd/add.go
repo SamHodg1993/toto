@@ -37,7 +37,7 @@ var addCmd = &cobra.Command{
 		} else {
 
 			row, err := GetProjectIdByFilepath()
-			if err.Error() == "No project exists for this filepath" {
+			if err != nil {
 				if row == 0 {
 					choice, err := HandleNoExistingProject()
 					if err != nil {
@@ -60,8 +60,6 @@ var addCmd = &cobra.Command{
 						releventProject = row
 					}
 				}
-			} else if err != nil {
-				return
 			} else {
 				releventProject = row
 			}
