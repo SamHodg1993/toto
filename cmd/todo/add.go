@@ -1,8 +1,11 @@
-package cmd
+package todo
 
 import (
 	"fmt"
 	"time"
+
+	"github.com/samhodg1993/todo-cli/cmd"
+	"github.com/samhodg1993/todo-cli/internal/projects"
 
 	"github.com/spf13/cobra"
 )
@@ -36,10 +39,10 @@ var addCmd = &cobra.Command{
 			releventProject = todoProjectId
 		} else {
 
-			row, err := GetProjectIdByFilepath()
+			row, err := projects.GetProjectIdByFilepath()
 			if err != nil {
 				if row == 0 {
-					choice, err := HandleNoExistingProject()
+					choice, err := projects.HandleNoExistingProject()
 					if err != nil {
 						fmt.Printf("%v.\n", err)
 					}
@@ -51,8 +54,8 @@ var addCmd = &cobra.Command{
 						releventProject = 1 // This is the global project
 					case 2:
 						// Create new project and get its ID
-						HandleAddNewProject("", "")
-						row, err := GetProjectIdByFilepath()
+						projects.HandleAddNewProject("", "")
+						row, err := projects.GetProjectIdByFilepath()
 						if err != nil {
 							fmt.Printf("Error getting project ID: %v\n", err)
 							return
@@ -100,5 +103,5 @@ func init() {
 
 	addCmd.MarkFlagRequired("title")
 
-	rootCmd.AddCommand(addCmd)
+	cmd.RootCmd.AddCommand(addCmd)
 }

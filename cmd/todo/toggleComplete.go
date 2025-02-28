@@ -1,9 +1,11 @@
-package cmd
+package todo
 
 import (
 	"fmt"
 
 	"database/sql"
+
+	"github.com/samhodg1993/todo-cli/cmd"
 
 	"github.com/spf13/cobra"
 )
@@ -86,6 +88,6 @@ var toggleComp = &cobra.Command{
 }
 
 func init() {
-	rootCmd.AddCommand(toggleComplete)
-	rootCmd.AddCommand(toggleComp)
+	cmd.RootCmd.AddCommand(toggleComplete)
+	cmd.RootCmd.AddCommand(toggleComp)
 }

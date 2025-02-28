@@ -1,8 +1,11 @@
-package cmd
+package projects
 
 import (
 	"fmt"
 	"strconv"
+
+	"github.com/samhodg1993/todo-cli/cmd"
+	"github.com/samhodg1993/todo-cli/internal/projects"
 
 	"github.com/spf13/cobra"
 )
@@ -22,7 +25,7 @@ var deleteProject = &cobra.Command{
 			return
 		}
 
-		DeleteProject(projectId)
+		projects.DeleteProject(projectId)
 
 		fmt.Printf("Project with id: %v deleted successfully.\n", id)
 	},
@@ -42,7 +45,7 @@ var delProj = &cobra.Command{
 			return
 		}
 
-		err = DeleteProject(projectId)
+		err = projects.DeleteProject(projectId)
 		if err != nil {
 			fmt.Printf("%v", err)
 		}
@@ -50,6 +53,6 @@ var delProj = &cobra.Command{
 }
 
 func init() {
-	rootCmd.AddCommand(deleteProject)
-	rootCmd.AddCommand(delProj)
+	cmd.RootCmd.AddCommand(deleteProject)
+	cmd.RootCmd.AddCommand(delProj)
 }

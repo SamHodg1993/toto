@@ -1,4 +1,4 @@
-package cmd
+package todo
 
 import (
 	"database/sql"
@@ -6,6 +6,9 @@ import (
 	"os"
 	"strconv"
 	"time"
+
+	"github.com/samhodg1993/todo-cli/cmd"
+	"github.com/samhodg1993/todo-cli/internal/todo"
 
 	"github.com/fatih/color"
 	"github.com/olekukonko/tablewriter"
@@ -25,7 +28,7 @@ var getCmd = &cobra.Command{
 	Args:  cobra.NoArgs,
 	Run: func(cmd *cobra.Command, args []string) {
 
-		rows, err := GetTodosForFilepath()
+		rows, err := todo.GetTodosForFilepath()
 		if err != nil {
 			fmt.Printf("%v.\n", err)
 			return
@@ -376,9 +379,9 @@ func init() {
 	getCmdLong.Flags().BoolVarP(&fullDate, "Full-Date", "D", false, "Return the dates as full timestamps")
 	getCmdLong.Flags().BoolVarP(&allTodos, "All-Todos", "A", false, "Return all todo's regardless of project")
 
-	rootCmd.AddCommand(getCmd)
-	rootCmd.AddCommand(lsCmd)
-	rootCmd.AddCommand(getCmdLong)
-	rootCmd.AddCommand(lsCmdLong)
-	rootCmd.AddCommand(lslCmdLong)
+	cmd.RootCmd.AddCommand(getCmd)
+	cmd.RootCmd.AddCommand(lsCmd)
+	cmd.RootCmd.AddCommand(getCmdLong)
+	cmd.RootCmd.AddCommand(lsCmdLong)
+	cmd.RootCmd.AddCommand(lslCmdLong)
 }

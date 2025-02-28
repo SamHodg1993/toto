@@ -1,6 +1,9 @@
-package cmd
+package projects
 
 import (
+	"github.com/samhodg1993/todo-cli/cmd"
+	"github.com/samhodg1993/todo-cli/internal/projects"
+
 	"github.com/spf13/cobra"
 )
 
@@ -16,7 +19,7 @@ var projectAddCmd = &cobra.Command{
 	Long:  "Add a new project to the list of stored projects.",
 	Args:  cobra.NoArgs,
 	Run: func(cmd *cobra.Command, args []string) {
-		HandleAddNewProject(projectTitle, projectDescription)
+		projects.HandleAddNewProject(projectTitle, projectDescription)
 	},
 }
 
@@ -26,7 +29,7 @@ var projAddCmd = &cobra.Command{
 	Long:  "Add a new project to the list of stored projects.",
 	Args:  cobra.NoArgs,
 	Run: func(cmd *cobra.Command, args []string) {
-		HandleAddNewProject(projectTitle, projectDescription)
+		projects.HandleAddNewProject(projectTitle, projectDescription)
 	},
 }
 
@@ -42,6 +45,6 @@ func init() {
 	projectAddCmd.MarkFlagRequired("title")
 	projAddCmd.MarkFlagRequired("title")
 
-	rootCmd.AddCommand(projectAddCmd)
-	rootCmd.AddCommand(projAddCmd)
+	cmd.RootCmd.AddCommand(projectAddCmd)
+	cmd.RootCmd.AddCommand(projAddCmd)
 }

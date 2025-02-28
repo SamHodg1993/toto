@@ -1,9 +1,11 @@
-package cmd
+package projects
 
 import (
 	"database/sql"
 	"fmt"
 	"time"
+
+	"github.com/samhodg1993/todo-cli/cmd"
 
 	"github.com/spf13/cobra"
 )
@@ -110,5 +112,5 @@ func init() {
 
 	editProject.MarkFlagRequired("id")
 
-	rootCmd.AddCommand(editProject)
+	cmd.RootCmd.AddCommand(editProject)
 }

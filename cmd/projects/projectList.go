@@ -1,8 +1,10 @@
-package cmd
+package projects
 
 import (
 	"fmt"
 	"os"
+
+	"github.com/samhodg1993/todo-cli/cmd"
 
 	"github.com/fatih/color"
 	"github.com/olekukonko/tablewriter"
@@ -132,6 +134,6 @@ var projectListCmd = &cobra.Command{
 }
 
 func init() {
-	rootCmd.AddCommand(projectLsCmd)
-	rootCmd.AddCommand(projectListCmd)
+	cmd.RootCmd.AddCommand(projectLsCmd)
+	cmd.RootCmd.AddCommand(projectListCmd)
 }

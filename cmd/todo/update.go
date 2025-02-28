@@ -1,10 +1,12 @@
-package cmd
+package todo
 
 import (
 	"fmt"
 	"time"
 
 	"database/sql"
+
+	"github.com/samhodg1993/todo-cli/cmd"
 
 	"github.com/spf13/cobra"
 )
@@ -96,5 +98,5 @@ func init() {
 
 	editTodo.MarkFlagRequired("id")
 
-	rootCmd.AddCommand(editTodo)
+	cmd.RootCmd.AddCommand(editTodo)
 }

@@ -1,7 +1,9 @@
-package cmd
+package todo
 
 import (
 	"fmt"
+
+	"github.com/samhodg1993/todo-cli/cmd"
 
 	"github.com/spf13/cobra"
 )
@@ -45,6 +47,6 @@ var delTodo = &cobra.Command{
 }
 
 func init() {
-	rootCmd.AddCommand(deleteTodo)
-	rootCmd.AddCommand(delTodo)
+	cmd.RootCmd.AddCommand(deleteTodo)
+	cmd.RootCmd.AddCommand(delTodo)
 }
