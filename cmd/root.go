@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/samhodg1993/todo-cli/db"
+	"github.com/samhodg1993/toto-todo-cli/internal/db"
 
 	"github.com/spf13/cobra"
 )

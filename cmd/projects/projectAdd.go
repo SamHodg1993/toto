@@ -2,7 +2,7 @@ package projects
 
 import (
 	"github.com/samhodg1993/toto-todo-cli/cmd"
-	"github.com/samhodg1993/toto-todo-cli/internal/projects"
+	"github.com/samhodg1993/toto-todo-cli/internal/service"
 
 	"github.com/spf13/cobra"
 )
@@ -19,7 +19,7 @@ var projectAddCmd = &cobra.Command{
 	Long:  "Add a new project to the list of stored projects.",
 	Args:  cobra.NoArgs,
 	Run: func(cmd *cobra.Command, args []string) {
-		projects.HandleAddNewProject(projectTitle, projectDescription)
+		service.HandleAddNewProject(projectTitle, projectDescription)
 	},
 }
 
@@ -29,7 +29,7 @@ var projAddCmd = &cobra.Command{
 	Long:  "Add a new project to the list of stored projects.",
 	Args:  cobra.NoArgs,
 	Run: func(cmd *cobra.Command, args []string) {
-		projects.HandleAddNewProject(projectTitle, projectDescription)
+		service.HandleAddNewProject(projectTitle, projectDescription)
 	},
 }
 

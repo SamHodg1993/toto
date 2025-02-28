@@ -5,7 +5,7 @@ import (
 
 	"database/sql"
 
-	"github.com/samhodg1993/todo-cli/cmd"
+	"github.com/samhodg1993/toto-todo-cli/cmd"
 
 	"github.com/spf13/cobra"
 )

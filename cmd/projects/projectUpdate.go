@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/samhodg1993/todo-cli/cmd"
+	"github.com/samhodg1993/toto-todo-cli/cmd"
 
 	"github.com/spf13/cobra"
 )
@@ -47,7 +47,7 @@ var editProject = &cobra.Command{
 			projectId          int
 			filepath           string
 		)
-		err := Database.QueryRow(sql_select_single_project_for_update, targetProjectId).Scan(&projectId, &projectTitle, &projectDescription, &filepath)
+		err := cmd.Database.QueryRow(sql_select_single_project_for_update, targetProjectId).Scan(&projectId, &projectTitle, &projectDescription, &filepath)
 		if err == sql.ErrNoRows {
 			fmt.Printf("There is no project with the id of %d.\n", targetProjectId)
 			return
@@ -79,7 +79,7 @@ var editProject = &cobra.Command{
 		}
 
 		// Update project
-		_, err = Database.Exec(sql_update_project, finalTitle, finalDesc, finalFilepath, time.Now(), targetProjectId)
+		_, err = cmd.Database.Exec(sql_update_project, finalTitle, finalDesc, finalFilepath, time.Now(), targetProjectId)
 		if err != nil {
 			fmt.Printf("Error updating project: %v\n", err)
 			return

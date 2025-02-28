@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/samhodg1993/todo-cli/cmd"
+	"github.com/samhodg1993/toto-todo-cli/cmd"
 
 	"github.com/fatih/color"
 	"github.com/olekukonko/tablewriter"
@@ -19,7 +19,7 @@ var projectLsCmd = &cobra.Command{
 	Long:  "Get a list of all the projects titles",
 	Args:  cobra.NoArgs,
 	Run: func(cmd *cobra.Command, args []string) {
-		rows, err := Database.Query(sql_get_projects)
+		rows, err := cmd.Database.Query(sql_get_projects)
 		if err != nil {
 			fmt.Printf("There was an error getting the project's from the database: %v\n", err)
 			return

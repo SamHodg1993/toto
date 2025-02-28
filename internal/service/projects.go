@@ -7,8 +7,8 @@ import (
 	"strings"
 	"time"
 
-	"github.com/samhodg1993/todo-cli/cmd"
-	"github.com/samhodg1993/todo-cli/internal/models"
+	"github.com/samhodg1993/toto-todo-cli/cmd"
+	"github.com/samhodg1993/toto-todo-cli/internal/models"
 )
 
 var sql_insert_project string = `

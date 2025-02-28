@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"strconv"
 
-	"github.com/samhodg1993/todo-cli/cmd"
-	"github.com/samhodg1993/todo-cli/internal/projects"
+	"github.com/samhodg1993/toto-todo-cli/cmd"
+	"github.com/samhodg1993/toto-todo-cli/internal/service"
 
 	"github.com/spf13/cobra"
 )
@@ -25,7 +25,7 @@ var deleteProject = &cobra.Command{
 			return
 		}
 
-		projects.DeleteProject(projectId)
+		service.DeleteProject(projectId)
 
 		fmt.Printf("Project with id: %v deleted successfully.\n", id)
 	},
@@ -45,7 +45,7 @@ var delProj = &cobra.Command{
 			return
 		}
 
-		err = projects.DeleteProject(projectId)
+		err = service.DeleteProject(projectId)
 		if err != nil {
 			fmt.Printf("%v", err)
 		}

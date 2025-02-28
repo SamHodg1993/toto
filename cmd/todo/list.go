@@ -7,8 +7,8 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/samhodg1993/todo-cli/cmd"
-	"github.com/samhodg1993/todo-cli/internal/todo"
+	"github.com/samhodg1993/toto-todo-cli/cmd"
+	"github.com/samhodg1993/toto-todo-cli/internal/service"
 
 	"github.com/fatih/color"
 	"github.com/olekukonko/tablewriter"
@@ -28,7 +28,7 @@ var getCmd = &cobra.Command{
 	Args:  cobra.NoArgs,
 	Run: func(cmd *cobra.Command, args []string) {
 
-		rows, err := todo.GetTodosForFilepath()
+		rows, err := service.GetTodosForFilepath()
 		if err != nil {
 			fmt.Printf("%v.\n", err)
 			return
@@ -89,9 +89,9 @@ var getCmdLong = &cobra.Command{
 		var err error
 
 		if allTodos {
-			rows, err = GetAllTodos_LONG()
+			rows, err = service.GetAllTodos_LONG()
 		} else {
-			rows, err = GetTodosForFilepath_LONG()
+			rows, err = service.GetTodosForFilepath_LONG()
 		}
 
 		if err != nil {
@@ -164,7 +164,7 @@ var lsCmd = &cobra.Command{
 	Args:  cobra.NoArgs,
 	Run: func(cmd *cobra.Command, args []string) {
 
-		rows, err := GetTodosForFilepath()
+		rows, err := service.GetTodosForFilepath()
 		if err != nil {
 			if err.Error() == "operation cancelled by user" {
 				return
@@ -225,7 +225,7 @@ var lsCmdLong = &cobra.Command{
 	Args:  cobra.NoArgs,
 	Run: func(cmd *cobra.Command, args []string) {
 
-		rows, err := GetTodosForFilepath_LONG()
+		rows, err := service.GetTodosForFilepath_LONG()
 		if err != nil {
 			fmt.Printf("%v.\n", err)
 			return
@@ -303,7 +303,7 @@ var lslCmdLong = &cobra.Command{
 	Args:  cobra.NoArgs,
 	Run: func(cmd *cobra.Command, args []string) {
 
-		rows, err := GetAllTodos_LONG()
+		rows, err := service.GetAllTodos_LONG()
 		if err != nil {
 			fmt.Printf("%v.\n", err)
 			return
