@@ -4,8 +4,7 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/samhodg1993/toto-todo-cli/cmd"
-	"github.com/samhodg1993/toto-todo-cli/internal/service"
+	"github.com/samhodg1993/toto-todo-cli/cmd/projects"
 
 	"github.com/spf13/cobra"
 )
@@ -20,7 +19,7 @@ var (
 	todoProjectId   int
 )
 
-var addCmd = &cobra.Command{
+var AddCmd = &cobra.Command{
 	Use:   "add [todo]",
 	Short: "Add a new todo",
 	Long:  "Add a new todo to the list of stored todos",
@@ -39,10 +38,10 @@ var addCmd = &cobra.Command{
 			releventProject = todoProjectId
 		} else {
 
-			row, err := service.GetProjectIdByFilepath()
+			row, err := projects.ProjectService.GetProjectIdByFilepath()
 			if err != nil {
 				if row == 0 {
-					choice, err := service.HandleNoExistingProject()
+					choice, err := projects.ProjectService.HandleNoExistingProject()
 					if err != nil {
 						fmt.Printf("%v.\n", err)
 					}
@@ -54,8 +53,8 @@ var addCmd = &cobra.Command{
 						releventProject = 1 // This is the global project
 					case 2:
 						// Create new project and get its ID
-						service.HandleAddNewProject("", "")
-						row, err := service.GetProjectIdByFilepath()
+						projects.ProjectService.HandleAddNewProject("", "")
+						row, err := projects.ProjectService.GetProjectIdByFilepath()
 						if err != nil {
 							fmt.Printf("Error getting project ID: %v\n", err)
 							return
@@ -85,7 +84,7 @@ var addCmd = &cobra.Command{
 		}
 
 		// Update the todo
-		_, err := Database.Exec(sql_insert_todo, todoTitle, todoDescription, createdAt, updatedAt, releventProject)
+		err := TodoService.AddTodo(todoTitle, todoDescription, releventProject, createdAt, updatedAt)
 		if err != nil {
 			fmt.Printf("There was an error adding the todo: %v\n", err)
 			return
@@ -95,13 +94,11 @@ var addCmd = &cobra.Command{
 }
 
 func init() {
-	addCmd.PersistentFlags().StringVarP(&todoTitle, "title", "t", "", "Title of the todo")
-	addCmd.PersistentFlags().StringVarP(&todoDescription, "description", "d", "", "Description of the todo")
-	addCmd.PersistentFlags().StringVarP(&todoCreatedAt, "created-at", "c", "", "Todo creation time")
-	addCmd.PersistentFlags().StringVarP(&todoUpdatedAt, "updated-at", "u", "", "Todo last updated time")
-	addCmd.PersistentFlags().IntVarP(&todoProjectId, "project-id", "p", 0, "Relevent Project Id")
+	AddCmd.PersistentFlags().StringVarP(&todoTitle, "title", "t", "", "Title of the todo")
+	AddCmd.PersistentFlags().StringVarP(&todoDescription, "description", "d", "", "Description of the todo")
+	AddCmd.PersistentFlags().StringVarP(&todoCreatedAt, "created-at", "c", "", "Todo creation time")
+	AddCmd.PersistentFlags().StringVarP(&todoUpdatedAt, "updated-at", "u", "", "Todo last updated time")
+	AddCmd.PersistentFlags().IntVarP(&todoProjectId, "project-id", "p", 0, "Relevent Project Id")
 
-	addCmd.MarkFlagRequired("title")
-
-	cmd.RootCmd.AddCommand(addCmd)
+	AddCmd.MarkFlagRequired("title")
 }

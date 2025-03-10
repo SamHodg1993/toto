@@ -4,8 +4,6 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/samhodg1993/toto-todo-cli/cmd"
-
 	"github.com/fatih/color"
 	"github.com/olekukonko/tablewriter"
 	"github.com/spf13/cobra"
@@ -13,13 +11,13 @@ import (
 
 var sql_get_projects string = "SELECT id, title, filepath, archived FROM projects"
 
-var projectLsCmd = &cobra.Command{
+var ProjectLsCmd = &cobra.Command{
 	Use:   "proj-ls",
 	Short: "List project's",
 	Long:  "Get a list of all the projects titles",
 	Args:  cobra.NoArgs,
 	Run: func(cmd *cobra.Command, args []string) {
-		rows, err := cmd.Database.Query(sql_get_projects)
+		rows, err := ProjectService.ListProjects()
 		if err != nil {
 			fmt.Printf("There was an error getting the project's from the database: %v\n", err)
 			return
@@ -73,13 +71,13 @@ var projectLsCmd = &cobra.Command{
 	},
 }
 
-var projectListCmd = &cobra.Command{
+var ProjectListCmd = &cobra.Command{
 	Use:   "project-list",
 	Short: "List project's",
 	Long:  "Get a list of all the projects titles",
 	Args:  cobra.NoArgs,
 	Run: func(cmd *cobra.Command, args []string) {
-		rows, err := Database.Query(sql_get_projects)
+		rows, err := ProjectService.ListProjects()
 		if err != nil {
 			fmt.Printf("There was an error getting the project's from the database: %v\n", err)
 			return
@@ -131,9 +129,4 @@ var projectListCmd = &cobra.Command{
 			fmt.Printf("Error iterating over rows: %v\n", err)
 		}
 	},
-}
-
-func init() {
-	cmd.RootCmd.AddCommand(projectLsCmd)
-	cmd.RootCmd.AddCommand(projectListCmd)
 }

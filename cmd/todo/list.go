@@ -7,28 +7,23 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/samhodg1993/toto-todo-cli/cmd"
-	"github.com/samhodg1993/toto-todo-cli/internal/service"
-
 	"github.com/fatih/color"
 	"github.com/olekukonko/tablewriter"
 	"github.com/spf13/cobra"
 )
 
-var sql_get_todos string = "SELECT id, title, completed FROM todos"
-var sql_get_todos_LONG string = "SELECT id, title, description, project_id, created_at, updated_at, completed FROM todos"
-
 var fullDate bool = false
 var allTodos bool = false
 
-var getCmd = &cobra.Command{
+var GetCmd = &cobra.Command{
 	Use:   "list",
 	Short: "List todo's for current project",
 	Long:  "Get a list of all the todo's for the current project (defined by the current directory).",
 	Args:  cobra.NoArgs,
 	Run: func(cmd *cobra.Command, args []string) {
 
-		rows, err := service.GetTodosForFilepath()
+		// rows, err := service.GetTodosForFilepath()
+		rows, err := TodoService.GetTodosForFilepath()
 		if err != nil {
 			fmt.Printf("%v.\n", err)
 			return
@@ -79,7 +74,7 @@ var getCmd = &cobra.Command{
 	},
 }
 
-var getCmdLong = &cobra.Command{
+var GetCmdLong = &cobra.Command{
 	Use:   "list-long",
 	Short: "List todo's with more data for the current project.",
 	Long:  "Get a more detailed list of all the todo's for the current project (defined by the current directory)",
@@ -89,9 +84,9 @@ var getCmdLong = &cobra.Command{
 		var err error
 
 		if allTodos {
-			rows, err = service.GetAllTodos_LONG()
+			rows, err = TodoService.GetAllTodos_LONG()
 		} else {
-			rows, err = service.GetTodosForFilepath_LONG()
+			rows, err = TodoService.GetTodosForFilepath_LONG()
 		}
 
 		if err != nil {
@@ -157,14 +152,14 @@ var getCmdLong = &cobra.Command{
 	},
 }
 
-var lsCmd = &cobra.Command{
+var LsCmd = &cobra.Command{
 	Use:   "ls",
 	Short: "List outstanding todo's",
 	Long:  "Get a list of all the todo titles that are outstanding",
 	Args:  cobra.NoArgs,
 	Run: func(cmd *cobra.Command, args []string) {
 
-		rows, err := service.GetTodosForFilepath()
+		rows, err := TodoService.GetTodosForFilepath()
 		if err != nil {
 			if err.Error() == "operation cancelled by user" {
 				return
@@ -218,14 +213,14 @@ var lsCmd = &cobra.Command{
 	},
 }
 
-var lsCmdLong = &cobra.Command{
+var LsCmdLong = &cobra.Command{
 	Use:   "lsl",
 	Short: "List todo's with more data",
 	Long:  "Get a more detailed list of all the todo's for the current project (defined by the current directory)",
 	Args:  cobra.NoArgs,
 	Run: func(cmd *cobra.Command, args []string) {
 
-		rows, err := service.GetTodosForFilepath_LONG()
+		rows, err := TodoService.GetTodosForFilepath_LONG()
 		if err != nil {
 			fmt.Printf("%v.\n", err)
 			return
@@ -296,14 +291,14 @@ var lsCmdLong = &cobra.Command{
 	},
 }
 
-var lslCmdLong = &cobra.Command{
+var LslCmdLong = &cobra.Command{
 	Use:   "lsla",
 	Short: "List todo's with more data regardless of project",
 	Long:  "Get a more detailed list of all the todo's for all projects",
 	Args:  cobra.NoArgs,
 	Run: func(cmd *cobra.Command, args []string) {
 
-		rows, err := service.GetAllTodos_LONG()
+		rows, err := TodoService.GetAllTodos_LONG()
 		if err != nil {
 			fmt.Printf("%v.\n", err)
 			return
@@ -375,13 +370,7 @@ var lslCmdLong = &cobra.Command{
 }
 
 func init() {
-	lsCmdLong.Flags().BoolVarP(&fullDate, "Full-Date", "D", false, "Return the dates as full timestamps")
-	getCmdLong.Flags().BoolVarP(&fullDate, "Full-Date", "D", false, "Return the dates as full timestamps")
-	getCmdLong.Flags().BoolVarP(&allTodos, "All-Todos", "A", false, "Return all todo's regardless of project")
-
-	cmd.RootCmd.AddCommand(getCmd)
-	cmd.RootCmd.AddCommand(lsCmd)
-	cmd.RootCmd.AddCommand(getCmdLong)
-	cmd.RootCmd.AddCommand(lsCmdLong)
-	cmd.RootCmd.AddCommand(lslCmdLong)
+	LsCmdLong.Flags().BoolVarP(&fullDate, "Full-Date", "D", false, "Return the dates as full timestamps")
+	GetCmdLong.Flags().BoolVarP(&fullDate, "Full-Date", "D", false, "Return the dates as full timestamps")
+	GetCmdLong.Flags().BoolVarP(&allTodos, "All-Todos", "A", false, "Return all todo's regardless of project")
 }

@@ -3,14 +3,12 @@ package todo
 import (
 	"fmt"
 
-	"github.com/samhodg1993/toto-todo-cli/cmd"
-
 	"github.com/spf13/cobra"
 )
 
 var sql_delete_todos string = "DELETE FROM todos WHERE id = ?"
 
-var deleteTodo = &cobra.Command{
+var DeleteTodo = &cobra.Command{
 	Use:   "delete",
 	Short: "Delete a todo",
 	Long:  "Delete a single todo from the database by referencing the todo id",
@@ -18,7 +16,7 @@ var deleteTodo = &cobra.Command{
 	Run: func(cmd *cobra.Command, args []string) {
 		id := args[0]
 
-		_, err := Database.Exec(sql_delete_todos, id)
+		err := TodoService.DeleteTodo(id)
 		if err != nil {
 			fmt.Printf("There was an error deleting the todo from the database: %v.\n", err)
 			return
@@ -28,7 +26,7 @@ var deleteTodo = &cobra.Command{
 	},
 }
 
-var delTodo = &cobra.Command{
+var DelTodo = &cobra.Command{
 	Use:   "del",
 	Short: "Delete a todo",
 	Long:  "Delete a single todo from the database by referencing the todo id",
@@ -36,7 +34,7 @@ var delTodo = &cobra.Command{
 	Run: func(cmd *cobra.Command, args []string) {
 		id := args[0]
 
-		_, err := Database.Exec(sql_delete_todos, id)
+		err := TodoService.DeleteTodo(id)
 		if err != nil {
 			fmt.Printf("There was an error deleting the todo from the database: %v.\n", err)
 			return
@@ -44,9 +42,4 @@ var delTodo = &cobra.Command{
 
 		fmt.Printf("Todo with id: %v deleted successfully.\n", id)
 	},
-}
-
-func init() {
-	cmd.RootCmd.AddCommand(deleteTodo)
-	cmd.RootCmd.AddCommand(delTodo)
 }

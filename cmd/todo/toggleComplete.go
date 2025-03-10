@@ -2,92 +2,54 @@ package todo
 
 import (
 	"fmt"
-
-	"database/sql"
-
-	"github.com/samhodg1993/toto-todo-cli/cmd"
-
 	"github.com/spf13/cobra"
 )
 
 var sql_select_single_todo string = "SELECT id, completed FROM todos WHERE id = ?"
 var sql_toggle_complete string = "UPDATE todos SET completed = ? WHERE id = ?"
 
-var toggleComplete = &cobra.Command{
+var ToggleComplete = &cobra.Command{
 	Use:   "toggle-complete",
 	Short: "Toggle a todo's status between complete and pending.",
 	Long:  "Toggle an exising todo's status between complete and pending.",
 	Args:  cobra.ExactArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {
 		id := args[0]
-		completed := false
 
-		// Query the current status
-		err := Database.QueryRow(sql_select_single_todo, id).Scan(&id, &completed)
-		if err == sql.ErrNoRows {
-			fmt.Printf("There is no todo with the id of %s\n", id)
-			return
-		}
+		newStatus, err := TodoService.ToggleComplete(id)
 		if err != nil {
-			fmt.Printf("Error querying todo: %v\n", err)
+			fmt.Printf("Error: %v\n", err)
 			return
 		}
 
-		// Toggle the status
-		newStatus := !completed
-
-		// Update the todo
-		result, err := Database.Exec(sql_toggle_complete, newStatus, id)
-		if err != nil {
-			fmt.Printf("There was an error updating the todo in the database: %v\n", err)
-			return
+		statusText := "incomplete"
+		if newStatus {
+			statusText = "complete"
 		}
 
-		rowsAffected, _ := result.RowsAffected()
-		if rowsAffected > 0 {
-			fmt.Printf("Todo with id: %s status updated successfully\n", id)
-		}
+		fmt.Printf("Todo with id: %s status updated successfully to %s\n", id, statusText)
 	},
 }
 
-var toggleComp = &cobra.Command{
+var ToggleComp = &cobra.Command{
 	Use:   "comp",
 	Short: "Toggle a todo's status between complete and pending.",
 	Long:  "Toggle an exising todo's status between complete and pending.",
 	Args:  cobra.ExactArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {
 		id := args[0]
-		completed := false
 
-		// Query the current status
-		err := Database.QueryRow(sql_select_single_todo, id).Scan(&id, &completed)
-		if err == sql.ErrNoRows {
-			fmt.Printf("There is no todo with the id of %s\n", id)
-			return
-		}
+		newStatus, err := TodoService.ToggleComplete(id)
 		if err != nil {
-			fmt.Printf("Error querying todo: %v\n", err)
+			fmt.Printf("Error: %v\n", err)
 			return
 		}
 
-		// Toggle the status
-		newStatus := !completed
-
-		// Update the todo
-		result, err := Database.Exec(sql_toggle_complete, newStatus, id)
-		if err != nil {
-			fmt.Printf("There was an error updating the todo in the database: %v\n", err)
-			return
+		statusText := "incomplete"
+		if newStatus {
+			statusText = "complete"
 		}
 
-		rowsAffected, _ := result.RowsAffected()
-		if rowsAffected > 0 {
-			fmt.Printf("Todo with id: %s status updated successfully\n", id)
-		}
+		fmt.Printf("Todo with id: %s status updated successfully to %s\n", id, statusText)
 	},
-}
-
-func init() {
-	cmd.RootCmd.AddCommand(toggleComplete)
-	cmd.RootCmd.AddCommand(toggleComp)
 }

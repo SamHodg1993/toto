@@ -1,6 +1,7 @@
 package models
 
 import (
+	"database/sql"
 	"time"
 )
 
@@ -19,4 +20,8 @@ type NewProject struct {
 	Description string `db:"description" json:"description"`
 	Archived    bool   `db:"archived" json:"archived"`
 	Filepath    string `db:"filepath" json:"filepath"`
+}
+
+type ProjectService struct {
+	db *sql.DB
 }

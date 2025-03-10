@@ -2,12 +2,12 @@ package service
 
 import (
 	"bufio"
+	"database/sql"
 	"fmt"
 	"os"
 	"strings"
 	"time"
 
-	"github.com/samhodg1993/toto-todo-cli/cmd"
 	"github.com/samhodg1993/toto-todo-cli/internal/models"
 )
 
@@ -21,27 +21,40 @@ var sql_insert_project string = `
 		updated_at
 	) VALUES (?,?,?,?,?,?)`
 
-func GetProjectIdByFilepath() (int, error) {
+type ProjectService struct {
+	db *sql.DB
+}
+
+func NewProjectService(db *sql.DB) *ProjectService {
+	return &ProjectService{db: db}
+}
+
+// ListProjects returns all projects
+func (s *ProjectService) ListProjects() (*sql.Rows, error) {
+	return s.db.Query("SELECT id, title, filepath, archived FROM projects")
+}
+
+// GetProjectIdByFilepath returns the project ID for the current directory
+func (s *ProjectService) GetProjectIdByFilepath() (int, error) {
 	var projectId int = 0
 
 	currentDir, err := os.Getwd()
 	if err != nil {
-		fmt.Printf("%v\n", err)
-		return 0, err
+		return 0, fmt.Errorf("error getting current directory: %w", err)
 	}
 
-	row := cmd.Database.QueryRow("SELECT id FROM projects WHERE filepath = ?", currentDir)
+	row := s.db.QueryRow("SELECT id FROM projects WHERE filepath = ?", currentDir)
 
 	err = row.Scan(&projectId)
 	if err != nil {
-
-		return 0, fmt.Errorf("No project exists for this filepath")
+		return 0, fmt.Errorf("no project exists for this filepath")
 	}
 
 	return projectId, nil
 }
 
-func AddNewProject_WITH_PROMPT() {
+// AddNewProjectWithPrompt prompts the user for project details and adds the project
+func (s *ProjectService) AddNewProjectWithPrompt() error {
 	var (
 		project models.NewProject
 		reader  = bufio.NewReader(os.Stdin)
@@ -55,25 +68,24 @@ func AddNewProject_WITH_PROMPT() {
 	projectDescription, _ := reader.ReadString('\n')
 	project.Description = strings.TrimSpace(projectDescription)
 
-	AddNewProject(project)
+	return s.AddNewProject(project)
 }
 
-func AddNewProject(project models.NewProject) {
+// AddNewProject adds a new project to the database
+func (s *ProjectService) AddNewProject(project models.NewProject) error {
 	if strings.TrimSpace(project.Title) == "" {
-		fmt.Println("Project title cannot be empty")
-		return
+		return fmt.Errorf("project title cannot be empty")
 	}
 
 	if strings.TrimSpace(project.Filepath) == "" {
 		currentDir, err := os.Getwd()
 		if err != nil {
-			fmt.Printf("Error getting current directory: %v\n", err)
-			return
+			return fmt.Errorf("error getting current directory: %w", err)
 		}
 		project.Filepath = currentDir
 	}
 
-	_, err := cmd.Database.Exec(
+	_, err := s.db.Exec(
 		sql_insert_project,
 		project.Title,
 		project.Description,
@@ -83,46 +95,47 @@ func AddNewProject(project models.NewProject) {
 		time.Now(),
 	)
 	if err != nil {
-		fmt.Printf("There was an error adding the project: %v\n", err)
-		return
+		return fmt.Errorf("error adding project: %w", err)
 	}
-	fmt.Printf("New project added: %s.\n", project.Title)
+
+	return nil
 }
 
-func DeleteProject(id int) error {
+// DeleteProject deletes a project and its associated todos
+func (s *ProjectService) DeleteProject(id int) error {
 	if id <= 0 {
 		return fmt.Errorf("invalid project id")
 	}
 
 	if id == 1 {
-		return fmt.Errorf("Please do not remove the global project. Other functionality relies upon it. A fix to this is in the roadmap, but for right now, please allow the global project to remain.\n")
+		return fmt.Errorf("cannot remove the global project as other functionality depends on it")
 	}
 
 	// Start a transaction to make sure no queries error out
-	tx, err := cmd.Database.Begin()
+	tx, err := s.db.Begin()
 	if err != nil {
-		return fmt.Errorf("failed to begin transaction: %v", err)
+		return fmt.Errorf("failed to begin transaction: %w", err)
 	}
 
 	// Delete todos
-	result, err := tx.Exec("DELETE FROM todos WHERE project_id = ?", id)
+	_, err = tx.Exec("DELETE FROM todos WHERE project_id = ?", id)
 	if err != nil {
 		tx.Rollback()
-		return fmt.Errorf("error deleting project todos: %v", err)
+		return fmt.Errorf("error deleting project todos: %w", err)
 	}
 
 	// Delete project
-	result, err = tx.Exec("DELETE FROM projects WHERE id = ?", id)
+	result, err := tx.Exec("DELETE FROM projects WHERE id = ?", id)
 	if err != nil {
 		tx.Rollback()
-		return fmt.Errorf("error deleting project: %v", err)
+		return fmt.Errorf("error deleting project: %w", err)
 	}
 
 	// Check if project existed
 	rowsAffected, err := result.RowsAffected()
 	if err != nil {
 		tx.Rollback()
-		return fmt.Errorf("error checking rows affected: %v", err)
+		return fmt.Errorf("error checking rows affected: %w", err)
 	}
 	if rowsAffected == 0 {
 		tx.Rollback()
@@ -131,15 +144,14 @@ func DeleteProject(id int) error {
 
 	// Commit the transaction
 	if err = tx.Commit(); err != nil {
-		return fmt.Errorf("error committing transaction: %v", err)
+		return fmt.Errorf("error committing transaction: %w", err)
 	}
 
-	fmt.Printf("Project with ID %d and all associated todos deleted successfully.\n", id)
 	return nil
 }
 
-func HandleNoExistingProject() (int, error) {
-	// Return choice so that we can handle the option on other side of the function easier. This can then be used in add.go too!
+// HandleNoExistingProject prompts the user for actions when no project exists
+func (s *ProjectService) HandleNoExistingProject() (int, error) {
 	var cancel string
 
 	fmt.Println(`There is currently no project for this filepath. 
@@ -159,36 +171,120 @@ func HandleNoExistingProject() (int, error) {
 	}
 }
 
-func HandleAddNewProject(projectTitle string, projectDescription string) {
+// UpdateProject updates a project's title, description, or filepath
+func (s *ProjectService) UpdateProject(projectID int, title, description, filepath string, titleProvided, descProvided, filepathProvided bool) (string, error) {
+	// Check if ID is valid
+	if projectID <= 0 {
+		return "", fmt.Errorf("invalid project ID")
+	}
+
+	// Get project's current data from db
+	var (
+		currentTitle       string
+		currentDescription sql.NullString
+		currentFilepath    string
+	)
+
+	err := s.db.QueryRow(
+		"SELECT title, description, filepath FROM projects WHERE id = ?",
+		projectID,
+	).Scan(&currentTitle, &currentDescription, &currentFilepath)
+
+	if err == sql.ErrNoRows {
+		return "", fmt.Errorf("there is no project with the id of %d", projectID)
+	}
+	if err != nil {
+		return "", fmt.Errorf("error querying project: %w", err)
+	}
+
+	// Set default values from existing project
+	finalTitle := currentTitle
+	finalDesc := ""
+	finalFilepath := currentFilepath
+
+	if currentDescription.Valid {
+		finalDesc = currentDescription.String
+	}
+
+	// Override with provided values
+	if titleProvided {
+		finalTitle = title
+	}
+	if descProvided {
+		finalDesc = description
+	}
+	if filepathProvided {
+		finalFilepath = filepath
+	}
+
+	// Update project
+	_, err = s.db.Exec(
+		`UPDATE projects 
+		 SET title = ?, description = ?, filepath = ?, updated_at = ? 
+		 WHERE id = ?`,
+		finalTitle, finalDesc, finalFilepath, time.Now(), projectID,
+	)
+	if err != nil {
+		return "", fmt.Errorf("error updating project: %w", err)
+	}
+
+	// Generate response message
+	var message string
+	if titleProvided && descProvided && filepathProvided {
+		message = fmt.Sprintf("Updated title, description and filepath for project #%d", projectID)
+	} else if titleProvided && descProvided {
+		message = fmt.Sprintf("Updated title and description for project #%d", projectID)
+	} else if titleProvided && filepathProvided {
+		message = fmt.Sprintf("Updated title and filepath for project #%d", projectID)
+	} else if descProvided && filepathProvided {
+		message = fmt.Sprintf("Updated description and filepath for project #%d", projectID)
+	} else if titleProvided {
+		message = fmt.Sprintf("Updated title for project #%d", projectID)
+	} else if descProvided {
+		message = fmt.Sprintf("Updated description for project #%d", projectID)
+	} else if filepathProvided {
+		message = fmt.Sprintf("Updated filepath for project #%d", projectID)
+	} else {
+		message = fmt.Sprintf("No changes made to project #%d", projectID)
+	}
+
+	return message, nil
+}
+
+// HandleAddNewProject takes title and description from CLI and adds a project
+func (s *ProjectService) HandleAddNewProject(projectTitle string, projectDescription string) error {
 	var project models.NewProject
 	var reader = bufio.NewReader(os.Stdin)
 
 	if projectTitle == "" {
 		fmt.Println("Please enter the title of your new project...")
-		projectTitle, _ := reader.ReadString('\n')
-		project.Title = strings.TrimSpace(projectTitle)
+		input, _ := reader.ReadString('\n')
+		project.Title = strings.TrimSpace(input)
 	} else {
 		project.Title = projectTitle
 	}
 
 	if projectDescription == "" {
 		fmt.Println("Please enter the description of your new project...")
-		projectDescription, _ := reader.ReadString('\n')
-		project.Description = strings.TrimSpace(projectDescription)
+		input, _ := reader.ReadString('\n')
+		project.Description = strings.TrimSpace(input)
 	} else {
 		project.Description = projectDescription
 	}
 
 	currentDir, err := os.Getwd()
 	if err != nil {
-		fmt.Printf("Error getting current directory: %v\n", err)
-		return
+		return fmt.Errorf("error getting current directory: %w", err)
 	}
 	// Set the filepath
 	project.Filepath = currentDir
 
 	// Add the new project
-	AddNewProject(project)
+	err = s.AddNewProject(project)
+	if err != nil {
+		return err
+	}
 
-	fmt.Printf("New project added: %s\n", projectTitle)
+	fmt.Printf("New project added: %s\n", project.Title)
+	return nil
 }
