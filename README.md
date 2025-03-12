@@ -91,6 +91,11 @@ toto toggle-complete <task-id>
 # Or the shorthand
 toto comp <task-id>
 
+# Clear the completed todos for the current project
+toto remove-complete
+# Or the shorthand
+toto cls-comp
+
 # Delete a task
 toto delete <task-id>
 # Or the shorthand
@@ -123,6 +128,7 @@ toto --help
 | `list-long` | `lsl` | Show detailed task list |
 | `edit`  | -        | Edit an existing task's title or description |
 | `toggle-complete` | `comp` | Mark a task as complete |
+| `remove-complete` | `cls-comp` | Remove all completed todos for the current project |
 | `delete` | `del`    | Remove a task |
 | `help`   | -        | Show help information |
 | `reset`  | -        | Reset the database to its initial state |
