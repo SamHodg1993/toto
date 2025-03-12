@@ -38,6 +38,7 @@ func Execute() {
 	// Add command groups to the root command
 	RootCmd.AddCommand(ResetCmd)
 
+	// Add todo commands
 	RootCmd.AddCommand(todo.AddCmd)
 	RootCmd.AddCommand(todo.DeleteTodo)
 	RootCmd.AddCommand(todo.DelTodo)
@@ -49,6 +50,17 @@ func Execute() {
 	RootCmd.AddCommand(todo.GetCmdLong)
 	RootCmd.AddCommand(todo.LsCmdLong)
 	RootCmd.AddCommand(todo.LslCmdLong)
+	RootCmd.AddCommand(todo.RemoveCompleteForProject)
+	RootCmd.AddCommand(todo.RemoveCompForProj)
+
+	// Add project commands
+	RootCmd.AddCommand(projects.ProjectAddCmd)
+	RootCmd.AddCommand(projects.ProjAddCmd)
+	RootCmd.AddCommand(projects.DeleteProject)
+	RootCmd.AddCommand(projects.DelProj)
+	RootCmd.AddCommand(projects.ProjectLsCmd)
+	RootCmd.AddCommand(projects.ProjectListCmd)
+	RootCmd.AddCommand(projects.EditProject)
 
 	// Execute the root command
 	if err := RootCmd.Execute(); err != nil {

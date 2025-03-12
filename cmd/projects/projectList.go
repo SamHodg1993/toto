@@ -50,7 +50,7 @@ var ProjectLsCmd = &cobra.Command{
 				title = strikethrough(title)
 			}
 
-			status := "Pending"
+			status := "Active"
 			if archived {
 				status = "Done"
 			}
@@ -110,7 +110,7 @@ var ProjectListCmd = &cobra.Command{
 				title = strikethrough(title)
 			}
 
-			status := "Pending"
+			status := "Active"
 			if archived {
 				status = "Done"
 			}

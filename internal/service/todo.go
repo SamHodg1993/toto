@@ -305,3 +305,21 @@ func (s *TodoService) UpdateTodo(id int, title, description string, titleProvide
 
 	return message, nil
 }
+
+func (s *TodoService) RemoveCompletedTodosForProject(projectId int) error {
+	res, err := s.db.Exec("delete from todos where project_id = ? and completed = 1", projectId)
+	if err != nil {
+		return err
+	}
+
+	rowsAffected, err := res.RowsAffected()
+	if err != nil {
+		return err
+	}
+
+	if rowsAffected < 1 {
+		return fmt.Errorf("No complete todos to remove")
+	}
+
+	return nil
+}
