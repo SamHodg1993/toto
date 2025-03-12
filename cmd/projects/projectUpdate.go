@@ -13,7 +13,7 @@ var (
 )
 
 var EditProject = &cobra.Command{
-	Use:   "edit",
+	Use:   "proj-edit",
 	Short: "Update a project",
 	Long:  "Update a project's title, description, or filepath",
 	Args:  cobra.NoArgs,
