@@ -319,6 +319,8 @@ func (s *TodoService) RemoveCompletedTodosForProject(projectId int) error {
 
 	if rowsAffected < 1 {
 		return fmt.Errorf("No complete todos to remove")
+	} else {
+		fmt.Println("Completed todo's removed for the current project.")
 	}
 
 	return nil
