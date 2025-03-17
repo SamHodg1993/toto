@@ -4,6 +4,8 @@ import (
 	"database/sql"
 	"fmt"
 	"os"
+	"os/exec"
+	"runtime"
 	"strconv"
 	"time"
 
@@ -12,8 +14,25 @@ import (
 	"github.com/spf13/cobra"
 )
 
-var fullDate bool = false
-var allTodos bool = false
+var (
+	fullDate  bool = false
+	allTodos  bool = false
+	clearTerm bool = false
+)
+
+func clearScreen() {
+	var cmd *exec.Cmd
+
+	if runtime.GOOS == "windows" {
+		cmd = exec.Command("cmd", "/c", "cls")
+	} else {
+		// For Linux, macOS, etc.
+		cmd = exec.Command("clear")
+	}
+
+	cmd.Stdout = os.Stdout
+	cmd.Run()
+}
 
 var GetCmd = &cobra.Command{
 	Use:   "list",
@@ -80,6 +99,10 @@ var GetCmdLong = &cobra.Command{
 	Long:  "Get a more detailed list of all the todo's for the current project (defined by the current directory)",
 	Args:  cobra.NoArgs,
 	Run: func(cmd *cobra.Command, args []string) {
+		if clearTerm {
+			clearScreen()
+		}
+
 		var rows *sql.Rows
 		var err error
 
@@ -219,6 +242,9 @@ var LsCmdLong = &cobra.Command{
 	Long:  "Get a more detailed list of all the todo's for the current project (defined by the current directory)",
 	Args:  cobra.NoArgs,
 	Run: func(cmd *cobra.Command, args []string) {
+		if clearTerm {
+			clearScreen()
+		}
 
 		rows, err := TodoService.GetTodosForFilepath_LONG()
 		if err != nil {
@@ -297,6 +323,9 @@ var LslCmdLong = &cobra.Command{
 	Long:  "Get a more detailed list of all the todo's for all projects",
 	Args:  cobra.NoArgs,
 	Run: func(cmd *cobra.Command, args []string) {
+		if clearTerm {
+			clearScreen()
+		}
 
 		rows, err := TodoService.GetAllTodos_LONG()
 		if err != nil {
@@ -373,4 +402,8 @@ func init() {
 	LsCmdLong.Flags().BoolVarP(&fullDate, "Full-Date", "D", false, "Return the dates as full timestamps")
 	GetCmdLong.Flags().BoolVarP(&fullDate, "Full-Date", "D", false, "Return the dates as full timestamps")
 	GetCmdLong.Flags().BoolVarP(&allTodos, "All-Todos", "A", false, "Return all todo's regardless of project")
+	LsCmdLong.Flags().BoolVarP(&clearTerm, "Clear terminal first", "C", false, "Clear the terminal before listing the todos")
+	GetCmdLong.Flags().BoolVarP(&clearTerm, "Clear terminal first", "C", false, "Clear the terminal before listing the todos")
+	LslCmdLong.Flags().BoolVarP(&clearTerm, "Clear terminal first", "C", false, "Clear the terminal before listing the todos")
+	LslCmdLong.Flags().BoolVarP(&fullDate, "Full-Date", "D", false, "Return the dates as full timestamps")
 }
