@@ -11,6 +11,8 @@ import (
 
 var sql_get_projects string = "SELECT id, title, filepath, archived FROM projects"
 
+var clearTerm bool = false
+
 var ProjectLsCmd = &cobra.Command{
 	Use:   "proj-ls",
 	Short: "List project's",
@@ -24,8 +26,23 @@ var ProjectLsCmd = &cobra.Command{
 		}
 		defer rows.Close()
 
+		if clearTerm {
+			clearScreen()
+		}
+
+		const sql_insert_initial_project = `
+		update projects set description = ""  and title = "Global list"
+		WHERE title = "Global list"
+		`
+
+		result, err := db.Exec(sql_insert_initial_project)
+		if err != nil {
+			fmt.Println(err)
+		}
+		fmt.Println(result)
+
 		table := tablewriter.NewWriter(os.Stdout)
-		table.SetHeader([]string{"ID", "Project Title", "Filepath", "Archived"})
+		table.SetHeader([]string{"ID", "Project Title", "Description", "Filepath", "Archived"})
 		table.SetBorder(true)
 		table.SetRowLine(true)
 
@@ -33,13 +50,14 @@ var ProjectLsCmd = &cobra.Command{
 
 		for rows.Next() {
 			var (
-				id       int
-				title    string
-				archived bool
-				filepath string
+				id          int
+				title       string
+				description string
+				filepath    string
+				archived    bool
 			)
 
-			err := rows.Scan(&id, &title, &filepath, &archived)
+			err := rows.Scan(&id, &title, &description, &filepath, &archived)
 			if err != nil {
 				fmt.Printf("Error reading row: %v\n", err)
 				return
@@ -58,6 +76,7 @@ var ProjectLsCmd = &cobra.Command{
 			table.Append([]string{
 				fmt.Sprintf("%d", id),
 				title,
+				description,
 				filepath,
 				status,
 			})
@@ -85,7 +104,7 @@ var ProjectListCmd = &cobra.Command{
 		defer rows.Close()
 
 		table := tablewriter.NewWriter(os.Stdout)
-		table.SetHeader([]string{"ID", "Project Title", "Filepath", "Archived"})
+		table.SetHeader([]string{"ID", "Project Title", "Descrition", "Filepath", "Archived"})
 		table.SetBorder(true)
 		table.SetRowLine(true)
 
@@ -93,13 +112,14 @@ var ProjectListCmd = &cobra.Command{
 
 		for rows.Next() {
 			var (
-				id       int
-				title    string
-				archived bool
-				filepath string
+				id          int
+				title       string
+				description string
+				filepath    string
+				archived    bool
 			)
 
-			err := rows.Scan(&id, &title, &filepath, &archived)
+			err := rows.Scan(&id, &title, &description, &filepath, &archived)
 			if err != nil {
 				fmt.Printf("Error reading row: %v\n", err)
 				return
@@ -118,6 +138,7 @@ var ProjectListCmd = &cobra.Command{
 			table.Append([]string{
 				fmt.Sprintf("%d", id),
 				title,
+				description,
 				filepath,
 				status,
 			})
@@ -129,4 +150,9 @@ var ProjectListCmd = &cobra.Command{
 			fmt.Printf("Error iterating over rows: %v\n", err)
 		}
 	},
+}
+
+func init() {
+	ProjectLsCmd.Flags().BoolVarP(&clearTerm, "Clear terminal first", "C", false, "Clear the terminal before listing the project list")
+	ProjectListCmd.Flags().BoolVarP(&clearTerm, "Clear terminal first", "C", false, "Clear the terminal before listing the project list")
 }

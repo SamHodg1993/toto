@@ -4,10 +4,10 @@ import (
 	"database/sql"
 	"fmt"
 	"os"
-	"os/exec"
-	"runtime"
 	"strconv"
 	"time"
+
+	"github.com/samhodg1993/toto-todo-cli/internal/utilities"
 
 	"github.com/fatih/color"
 	"github.com/olekukonko/tablewriter"
@@ -20,19 +20,19 @@ var (
 	clearTerm bool = false
 )
 
-func clearScreen() {
-	var cmd *exec.Cmd
-
-	if runtime.GOOS == "windows" {
-		cmd = exec.Command("cmd", "/c", "cls")
-	} else {
-		// For Linux, macOS, etc.
-		cmd = exec.Command("clear")
-	}
-
-	cmd.Stdout = os.Stdout
-	cmd.Run()
-}
+// func clearScreen() {
+// 	var cmd *exec.Cmd
+//
+// 	if runtime.GOOS == "windows" {
+// 		cmd = exec.Command("cmd", "/c", "cls")
+// 	} else {
+// 		// For Linux, macOS, etc.
+// 		cmd = exec.Command("clear")
+// 	}
+//
+// 	cmd.Stdout = os.Stdout
+// 	cmd.Run()
+// }
 
 var GetCmd = &cobra.Command{
 	Use:   "list",
@@ -100,7 +100,7 @@ var GetCmdLong = &cobra.Command{
 	Args:  cobra.NoArgs,
 	Run: func(cmd *cobra.Command, args []string) {
 		if clearTerm {
-			clearScreen()
+			utilities.ClearScreen()
 		}
 
 		var rows *sql.Rows
@@ -243,7 +243,7 @@ var LsCmdLong = &cobra.Command{
 	Args:  cobra.NoArgs,
 	Run: func(cmd *cobra.Command, args []string) {
 		if clearTerm {
-			clearScreen()
+			utilities.ClearScreen()
 		}
 
 		rows, err := TodoService.GetTodosForFilepath_LONG()

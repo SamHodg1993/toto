@@ -31,7 +31,7 @@ func NewProjectService(db *sql.DB) *ProjectService {
 
 // ListProjects returns all projects
 func (s *ProjectService) ListProjects() (*sql.Rows, error) {
-	return s.db.Query("SELECT id, title, filepath, archived FROM projects")
+	return s.db.Query("SELECT id, title, description, filepath, archived FROM projects")
 }
 
 // GetProjectIdByFilepath returns the project ID for the current directory

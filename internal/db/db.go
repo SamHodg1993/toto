@@ -68,8 +68,8 @@ func InitDB() (*sql.DB, error) {
 	`
 
 	const sql_insert_initial_project = `
-	INSERT INTO projects (title, created_at, updated_at) 
-	SELECT "Global list", ?, ?
+	INSERT INTO projects (title, description, created_at, updated_at) 
+	SELECT "Global list", "", ?, ?
 	WHERE NOT EXISTS (SELECT 1 FROM projects)
 	`
 
