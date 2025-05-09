@@ -1,4 +1,4 @@
-package utilties
+package utilities
 
 import (
 	"os"

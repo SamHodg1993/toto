@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/samhodg1993/toto-todo-cli/internal/utilities"
+
 	"github.com/fatih/color"
 	"github.com/olekukonko/tablewriter"
 	"github.com/spf13/cobra"
@@ -27,19 +29,8 @@ var ProjectLsCmd = &cobra.Command{
 		defer rows.Close()
 
 		if clearTerm {
-			clearScreen()
+			utilities.ClearScreen()
 		}
-
-		const sql_insert_initial_project = `
-		update projects set description = ""  and title = "Global list"
-		WHERE title = "Global list"
-		`
-
-		result, err := db.Exec(sql_insert_initial_project)
-		if err != nil {
-			fmt.Println(err)
-		}
-		fmt.Println(result)
 
 		table := tablewriter.NewWriter(os.Stdout)
 		table.SetHeader([]string{"ID", "Project Title", "Description", "Filepath", "Archived"})
@@ -102,6 +93,10 @@ var ProjectListCmd = &cobra.Command{
 			return
 		}
 		defer rows.Close()
+
+		if clearTerm {
+			utilities.ClearScreen()
+		}
 
 		table := tablewriter.NewWriter(os.Stdout)
 		table.SetHeader([]string{"ID", "Project Title", "Descrition", "Filepath", "Archived"})
