@@ -138,16 +138,16 @@ toto --help
 | Command           | Shorthand   | Description                                        | Flags                                                        |
 | ----------------- | ----------- | -------------------------------------------------- | ------------------------------------------------------------ |
 | `add`             | -           | Add a new task                                     | `-t`: specify title, `-d`: specify description, `-c`: specify created-at, `-u`: specify updated-at, `-p`: specify project-id |
-| `list`            | `ls`        | Show all tasks                                     | `-D`: get full date, `-C`: clear terminal before render      |
+| `list`            | `ls`        | Show all tasks                                     | `-C`: clear terminal before render                          |
 | `list-long`       | `lsl`       | Show detailed task list                            | `-D`: get full date, `-C`: clear terminal before render      |
 | -                 | `lsla`      | Show detailed task list for all projects          | `-D`: get full date, `-C`: clear terminal before render      |
-| `edit`            | -           | Edit an existing task's title or description       | `-t`: text fort title update, `-d`: description for update, `-i`: target todo id |
+| `edit`            | -           | Edit an existing task's title or description       | `-t`: text for title update, `-d`: description for update, `-i`: target todo id |
 | `toggle-complete` | `comp`      | Mark a task as complete                            |                                                              |
 | `remove-complete` | `cls-comp`  | Remove all completed todos for the current project |                                                              |
 | `delete`          | `del`       | Remove a task                                      |                                                              |
 | `help`            | -           | Show help information                              |                                                              |
 | `reset`           | -           | Reset the database to its initial state            |                                                              |
-| `project-list`    | `proj-ls`   | Show all projects                                  | `-C`: clear terminal before render                           |
+| `project-list`    | `proj-ls`   | Show all projects                                  | `-C`: clear terminal before render                          |
 | `project-add`     | `proj-add`  | Add a new project                                  | `-t`: specify title, `-d`: specify description, `-f`: specify project filepath |
 | `project-delete`  | `proj-del`  | Delete an existing project                         |                                                              |
 | -                 | `proj-edit` | Update a single project                            | `-t`: text for title update, `-f`: text for filepath update , `-i`: target project id, `-d`: text for description update |

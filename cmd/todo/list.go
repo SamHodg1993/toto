@@ -26,6 +26,9 @@ var GetCmd = &cobra.Command{
 	Long:  "Get a list of all the todo's for the current project (defined by the current directory).",
 	Args:  cobra.NoArgs,
 	Run: func(cmd *cobra.Command, args []string) {
+		if clearTerm {
+			utilities.ClearScreen()
+		}
 
 		// rows, err := service.GetTodosForFilepath()
 		rows, err := TodoService.GetTodosForFilepath()
@@ -167,6 +170,9 @@ var LsCmd = &cobra.Command{
 	Long:  "Get a list of all the todo titles that are outstanding",
 	Args:  cobra.NoArgs,
 	Run: func(cmd *cobra.Command, args []string) {
+		if clearTerm {
+			utilities.ClearScreen()
+		}
 
 		rows, err := TodoService.GetTodosForFilepath()
 		if err != nil {
@@ -389,6 +395,8 @@ func init() {
 	GetCmdLong.Flags().BoolVarP(&fullDate, "Full-Date", "D", false, "Return the dates as full timestamps")
 	LslCmdLong.Flags().BoolVarP(&fullDate, "Full-Date", "D", false, "Return the dates as full timestamps")
 	GetCmdLong.Flags().BoolVarP(&allTodos, "All-Todos", "A", false, "Return all todo's regardless of project")
+	GetCmd.Flags().BoolVarP(&clearTerm, "Clear terminal first", "C", false, "Clear the terminal before listing the todos")
+	LsCmd.Flags().BoolVarP(&clearTerm, "Clear terminal first", "C", false, "Clear the terminal before listing the todos")
 	LsCmdLong.Flags().BoolVarP(&clearTerm, "Clear terminal first", "C", false, "Clear the terminal before listing the todos")
 	GetCmdLong.Flags().BoolVarP(&clearTerm, "Clear terminal first", "C", false, "Clear the terminal before listing the todos")
 	LslCmdLong.Flags().BoolVarP(&clearTerm, "Clear terminal first", "C", false, "Clear the terminal before listing the todos")
