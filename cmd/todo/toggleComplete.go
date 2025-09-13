@@ -2,22 +2,24 @@ package todo
 
 import (
 	"fmt"
+	"strconv"
 
 	"github.com/spf13/cobra"
 )
 
 var sql_select_single_todo string = "SELECT id, completed FROM todos WHERE id = ?"
 var sql_toggle_complete string = "UPDATE todos SET completed = ? WHERE id = ?"
+var completeSelectedId int = 0
 
 var ToggleComplete = &cobra.Command{
 	Use:   "toggle-complete",
 	Short: "Toggle a todo's status between complete and pending.",
 	Long:  "Toggle an exising todo's status between complete and pending.",
-	Args:  cobra.ExactArgs(1),
+	Args:  cobra.NoArgs,
 	Run: func(cmd *cobra.Command, args []string) {
-		id := args[0]
+		idString := strconv.Itoa(completeSelectedId)
 
-		newStatus, err := TodoService.ToggleComplete(id)
+		newStatus, err := TodoService.ToggleComplete(idString)
 		if err != nil {
 			fmt.Printf("Error: %v\n", err)
 			return
@@ -28,7 +30,7 @@ var ToggleComplete = &cobra.Command{
 			statusText = "complete"
 		}
 
-		fmt.Printf("Todo with id: %s status updated successfully to %s\n", id, statusText)
+		fmt.Printf("Todo with id: %s status updated successfully to %s\n", idString, statusText)
 	},
 }
 
@@ -36,11 +38,11 @@ var ToggleComp = &cobra.Command{
 	Use:   "comp",
 	Short: "Toggle a todo's status between complete and pending.",
 	Long:  "Toggle an exising todo's status between complete and pending.",
-	Args:  cobra.ExactArgs(1),
+	Args:  cobra.NoArgs,
 	Run: func(cmd *cobra.Command, args []string) {
-		id := args[0]
+		idString := strconv.Itoa(completeSelectedId)
 
-		newStatus, err := TodoService.ToggleComplete(id)
+		newStatus, err := TodoService.ToggleComplete(idString)
 		if err != nil {
 			fmt.Printf("Error: %v\n", err)
 			return
@@ -51,6 +53,11 @@ var ToggleComp = &cobra.Command{
 			statusText = "complete"
 		}
 
-		fmt.Printf("Todo with id: %s status updated successfully to %s\n", id, statusText)
+		fmt.Printf("Todo with id: %s status updated successfully to %s\n", idString, statusText)
 	},
+}
+
+func init() {
+	ToggleComp.Flags().IntVarP(&completeSelectedId, "Todo ID", "i", 0, "The target todo's ID")
+	ToggleComplete.Flags().IntVarP(&completeSelectedId, "Todo ID", "i", 0, "The target todo's ID")
 }
