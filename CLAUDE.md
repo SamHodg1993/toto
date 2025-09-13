@@ -56,9 +56,10 @@ Toto is a command-line todo application written in Go that manages tasks based o
 - `reset` - Reset database
 
 ### Known Issues (as of analysis)
-1. **-C flag missing**: Works on `lsl`, `list-long`, `lsla` but NOT on `ls`, `list`
-2. **-D flag missing**: Same issue - missing from basic list commands
-3. **Documentation inconsistencies**: README claims flags work everywhere
+1. ~~**-C flag missing**: Fixed - now works on all list commands~~
+2. ~~**-D flag missing**: Not applicable - basic list commands don't show dates~~
+3. ~~**Documentation inconsistencies**: Fixed - README now accurate~~
+4. **Project creation prompt bug**: When user selects option 2 to create new project, system loops without actually creating the project (internal/service/todo.go:42-44)
 
 ## Key Files for Bug Fixes
 
