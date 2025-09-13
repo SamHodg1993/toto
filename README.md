@@ -1,6 +1,6 @@
 # Todo CLI App
 
-A simple command-line interface (CLI) application for managing your daily tasks and todo items. This is currently and will always be (while under my control) be a FOSS (Free and Open Source Software) application.
+A simple command-line interface (CLI) application for managing your daily tasks and todo items. This is currently and will always be (while under my control) a FOSS (Free and Open Source Software) application.
 
 ## Why?
 - Why toto?
@@ -25,23 +25,37 @@ Right now, just that we base projects around the current working directory. Soon
 
 ## Installation
 
+### For Users (Recommended)
+```bash
+# Install directly with Go (requires Go 1.21+)
+# Works on Windows, Mac, and Linux
+go install github.com/samhodg1993/toto-todo-cli@latest
+```
+
+The `toto` command will be available in your terminal once `$GOPATH/bin` is in your PATH.
+
+### For Developers/Contributors
+
 ```bash
 # Clone the repository
 git clone https://github.com/samhodg1993/toto-todo-cli.git
 
 # Navigate to the directory
 cd toto-todo-cli
+
+# Build locally
+go build -o toto .
 ```
 
-### Windows
+#### Windows
 - Powershell
 ```powershell
-# Run the install script 
+# Run the install script
 cd toto-todo-cli
 ./install.ps1
 ```
 
-### Linux
+#### Linux & Mac
 ```bash
 # Run the install script
 cd toto-todo-cli
@@ -126,6 +140,7 @@ toto --help
 | `add`             | -           | Add a new task                                     | `-t`: specify title, `-d`: specify description, `-c`: specify created-at, `-u`: specify updated-at, `-p`: specify project-id |
 | `list`            | `ls`        | Show all tasks                                     | `-D`: get full date, `-C`: clear terminal before render      |
 | `list-long`       | `lsl`       | Show detailed task list                            | `-D`: get full date, `-C`: clear terminal before render      |
+| -                 | `lsla`      | Show detailed task list for all projects          | `-D`: get full date, `-C`: clear terminal before render      |
 | `edit`            | -           | Edit an existing task's title or description       | `-t`: text fort title update, `-d`: description for update, `-i`: target todo id |
 | `toggle-complete` | `comp`      | Mark a task as complete                            |                                                              |
 | `remove-complete` | `cls-comp`  | Remove all completed todos for the current project |                                                              |
@@ -136,6 +151,7 @@ toto --help
 | `project-add`     | `proj-add`  | Add a new project                                  | `-t`: specify title, `-d`: specify description, `-f`: specify project filepath |
 | `project-delete`  | `proj-del`  | Delete an existing project                         |                                                              |
 | -                 | `proj-edit` | Update a single project                            | `-t`: text for title update, `-f`: text for filepath update , `-i`: target project id, `-d`: text for description update |
+| `completion`      | -           | Generate autocompletion script for specified shell | Run `toto completion --help` for shell options               |
 
 ## Examples
 
@@ -161,9 +177,9 @@ toto comp 1
 
 ## Prerequisites
 
-- Go 1.x or higher
-- Git
-- SQLite3
+- Go 1.21 or higher
+- Git (for development)
+- SQLite3 (automatically handled by Go modules)
 
 ## Contributing
 
