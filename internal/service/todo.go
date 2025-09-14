@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"os"
 	"time"
+
+	"github.com/samhodg1993/toto-todo-cli/internal/utilities"
 )
 
 // TodoService handles todo operations
@@ -154,8 +156,11 @@ func (s *TodoService) GetTodosForFilepath_LONG() (*sql.Rows, error) {
 }
 
 // AddTodo adds a new todo
-func (s *TodoService) AddTodo(title, description string, projectId int, createdAt, updatedAt time.Time) error {
+func (s *TodoService) AddTodo(title string, description string, projectId int, createdAt, updatedAt time.Time) error {
 	var relevantProject int = 1
+
+	sanitisedTitle := utilities.SanitizeInput(title, "title")
+	sanitisedDesc := utilities.SanitizeInput(description, "description")
 
 	// If projectId specified, use it
 	if projectId != 0 {
@@ -192,7 +197,7 @@ func (s *TodoService) AddTodo(title, description string, projectId int, createdA
 	// Insert the todo
 	_, err := s.db.Exec(
 		"INSERT INTO todos (title, description, created_at, updated_at, project_id) VALUES (?,?,?,?,?)",
-		title, description, createdAt, updatedAt, relevantProject)
+		sanitisedTitle, sanitisedDesc, createdAt, updatedAt, relevantProject)
 	if err != nil {
 		return fmt.Errorf("error adding todo: %w", err)
 	}
@@ -251,7 +256,7 @@ func (s *TodoService) ToggleComplete(id string) (bool, error) {
 }
 
 // UpdateTodo updates a todo's title and/or description
-func (s *TodoService) UpdateTodo(id int, title, description string, titleProvided, descProvided bool) (string, error) {
+func (s *TodoService) UpdateTodo(id int, title string, description string, titleProvided, descProvided bool) (string, error) {
 	// Get todo's current data
 	var (
 		todoTitle       string
@@ -279,10 +284,12 @@ func (s *TodoService) UpdateTodo(id int, title, description string, titleProvide
 
 	// Override with provided values
 	if titleProvided {
-		finalTitle = title
+		sanitisedTitle := utilities.SanitizeInput(title, "title")
+		finalTitle = sanitisedTitle
 	}
 	if descProvided {
-		finalDesc = description
+		sanitisedDesc := utilities.SanitizeInput(description, "description")
+		finalDesc = sanitisedDesc
 	}
 
 	// Update todo

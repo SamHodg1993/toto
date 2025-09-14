@@ -9,6 +9,7 @@ import (
 	"time"
 
 	"github.com/samhodg1993/toto-todo-cli/internal/models"
+	"github.com/samhodg1993/toto-todo-cli/internal/utilities"
 )
 
 var sql_insert_project string = `
@@ -62,11 +63,13 @@ func (s *ProjectService) AddNewProjectWithPrompt() error {
 
 	fmt.Println("Please enter the title of your new project...")
 	projectTitle, _ := reader.ReadString('\n')
-	project.Title = strings.TrimSpace(projectTitle)
+	sanitisedTitle := utilities.SanitizeInput(projectTitle, "title")
+	project.Title = strings.TrimSpace(sanitisedTitle)
 
 	fmt.Println("Please enter the description of your new project...")
 	projectDescription, _ := reader.ReadString('\n')
-	project.Description = strings.TrimSpace(projectDescription)
+	sanitisedDesc := utilities.SanitizeInput(projectDescription, "description")
+	project.Description = strings.TrimSpace(sanitisedDesc)
 
 	return s.AddNewProject(project)
 }
@@ -172,7 +175,7 @@ func (s *ProjectService) HandleNoExistingProject() (int, error) {
 }
 
 // UpdateProject updates a project's title, description, or filepath
-func (s *ProjectService) UpdateProject(projectID int, title, description, filepath string, titleProvided, descProvided, filepathProvided bool) (string, error) {
+func (s *ProjectService) UpdateProject(projectID int, title string, description, filepath string, titleProvided, descProvided, filepathProvided bool) (string, error) {
 	// Check if ID is valid
 	if projectID <= 0 {
 		return "", fmt.Errorf("invalid project ID")
@@ -208,12 +211,15 @@ func (s *ProjectService) UpdateProject(projectID int, title, description, filepa
 
 	// Override with provided values
 	if titleProvided {
-		finalTitle = title
+		sanitisedTitle := utilities.SanitizeInput(title, "title")
+		finalTitle = sanitisedTitle
 	}
 	if descProvided {
-		finalDesc = description
+		sanitisedDesc := utilities.SanitizeInput(description, "description")
+		finalDesc = sanitisedDesc
 	}
 	if filepathProvided {
+		// Don't sanitize filepath - it needs exact formatting for paths
 		finalFilepath = filepath
 	}
 
@@ -271,6 +277,9 @@ func (s *ProjectService) HandleAddNewProject(projectTitle string, projectDescrip
 	} else {
 		project.Description = projectDescription
 	}
+
+	project.Title = utilities.SanitizeInput(project.Title, "title")
+	project.Description = utilities.SanitizeInput(project.Description, "description")
 
 	currentDir, err := os.Getwd()
 	if err != nil {

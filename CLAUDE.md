@@ -38,12 +38,14 @@ Toto is a command-line todo application written in Go that manages tasks based o
 ├── internal/
 │   ├── db/db.go               # Database initialization with auto-timestamp triggers
 │   ├── service/               # Business logic
-│   │   ├── todo.go            # Todo operations
-│   │   ├── project.go         # Project operations
+│   │   ├── todo.go            # Todo operations with input sanitization
+│   │   ├── projects.go        # Project operations with input sanitization
 │   │   ├── db.go              # Database utilities (reset)
 │   │   └── utilityCommandsService.go # Utility command operations
 │   ├── models/                # Data structures (projects.go, todo.go)
-│   └── utilities/general.go   # Helper functions (ClearScreen)
+│   └── utilities/             # Helper functions
+│       ├── general.go         # ClearScreen functionality
+│       └── sanitisation.go   # Input sanitization (ANSI escape prevention)
 └── test-directory/            # Test directory (in .gitignore)
 ```
 
@@ -69,6 +71,7 @@ Toto is a command-line todo application written in Go that manages tasks based o
 1. ~~**Project creation prompt bug**: Fixed - now properly calls AddNewProjectWithPrompt() when user selects option 2~~
 2. ~~**Project delete commands**: Updated to use -i flag consistently instead of positional arguments~~
 3. ~~**Completed_at timestamp**: Fixed ToggleComplete to properly set/unset completed_at timestamps~~
+4. ~~**Input sanitization**: Added ANSI escape sequence prevention in titles and descriptions~~
 
 ### Known Issues (as of analysis)
 - All major known issues have been resolved
