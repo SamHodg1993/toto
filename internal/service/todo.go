@@ -72,7 +72,8 @@ func (s *TodoService) GetAllTodos_LONG() (*sql.Rows, error) {
 			project_id, 
 			created_at, 
 			updated_at, 
-			completed 	
+			completed, 	
+		  completed_at
 		FROM todos 
 		`)
 	if err != nil {
@@ -134,7 +135,8 @@ func (s *TodoService) GetTodosForFilepath_LONG() (*sql.Rows, error) {
 			project_id, 
 			created_at, 
 			updated_at, 
-			completed 	
+			completed,
+		  completed_at
 		FROM todos 
 		WHERE project_id = ?
 		`, projectId)
@@ -234,7 +236,7 @@ func (s *TodoService) ToggleComplete(id string) (bool, error) {
 	newStatus := !completed
 
 	// Update todo
-	result, err := s.db.Exec("UPDATE todos SET completed = ? WHERE id = ?", newStatus, id)
+	result, err := s.db.Exec("UPDATE todos SET completed = ?, completed_at = CASE WHEN ? = 1 THEN CURRENT_TIMESTAMP ELSE NULL END WHERE id = ?", newStatus, newStatus, id)
 	if err != nil {
 		return false, fmt.Errorf("error updating todo: %w", err)
 	}

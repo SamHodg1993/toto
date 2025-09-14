@@ -7,8 +7,6 @@ import (
 	"github.com/spf13/cobra"
 )
 
-var sql_select_single_todo string = "SELECT id, completed FROM todos WHERE id = ?"
-var sql_toggle_complete string = "UPDATE todos SET completed = ? WHERE id = ?"
 var completeSelectedId int = 0
 
 var ToggleComplete = &cobra.Command{

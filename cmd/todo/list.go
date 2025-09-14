@@ -245,7 +245,7 @@ var LsCmdLong = &cobra.Command{
 		}
 
 		table := tablewriter.NewWriter(os.Stdout)
-		table.SetHeader([]string{"ID", "Todo", "Description", "ProjectId", "Created At", "Updated At", "Status"})
+		table.SetHeader([]string{"ID", "Todo", "Description", "ProjectId", "Created At", "Updated At", "Status", "Completed At"})
 		table.SetBorder(true)
 		table.SetRowLine(true)
 
@@ -260,9 +260,10 @@ var LsCmdLong = &cobra.Command{
 				projectId   int
 				createdAt   time.Time
 				updatedAt   time.Time
+				completedAt sql.NullTime
 			)
 
-			err := rows.Scan(&id, &title, &description, &projectId, &createdAt, &updatedAt, &completed)
+			err := rows.Scan(&id, &title, &description, &projectId, &createdAt, &updatedAt, &completed, &completedAt)
 			if err != nil {
 				fmt.Printf("Error reading row: %v\n", err)
 				return
@@ -278,6 +279,15 @@ var LsCmdLong = &cobra.Command{
 				status = "Done"
 			}
 
+			completedAtString := "-"
+			if completedAt.Valid {
+				if fullDate {
+					completedAtString = completedAt.Time.Format(time.RFC3339)
+				} else {
+					completedAtString = completedAt.Time.Format("02-01-2006")
+				}
+			}
+
 			if fullDate {
 				table.Append([]string{
 					fmt.Sprintf("%d", id),
@@ -287,6 +297,7 @@ var LsCmdLong = &cobra.Command{
 					createdAt.Format(time.RFC3339),
 					updatedAt.Format(time.RFC3339),
 					status,
+					completedAtString,
 				})
 			} else {
 				table.Append([]string{
@@ -297,6 +308,7 @@ var LsCmdLong = &cobra.Command{
 					createdAt.Format("02-01-2006"),
 					updatedAt.Format("02-01-2006"),
 					status,
+					completedAtString,
 				})
 			}
 		}
@@ -326,7 +338,7 @@ var LslCmdLong = &cobra.Command{
 		}
 
 		table := tablewriter.NewWriter(os.Stdout)
-		table.SetHeader([]string{"ID", "Todo", "Description", "ProjectId", "Created At", "Updated At", "Status"})
+		table.SetHeader([]string{"ID", "Todo", "Description", "ProjectId", "Created At", "Updated At", "Status", "Completed At"})
 		table.SetBorder(true)
 		table.SetRowLine(true)
 
@@ -341,9 +353,10 @@ var LslCmdLong = &cobra.Command{
 				projectId   int
 				createdAt   time.Time
 				updatedAt   time.Time
+				completedAt sql.NullTime
 			)
 
-			err := rows.Scan(&id, &title, &description, &projectId, &createdAt, &updatedAt, &completed)
+			err := rows.Scan(&id, &title, &description, &projectId, &createdAt, &updatedAt, &completed, &completedAt)
 			if err != nil {
 				fmt.Printf("Error reading row: %v\n", err)
 				return
@@ -359,6 +372,15 @@ var LslCmdLong = &cobra.Command{
 				status = "Done"
 			}
 
+			completedAtString := "-"
+			if completedAt.Valid {
+				if fullDate {
+					completedAtString = completedAt.Time.Format(time.RFC3339)
+				} else {
+					completedAtString = completedAt.Time.Format("02-01-2006")
+				}
+			}
+
 			if fullDate {
 				table.Append([]string{
 					fmt.Sprintf("%d", id),
@@ -368,6 +390,7 @@ var LslCmdLong = &cobra.Command{
 					createdAt.Format(time.RFC3339),
 					updatedAt.Format(time.RFC3339),
 					status,
+					completedAtString,
 				})
 			} else {
 				table.Append([]string{
@@ -378,6 +401,7 @@ var LslCmdLong = &cobra.Command{
 					createdAt.Format("02-01-2006"),
 					updatedAt.Format("02-01-2006"),
 					status,
+					completedAtString,
 				})
 			}
 		}
