@@ -6,7 +6,7 @@ Toto is a command-line todo application written in Go that manages tasks based o
 ## Key Architecture
 - **Language**: Go 1.23.4
 - **CLI Framework**: Cobra (`github.com/spf13/cobra`)
-- **Database**: SQLite3 (`github.com/mattn/go-sqlite3`)
+- **Database**: SQLite3 (`github.com/mattn/go-sqlite3`) with automatic timestamp triggers
 - **UI**: Table output using `github.com/olekukonko/tablewriter`
 - **Colors**: `github.com/fatih/color`
 
@@ -24,6 +24,7 @@ Toto is a command-line todo application written in Go that manages tasks based o
 │   │   ├── toggleComplete.go   # Mark todos complete/incomplete
 │   │   ├── removeComplete.go   # Remove completed todos
 │   │   ├── update.go           # Edit todo title/description
+│   │   ├── description.go      # Get todo description
 │   │   └── todo.go             # Todo service setup
 │   └── projects/
 │       ├── projectAdd.go       # Add projects
@@ -32,9 +33,9 @@ Toto is a command-line todo application written in Go that manages tasks based o
 │       ├── projectUpdate.go    # Edit projects
 │       └── projects.go         # Project service setup
 ├── internal/
-│   ├── db/db.go               # Database initialization
+│   ├── db/db.go               # Database initialization with auto-timestamp triggers
 │   ├── service/               # Business logic
-│   ├── models/                # Data structures
+│   ├── models/                # Data structures (projects.go, todo.go)
 │   └── utilities/general.go   # Helper functions (ClearScreen)
 └── test-directory/            # Test directory (in .gitignore)
 ```
@@ -50,16 +51,14 @@ Toto is a command-line todo application written in Go that manages tasks based o
 - `edit` - Update todo with -i (id), -t (title), -d (description)
 - `del`/`delete` - Delete specific todo
 - `cls-comp`/`remove-complete` - Remove completed todos for project
+- `description`/`desc` - Get description for single todo with -i (id)
 - `proj-add`/`project-add` - Add new project
 - `proj-ls`/`project-list` - List all projects
 - `proj-edit` - Edit project details
 - `reset` - Reset database
 
 ### Known Issues (as of analysis)
-1. ~~**-C flag missing**: Fixed - now works on all list commands~~
-2. ~~**-D flag missing**: Not applicable - basic list commands don't show dates~~
-3. ~~**Documentation inconsistencies**: Fixed - README now accurate~~
-4. **Project creation prompt bug**: When user selects option 2 to create new project, system loops without actually creating the project (internal/service/todo.go:42-44)
+1. **Project creation prompt bug**: When user selects option 2 to create new project, system loops without actually creating the project (internal/service/todo.go:42-44)
 
 ## Key Files for Bug Fixes
 
@@ -164,6 +163,7 @@ cd test-directory
 - Your role is to ANALYZE, INVESTIGATE, and SUGGEST only
 - Do NOT edit any .go files or make code modifications
 - Do NOT implement fixes directly
+- Do NOT run git commands (commit, push, etc.)
 - Focus on understanding problems and providing detailed guidance
 
 **Your Tasks:**
