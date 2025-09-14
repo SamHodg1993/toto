@@ -65,8 +65,13 @@ Toto is a command-line todo application written in Go that manages tasks based o
 - `proj-edit` - Edit project details
 - `reset` - Reset database
 
+### Recent Fixes
+1. ~~**Project creation prompt bug**: Fixed - now properly calls AddNewProjectWithPrompt() when user selects option 2~~
+2. ~~**Project delete commands**: Updated to use -i flag consistently instead of positional arguments~~
+3. ~~**Completed_at timestamp**: Fixed ToggleComplete to properly set/unset completed_at timestamps~~
+
 ### Known Issues (as of analysis)
-1. **Project creation prompt bug**: When user selects option 2 to create new project, system loops without actually creating the project (internal/service/todo.go:42-44)
+- All major known issues have been resolved
 
 ## Key Files for Bug Fixes
 

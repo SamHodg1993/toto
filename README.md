@@ -142,14 +142,16 @@ toto --help
 | `list-long`       | `lsl`       | Show detailed task list                            | `-D`: get full date, `-C`: clear terminal before render      |
 | -                 | `lsla`      | Show detailed task list for all projects          | `-D`: get full date, `-C`: clear terminal before render      |
 | `edit`            | -           | Edit an existing task's title or description       | `-t`: text for title update, `-d`: description for update, `-i`: target todo id |
+| `description`     | `desc`      | Get description for a single todo                  | `-i`: target todo id                                        |
 | `toggle-complete` | `comp`      | Mark a task as complete                            |                                                              |
 | `remove-complete` | `cls-comp`  | Remove all completed todos for the current project |                                                              |
+| `clean`           | -           | Clear screen, remove completed todos, and show remaining | -                                                            |
 | `delete`          | `del`       | Remove a task                                      |                                                              |
 | `help`            | -           | Show help information                              |                                                              |
 | `reset`           | -           | Reset the database to its initial state            |                                                              |
 | `project-list`    | `proj-ls`   | Show all projects                                  | `-C`: clear terminal before render                          |
 | `project-add`     | `proj-add`  | Add a new project                                  | `-t`: specify title, `-d`: specify description, `-f`: specify project filepath |
-| `project-delete`  | `proj-del`  | Delete an existing project                         |                                                              |
+| `project-delete`  | `proj-del`  | Delete an existing project                         | `-i`: target project id                                     |
 | -                 | `proj-edit` | Update a single project                            | `-t`: text for title update, `-f`: text for filepath update , `-i`: target project id, `-d`: text for description update |
 | `completion`      | -           | Generate autocompletion script for specified shell | Run `toto completion --help` for shell options               |
 

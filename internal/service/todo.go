@@ -40,6 +40,7 @@ func (s *TodoService) GetTodosForFilepath() (*sql.Rows, error) {
 			return nil, err
 		}
 		if choice == 2 {
+			s.projectService.AddNewProjectWithPrompt()
 			return s.GetTodosForFilepath()
 		}
 	}

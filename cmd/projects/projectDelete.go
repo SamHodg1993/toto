@@ -9,13 +9,16 @@ import (
 
 var sql_delete_projects string = "DELETE FROM projects WHERE id = ?"
 
+var deleteSelectedProjectId int
+
 var DeleteProject = &cobra.Command{
 	Use:   "project-delete",
 	Short: "Delete a project",
 	Long:  "Delete a single project from the database by referencing the project id",
-	Args:  cobra.ExactArgs(1),
+	Args:  cobra.NoArgs,
 	Run: func(cmd *cobra.Command, args []string) {
-		id := args[0]
+		id := strconv.Itoa(deleteSelectedProjectId)
+
 		projectId, err := strconv.Atoi(id)
 		if err != nil {
 			fmt.Printf("Invalid project ID format: %v\n", err)
@@ -32,9 +35,9 @@ var DelProj = &cobra.Command{
 	Use:   "proj-del",
 	Short: "Delete a project",
 	Long:  "Delete a single project from the database by referencing the project id",
-	Args:  cobra.ExactArgs(1),
+	Args:  cobra.NoArgs,
 	Run: func(cmd *cobra.Command, args []string) {
-		id := args[0]
+		id := strconv.Itoa(deleteSelectedProjectId)
 
 		projectId, err := strconv.Atoi(id)
 		if err != nil {
@@ -46,5 +49,12 @@ var DelProj = &cobra.Command{
 		if err != nil {
 			fmt.Printf("%v", err)
 		}
+
+		fmt.Printf("Project with id: %v deleted successfully.\n", id)
 	},
+}
+
+func init() {
+	DeleteProject.Flags().IntVarP(&deleteSelectedProjectId, "Project ID", "i", 0, "The target project's ID")
+	DelProj.Flags().IntVarP(&deleteSelectedProjectId, "Project ID", "i", 0, "The target project's ID")
 }
