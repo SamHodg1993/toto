@@ -16,7 +16,6 @@ Toto is a command-line todo application written in Go that manages tasks based o
 ├── main.go                     # Entry point, calls cmd.Execute()
 ├── cmd/
 │   ├── root.go                 # Root command setup, database init
-│   ├── reset.go                # Database reset command
 │   ├── todo/
 │   │   ├── add.go              # Add new todos
 │   │   ├── delete.go           # Delete todos
@@ -26,15 +25,23 @@ Toto is a command-line todo application written in Go that manages tasks based o
 │   │   ├── update.go           # Edit todo title/description
 │   │   ├── description.go      # Get todo description
 │   │   └── todo.go             # Todo service setup
-│   └── projects/
-│       ├── projectAdd.go       # Add projects
-│       ├── projectDelete.go    # Delete projects
-│       ├── projectList.go      # List projects
-│       ├── projectUpdate.go    # Edit projects
-│       └── projects.go         # Project service setup
+│   ├── projects/
+│   │   ├── projectAdd.go       # Add projects
+│   │   ├── projectDelete.go    # Delete projects
+│   │   ├── projectList.go      # List projects
+│   │   ├── projectUpdate.go    # Edit projects
+│   │   └── projects.go         # Project service setup
+│   └── utilityCommands/
+│       ├── clean.go            # Clean command (clear, remove completed, list)
+│       ├── reset.go            # Database reset command
+│       └── utilityCommands.go  # Utility service setup
 ├── internal/
 │   ├── db/db.go               # Database initialization with auto-timestamp triggers
 │   ├── service/               # Business logic
+│   │   ├── todo.go            # Todo operations
+│   │   ├── project.go         # Project operations
+│   │   ├── db.go              # Database utilities (reset)
+│   │   └── utilityCommandsService.go # Utility command operations
 │   ├── models/                # Data structures (projects.go, todo.go)
 │   └── utilities/general.go   # Helper functions (ClearScreen)
 └── test-directory/            # Test directory (in .gitignore)
@@ -52,6 +59,7 @@ Toto is a command-line todo application written in Go that manages tasks based o
 - `del`/`delete` - Delete specific todo
 - `cls-comp`/`remove-complete` - Remove completed todos for project
 - `description`/`desc` - Get description for single todo with -i (id)
+- `clean` - Clear screen, remove completed todos, and display remaining todos
 - `proj-add`/`project-add` - Add new project
 - `proj-ls`/`project-list` - List all projects
 - `proj-edit` - Edit project details

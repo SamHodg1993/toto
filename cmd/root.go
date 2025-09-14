@@ -7,6 +7,7 @@ import (
 
 	"github.com/samhodg1993/toto-todo-cli/cmd/projects"
 	"github.com/samhodg1993/toto-todo-cli/cmd/todo"
+	"github.com/samhodg1993/toto-todo-cli/cmd/utilityCommands"
 	"github.com/samhodg1993/toto-todo-cli/internal/db"
 
 	"github.com/spf13/cobra"
@@ -33,10 +34,12 @@ func Execute() {
 	// Pass database to command packages
 	projects.SetDatabase(Database)
 	todo.SetDatabase(Database)
-	InitDBService(Database)
+	utilityCommands.SetDatabase(Database)
+	utilityCommands.InitDBService(Database)
 
 	// Add utility commands
-	RootCmd.AddCommand(ResetCmd)
+	RootCmd.AddCommand(utilityCommands.ResetCmd)
+	RootCmd.AddCommand(utilityCommands.CleanUtility)
 
 	// Add todo commands
 	RootCmd.AddCommand(todo.AddCmd)

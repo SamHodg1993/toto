@@ -1,4 +1,4 @@
-package cmd
+package utilityCommands
 
 import (
 	"database/sql"

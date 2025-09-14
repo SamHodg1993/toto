@@ -312,16 +312,12 @@ func (s *TodoService) RemoveCompletedTodosForProject(projectId int) error {
 		return err
 	}
 
-	rowsAffected, err := res.RowsAffected()
+	_, err = res.RowsAffected()
 	if err != nil {
 		return err
 	}
 
-	if rowsAffected < 1 {
-		return fmt.Errorf("No complete todos to remove")
-	} else {
-		fmt.Println("Completed todo's removed for the current project.")
-	}
+	fmt.Println("Completed todo's removed for the current project.")
 
 	return nil
 }

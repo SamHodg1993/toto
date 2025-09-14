@@ -28,7 +28,7 @@ var GetTodoDescription = &cobra.Command{
 }
 
 var GetTodoDesc = &cobra.Command{
-	Use:   "description",
+	Use:   "desc",
 	Short: "Get the description for a single todo.",
 	Long:  "Get the description for a single todo.",
 	Args:  cobra.NoArgs,
