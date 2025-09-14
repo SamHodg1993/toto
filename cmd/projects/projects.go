@@ -23,15 +23,3 @@ func SetDatabase(database *sql.DB) {
 	db = database
 	ProjectService = service.NewProjectService(db)
 }
-
-// Keeping this here for now. Might want to revert back to subcommands later
-// func init() {
-// 	// Add subcommands
-// 	ProjectsCmd.AddCommand(ProjectAddCmd)
-// 	ProjectsCmd.AddCommand(ProjAddCmd)
-// 	ProjectsCmd.AddCommand(DeleteProject)
-// 	ProjectsCmd.AddCommand(DelProj)
-// 	ProjectsCmd.AddCommand(ProjectLsCmd)
-// 	ProjectsCmd.AddCommand(ProjectListCmd)
-// 	ProjectsCmd.AddCommand(EditProject)
-// }

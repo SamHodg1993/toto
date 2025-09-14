@@ -83,6 +83,32 @@ func InitDB() (*sql.DB, error) {
 		return nil, err
 	}
 
+	const sql_create_todo_trigger = `
+	CREATE TRIGGER IF NOT EXISTS update_todos_updated_at
+	AFTER UPDATE ON todos
+	BEGIN
+		UPDATE todos SET updated_at = CURRENT_TIMESTAMP WHERE id = NEW.id;
+	END
+	`
+
+	const sql_create_project_trigger = `
+	CREATE TRIGGER IF NOT EXISTS update_projects_updated_at
+	AFTER UPDATE ON projects
+	BEGIN
+		UPDATE projects SET updated_at = CURRENT_TIMESTAMP WHERE id = NEW.id;
+	END
+	`
+
+	_, err = db.Exec(sql_create_todo_trigger)
+	if err != nil {
+		return nil, err
+	}
+
+	_, err = db.Exec(sql_create_project_trigger)
+	if err != nil {
+		return nil, err
+	}
+
 	_, err = db.Exec(sql_insert_initial_project, time.Now(), time.Now())
 	if err != nil {
 		return nil, err

@@ -35,7 +35,7 @@ func Execute() {
 	todo.SetDatabase(Database)
 	InitDBService(Database)
 
-	// Add command groups to the root command
+	// Add utility commands
 	RootCmd.AddCommand(ResetCmd)
 
 	// Add todo commands
@@ -52,6 +52,8 @@ func Execute() {
 	RootCmd.AddCommand(todo.LslCmdLong)
 	RootCmd.AddCommand(todo.RemoveCompleteForProject)
 	RootCmd.AddCommand(todo.RemoveCompForProj)
+	RootCmd.AddCommand(todo.GetTodoDescription)
+	RootCmd.AddCommand(todo.GetTodoDesc)
 
 	// Add project commands
 	RootCmd.AddCommand(projects.ProjectAddCmd)

@@ -325,3 +325,15 @@ func (s *TodoService) RemoveCompletedTodosForProject(projectId int) error {
 
 	return nil
 }
+
+func (s *TodoService) GetTodoDetails(todoId int) (string, error) {
+	result := s.db.QueryRow("SELECT description FROM todos WHERE id = ?", todoId)
+
+	description := ""
+	err := result.Scan(&description)
+	if err != nil {
+		return "", err
+	}
+
+	return description, nil
+}

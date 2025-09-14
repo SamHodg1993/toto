@@ -23,19 +23,3 @@ func SetDatabase(database *sql.DB) {
 	db = database
 	TodoService = service.NewTodoService(db)
 }
-
-// Keeping this here for now. Might want to revert back to sub commands later
-// func init() {
-// Add subcommands
-// TodoCmd.AddCommand(AddCmd)
-// TodoCmd.AddCommand(DeleteTodo)
-// TodoCmd.AddCommand(DelTodo)
-// TodoCmd.AddCommand(ToggleComplete)
-// TodoCmd.AddCommand(ToggleComp)
-// TodoCmd.AddCommand(EditTodo)
-// TodoCmd.AddCommand(LsCmd)
-// TodoCmd.AddCommand(GetCmd)
-// TodoCmd.AddCommand(GetCmdLong)
-// TodoCmd.AddCommand(LsCmdLong)
-// TodoCmd.AddCommand(LslCmdLong)
-// }
