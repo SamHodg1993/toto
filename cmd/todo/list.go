@@ -30,12 +30,20 @@ var GetCmd = &cobra.Command{
 			utilities.ClearScreen()
 		}
 
-		// rows, err := service.GetTodosForFilepath()
-		rows, err := TodoService.GetTodosForFilepath()
+		var rows *sql.Rows
+		var err error
+
+		if allTodos {
+			rows, err = TodoService.GetAllTodos()
+		} else {
+			rows, err = TodoService.GetTodosForFilepath()
+		}
+
 		if err != nil {
 			fmt.Printf("%v.\n", err)
 			return
 		}
+		defer rows.Close()
 
 		table := tablewriter.NewWriter(os.Stdout)
 		table.SetHeader([]string{"ID", "Todo", "Status"})
@@ -174,14 +182,20 @@ var LsCmd = &cobra.Command{
 			utilities.ClearScreen()
 		}
 
-		rows, err := TodoService.GetTodosForFilepath()
+		var rows *sql.Rows
+		var err error
+
+		if allTodos {
+			rows, err = TodoService.GetAllTodos()
+		} else {
+			rows, err = TodoService.GetTodosForFilepath()
+		}
+
 		if err != nil {
-			if err.Error() == "operation cancelled by user" {
-				return
-			}
-			fmt.Printf("%v\n", err)
+			fmt.Printf("%v.\n", err)
 			return
 		}
+		defer rows.Close()
 
 		table := tablewriter.NewWriter(os.Stdout)
 		table.SetHeader([]string{"ID", "Todo", "Status"})
@@ -238,11 +252,20 @@ var LsCmdLong = &cobra.Command{
 			utilities.ClearScreen()
 		}
 
-		rows, err := TodoService.GetTodosForFilepath_LONG()
+		var rows *sql.Rows
+		var err error
+
+		if allTodos {
+			rows, err = TodoService.GetAllTodos_LONG()
+		} else {
+			rows, err = TodoService.GetTodosForFilepath_LONG()
+		}
+
 		if err != nil {
 			fmt.Printf("%v.\n", err)
 			return
 		}
+		defer rows.Close()
 
 		table := tablewriter.NewWriter(os.Stdout)
 		table.SetHeader([]string{"ID", "Todo", "Description", "ProjectId", "Created At", "Updated At", "Status", "Completed At"})
@@ -420,7 +443,10 @@ func init() {
 	GetCmdLong.Flags().BoolVarP(&fullDate, "Full-Date", "D", false, "Return the dates as full timestamps")
 	LslCmdLong.Flags().BoolVarP(&fullDate, "Full-Date", "D", false, "Return the dates as full timestamps")
 	// All todos
+	GetCmd.Flags().BoolVarP(&allTodos, "All-Todos", "A", false, "Return all todo's regardless of project")
 	GetCmdLong.Flags().BoolVarP(&allTodos, "All-Todos", "A", false, "Return all todo's regardless of project")
+	LsCmd.Flags().BoolVarP(&allTodos, "All-Todos", "A", false, "Return all todo's regardless of project")
+	LsCmdLong.Flags().BoolVarP(&allTodos, "All-Todos", "A", false, "Return all todo's regardless of project")
 	// Clear before print
 	GetCmd.Flags().BoolVarP(&clearTerm, "Clear terminal first", "C", false, "Clear the terminal before listing the todos")
 	LsCmd.Flags().BoolVarP(&clearTerm, "Clear terminal first", "C", false, "Clear the terminal before listing the todos")

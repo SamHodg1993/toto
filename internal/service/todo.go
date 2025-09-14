@@ -65,6 +65,22 @@ func (s *TodoService) GetTodosForFilepath() (*sql.Rows, error) {
 	return rows, nil
 }
 
+// GetAllTodosForFilepath gets todos for the current directory's project
+func (s *TodoService) GetAllTodosForFilepath() (*sql.Rows, error) {
+	rows, err := s.db.Query("SELECT id, title, completed FROM todos")
+
+	if err != nil {
+		fmt.Printf("%v\n", err)
+		return nil, err
+	}
+
+	if err = rows.Err(); err != nil {
+		return nil, err
+	}
+
+	return rows, nil
+}
+
 // GetAllTodos_LONG gets all todos with detailed information
 func (s *TodoService) GetAllTodos_LONG() (*sql.Rows, error) {
 	rows, err := s.db.Query(
@@ -79,6 +95,22 @@ func (s *TodoService) GetAllTodos_LONG() (*sql.Rows, error) {
 		  completed_at
 		FROM todos 
 		`)
+	if err != nil {
+		fmt.Printf("%v\n", err)
+		return nil, err
+	}
+
+	if err = rows.Err(); err != nil {
+		return nil, err
+	}
+
+	return rows, nil
+}
+
+// GetAllTodos gets all todos regardless of filepath
+func (s *TodoService) GetAllTodos() (*sql.Rows, error) {
+	rows, err := s.db.Query("SELECT id, title, completed FROM todos")
+
 	if err != nil {
 		fmt.Printf("%v\n", err)
 		return nil, err
