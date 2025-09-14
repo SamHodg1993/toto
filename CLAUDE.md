@@ -72,6 +72,7 @@ Toto is a command-line todo application written in Go that manages tasks based o
 2. ~~**Project delete commands**: Updated to use -i flag consistently instead of positional arguments~~
 3. ~~**Completed_at timestamp**: Fixed ToggleComplete to properly set/unset completed_at timestamps~~
 4. ~~**Input sanitization**: Added ANSI escape sequence prevention in titles and descriptions~~
+5. ~~**Flag consistency**: All commands confirmed to use -i flag correctly, no positional arguments remain~~
 
 ### Known Issues (as of analysis)
 - All major known issues have been resolved
