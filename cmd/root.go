@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/samhodg1993/toto-todo-cli/cmd/jira"
 	"github.com/samhodg1993/toto-todo-cli/cmd/projects"
 	"github.com/samhodg1993/toto-todo-cli/cmd/todo"
 	"github.com/samhodg1993/toto-todo-cli/cmd/utilityCommands"
@@ -40,6 +41,9 @@ func Execute() {
 	// Add utility commands
 	RootCmd.AddCommand(utilityCommands.ResetCmd)
 	RootCmd.AddCommand(utilityCommands.CleanUtility)
+
+	// Add the jira commands
+	RootCmd.AddCommand(jira.JiraAuth)
 
 	// Add todo commands
 	RootCmd.AddCommand(todo.AddCmd)

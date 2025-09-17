@@ -44,42 +44,42 @@ func InitDB() (*sql.DB, error) {
 	// Autoincrement missing is intentional to allow sqlite to reuse deleted id's
 	sql_create_todo_table := `
 	CREATE TABLE IF NOT EXISTS todos (
-	id INTEGER PRIMARY KEY,
-	title VARCHAR(255) NOT NULL,
-	description TEXT,
-	project_id INTEGER NOT NULL,
-	jira_ticket_id INTEGER,
-	completed BOOLEAN NOT NULL DEFAULT FALSE,
-	completed_at DATETIME,
-	created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-	updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
+		id INTEGER PRIMARY KEY,
+		title VARCHAR(255) NOT NULL,
+		description TEXT,
+		project_id INTEGER NOT NULL,
+		jira_ticket_id INTEGER,
+		completed BOOLEAN NOT NULL DEFAULT FALSE,
+		completed_at DATETIME,
+		created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+		updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
 	)
 	`
 
 	sql_create_project_table := `
 	CREATE TABLE IF NOT EXISTS projects (
-	id INTEGER PRIMARY KEY,
-	title VARCHAR(255) NOT NULL,
-	description TEXT,
-	archived BOOLEAN NOT NULL DEFAULT FALSE,
-	filepath VARCHAR(255) NOT NULL DEFAULT '` + filepath.Clean(homeDir) + `',
-	created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-	updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
+		id INTEGER PRIMARY KEY,
+		title VARCHAR(255) NOT NULL,
+		description TEXT,
+		archived BOOLEAN NOT NULL DEFAULT FALSE,
+		filepath VARCHAR(255) NOT NULL DEFAULT '` + filepath.Clean(homeDir) + `',
+		created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+		updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
 	)
 	`
 
 	sql_create_jira_tickets_table := `
 	CREATE TABLE IF NOT EXISTS jira_tickets (
-	id INTEGER PRIMARY KEY,
-	jira_key VARCHAR(50) NOT NULL UNIQUE,
-	title VARCHAR(500) NOT NULL,
-	status VARCHAR(50) NOT NULL,
-	project_key VARCHAR(50),
-	issue_type VARCHAR(50) NOT NULL,
-	url VARCHAR(500) NOT NULL,
-	last_synced_at DATETIME,
-	created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-	updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
+		id INTEGER PRIMARY KEY,
+		jira_key VARCHAR(50) NOT NULL UNIQUE,
+		title VARCHAR(500) NOT NULL,
+		status VARCHAR(50) NOT NULL,
+		project_key VARCHAR(50),
+		issue_type VARCHAR(50) NOT NULL,
+		url VARCHAR(500) NOT NULL,
+		last_synced_at DATETIME,
+		created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+		updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
 	)
 	`
 
