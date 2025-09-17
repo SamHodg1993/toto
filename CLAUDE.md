@@ -201,6 +201,50 @@ cd test-directory
 4. **Add detailed todos**: Add todos to main project with specific implementation guidance
 5. **Provide analysis**: Give detailed suggestions on how to fix, but don't fix directly
 
+## Database Schema
+
+### Current Tables
+**todos table:**
+- id INTEGER PRIMARY KEY
+- title VARCHAR(255) NOT NULL
+- description TEXT
+- project_id INTEGER NOT NULL
+- jira_ticket_id INTEGER (nullable - links to jira_tickets.id)
+- completed BOOLEAN NOT NULL DEFAULT FALSE
+- completed_at DATETIME (nullable)
+- created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
+- updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
+
+**projects table:**
+- id INTEGER PRIMARY KEY
+- title VARCHAR(255) NOT NULL
+- description TEXT
+- archived BOOLEAN NOT NULL DEFAULT FALSE
+- filepath VARCHAR(255) NOT NULL
+- created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
+- updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
+
+**jira_tickets table:** (NEW - for Jira integration)
+- id INTEGER PRIMARY KEY
+- jira_key VARCHAR(50) NOT NULL UNIQUE (e.g., "PROJ-123")
+- title VARCHAR(500) NOT NULL
+- status VARCHAR(50) NOT NULL (e.g., "To Do", "In Progress", "Done")
+- project_key VARCHAR(50) (e.g., "PROJ", "DEV")
+- issue_type VARCHAR(50) NOT NULL (e.g., "Story", "Bug", "Task")
+- url VARCHAR(500) NOT NULL (full Jira URL)
+- last_synced_at DATETIME (nullable - tracks last sync)
+- created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
+- updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
+
+### Relationships
+- **One-to-Many**: jira_tickets → todos (one Jira ticket can have multiple todos)
+- **Many-to-One**: todos → projects (multiple todos belong to one project)
+- **Foreign Keys**: todos.jira_ticket_id → jira_tickets.id, todos.project_id → projects.id
+
+### Auto-Update Triggers
+- All tables have UPDATE triggers that automatically set updated_at to CURRENT_TIMESTAMP
+- Allows tracking when records were last modified
+
 ## Tips
 - The project uses directory-based project management
 - Always test from test-directory to avoid polluting main project

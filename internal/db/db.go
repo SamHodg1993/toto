@@ -42,12 +42,13 @@ func InitDB() (*sql.DB, error) {
 	}
 
 	// Autoincrement missing is intentional to allow sqlite to reuse deleted id's
-	const sql_create_todo_table = `
+	sql_create_todo_table := `
 	CREATE TABLE IF NOT EXISTS todos (
 	id INTEGER PRIMARY KEY,
 	title VARCHAR(255) NOT NULL,
 	description TEXT,
 	project_id INTEGER NOT NULL,
+	jira_ticket_id INTEGER,
 	completed BOOLEAN NOT NULL DEFAULT FALSE,
 	completed_at DATETIME,
 	created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -62,6 +63,21 @@ func InitDB() (*sql.DB, error) {
 	description TEXT,
 	archived BOOLEAN NOT NULL DEFAULT FALSE,
 	filepath VARCHAR(255) NOT NULL DEFAULT '` + filepath.Clean(homeDir) + `',
+	created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+	updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
+	)
+	`
+
+	sql_create_jira_tickets_table := `
+	CREATE TABLE IF NOT EXISTS jira_tickets (
+	id INTEGER PRIMARY KEY,
+	jira_key VARCHAR(50) NOT NULL UNIQUE,
+	title VARCHAR(500) NOT NULL,
+	status VARCHAR(50) NOT NULL,
+	project_key VARCHAR(50),
+	issue_type VARCHAR(50) NOT NULL,
+	url VARCHAR(500) NOT NULL,
+	last_synced_at DATETIME,
 	created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
 	updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
 	)
@@ -83,6 +99,11 @@ func InitDB() (*sql.DB, error) {
 		return nil, err
 	}
 
+	_, err = db.Exec(sql_create_jira_tickets_table)
+	if err != nil {
+		return nil, err
+	}
+
 	const sql_create_todo_trigger = `
 	CREATE TRIGGER IF NOT EXISTS update_todos_updated_at
 	AFTER UPDATE ON todos
@@ -99,12 +120,25 @@ func InitDB() (*sql.DB, error) {
 	END
 	`
 
+	const sql_create_jira_tickets_trigger = `
+	CREATE TRIGGER IF NOT EXISTS update_jira_tickets_updated_at
+	AFTER UPDATE ON jira_tickets
+	BEGIN
+		UPDATE jira_tickets SET updated_at = CURRENT_TIMESTAMP WHERE id = NEW.id;
+	END
+	`
+
 	_, err = db.Exec(sql_create_todo_trigger)
 	if err != nil {
 		return nil, err
 	}
 
 	_, err = db.Exec(sql_create_project_trigger)
+	if err != nil {
+		return nil, err
+	}
+
+	_, err = db.Exec(sql_create_jira_tickets_trigger)
 	if err != nil {
 		return nil, err
 	}

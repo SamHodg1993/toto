@@ -20,6 +20,7 @@ Right now, just that we base projects around the current working directory. Soon
 - Edit title and description information
 - Reset the database
 - Projects based on the current working directory
+- **Jira integration** - Link todos to Jira tickets, sync status, create tickets
 - Simple and intuitive command-line interface
 - Build so you spend less time planning...
 
@@ -153,6 +154,11 @@ toto --help
 | `project-add`     | `proj-add`  | Add a new project                                  | `-t`: specify title, `-d`: specify description, `-f`: specify project filepath |
 | `project-delete`  | `proj-del`  | Delete an existing project                         | `-i`: target project id                                     |
 | -                 | `proj-edit` | Update a single project                            | `-t`: text for title update, `-f`: text for filepath update , `-i`: target project id, `-d`: text for description update |
+| **Jira Integration** | -         | **Jira ticket management**                        | -                                                            |
+| `jira create`     | -           | Create Jira ticket from todo                       | `-i`: target todo id                                        |
+| `jira link`       | -           | Link existing Jira ticket to todo                 | `-i`: target todo id, `-j`: Jira ticket key                |
+| `jira sync`       | -           | Sync status between todos and Jira tickets        | `--dry-run`: preview changes without applying               |
+| `jira config`     | -           | Manage Jira configuration                          | `set`, `get`, `test` subcommands                            |
 | `completion`      | -           | Generate autocompletion script for specified shell | Run `toto completion --help` for shell options               |
 
 ## Examples
@@ -172,16 +178,64 @@ Mark task as complete:
 toto comp 1
 ```
 
-## Roadmap 
+**Jira Integration Examples:**
+
+Create a Jira ticket from an existing todo:
+```bash
+toto jira create -i 5
+```
+
+Link an existing Jira ticket to a todo:
+```bash
+toto jira link -i 3 -j PROJ-123
+```
+
+Sync all linked todos with their Jira tickets:
+```bash
+toto jira sync
+```
+
+Configure Jira connection:
+```bash
+toto jira config set url https://your-company.atlassian.net
+toto jira config set token your-api-token
+toto jira config test
+```
+
+## Roadmap
+- ✅ **Jira integration** - Link todos to Jira tickets, bidirectional sync
 - Complete projects/workspaces
-- Add monday.com integration 
-- Add Jira integration
+- Add monday.com integration
+- Add priority levels for todos
+- Add due dates and reminders
+
+## Jira Integration Setup
+
+To use Jira integration features:
+
+1. **Get your Jira API token:**
+   - Go to https://id.atlassian.com/manage-profile/security/api-tokens
+   - Create a new API token
+
+2. **Configure toto:**
+   ```bash
+   toto jira config set url https://your-company.atlassian.net
+   toto jira config set token your-api-token
+   toto jira config set project YOUR-PROJECT-KEY
+   toto jira config test  # Verify connection
+   ```
+
+3. **Start using Jira features:**
+   - Create tickets from todos: `toto jira create -i <todo-id>`
+   - Link existing tickets: `toto jira link -i <todo-id> -j <ticket-key>`
+   - Keep everything in sync: `toto jira sync`
 
 ## Prerequisites
 
 - Go 1.21 or higher
 - Git (for development)
 - SQLite3 (automatically handled by Go modules)
+- **For Jira integration:** Jira account with API access
 
 ## Contributing
 
