@@ -11,7 +11,6 @@ import (
 	"github.com/spf13/cobra"
 )
 
-var sql_get_projects string = "SELECT id, title, filepath, archived FROM projects"
 
 var clearTerm bool = false
 
@@ -21,12 +20,11 @@ var ProjectLsCmd = &cobra.Command{
 	Long:  "Get a list of all the projects titles",
 	Args:  cobra.NoArgs,
 	Run: func(cmd *cobra.Command, args []string) {
-		rows, err := ProjectService.ListProjects()
+		projects, err := ProjectService.ListProjects()
 		if err != nil {
 			fmt.Printf("There was an error getting the project's from the database: %v\n", err)
 			return
 		}
-		defer rows.Close()
 
 		if clearTerm {
 			utilities.ClearScreen()
@@ -39,45 +37,28 @@ var ProjectLsCmd = &cobra.Command{
 
 		strikethrough := color.New(color.CrossedOut).SprintFunc()
 
-		for rows.Next() {
-			var (
-				id          int
-				title       string
-				description string
-				filepath    string
-				archived    bool
-			)
-
-			err := rows.Scan(&id, &title, &description, &filepath, &archived)
-			if err != nil {
-				fmt.Printf("Error reading row: %v\n", err)
-				return
-			}
-
+		for _, project := range projects {
+			title := project.Title
 			// If project has been archived, apply strikethrough to the title
-			if archived {
+			if project.Archived {
 				title = strikethrough(title)
 			}
 
 			status := "Active"
-			if archived {
+			if project.Archived {
 				status = "Done"
 			}
 
 			table.Append([]string{
-				fmt.Sprintf("%d", id),
+				fmt.Sprintf("%d", project.ID),
 				title,
-				description,
-				filepath,
+				project.Description,
+				project.Filepath,
 				status,
 			})
 		}
 
 		table.Render()
-
-		if err := rows.Err(); err != nil {
-			fmt.Printf("Error iterating over rows: %v\n", err)
-		}
 	},
 }
 
@@ -87,63 +68,45 @@ var ProjectListCmd = &cobra.Command{
 	Long:  "Get a list of all the projects titles",
 	Args:  cobra.NoArgs,
 	Run: func(cmd *cobra.Command, args []string) {
-		rows, err := ProjectService.ListProjects()
+		projects, err := ProjectService.ListProjects()
 		if err != nil {
 			fmt.Printf("There was an error getting the project's from the database: %v\n", err)
 			return
 		}
-		defer rows.Close()
 
 		if clearTerm {
 			utilities.ClearScreen()
 		}
 
 		table := tablewriter.NewWriter(os.Stdout)
-		table.SetHeader([]string{"ID", "Project Title", "Descrition", "Filepath", "Archived"})
+		table.SetHeader([]string{"ID", "Project Title", "Description", "Filepath", "Archived"})
 		table.SetBorder(true)
 		table.SetRowLine(true)
 
 		strikethrough := color.New(color.CrossedOut).SprintFunc()
 
-		for rows.Next() {
-			var (
-				id          int
-				title       string
-				description string
-				filepath    string
-				archived    bool
-			)
-
-			err := rows.Scan(&id, &title, &description, &filepath, &archived)
-			if err != nil {
-				fmt.Printf("Error reading row: %v\n", err)
-				return
-			}
-
+		for _, project := range projects {
+			title := project.Title
 			// If project has been archived, apply strikethrough to the title
-			if archived {
+			if project.Archived {
 				title = strikethrough(title)
 			}
 
 			status := "Active"
-			if archived {
+			if project.Archived {
 				status = "Done"
 			}
 
 			table.Append([]string{
-				fmt.Sprintf("%d", id),
+				fmt.Sprintf("%d", project.ID),
 				title,
-				description,
-				filepath,
+				project.Description,
+				project.Filepath,
 				status,
 			})
 		}
 
 		table.Render()
-
-		if err := rows.Err(); err != nil {
-			fmt.Printf("Error iterating over rows: %v\n", err)
-		}
 	},
 }
 

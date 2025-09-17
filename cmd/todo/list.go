@@ -1,12 +1,12 @@
 package todo
 
 import (
-	"database/sql"
 	"fmt"
 	"os"
 	"strconv"
 	"time"
 
+	"github.com/samhodg1993/toto-todo-cli/internal/models"
 	"github.com/samhodg1993/toto-todo-cli/internal/utilities"
 
 	"github.com/fatih/color"
@@ -30,20 +30,19 @@ var GetCmd = &cobra.Command{
 			utilities.ClearScreen()
 		}
 
-		var rows *sql.Rows
+		var todos []models.Todo
 		var err error
 
 		if allTodos {
-			rows, err = TodoService.GetAllTodos()
+			todos, err = TodoService.GetAllTodos()
 		} else {
-			rows, err = TodoService.GetTodosForFilepath()
+			todos, err = TodoService.GetTodosForFilepath()
 		}
 
 		if err != nil {
 			fmt.Printf("%v.\n", err)
 			return
 		}
-		defer rows.Close()
 
 		table := tablewriter.NewWriter(os.Stdout)
 		table.SetHeader([]string{"ID", "Todo", "Status"})
@@ -52,41 +51,26 @@ var GetCmd = &cobra.Command{
 
 		strikethrough := color.New(color.CrossedOut).SprintFunc()
 
-		for rows.Next() {
-			var (
-				id        int
-				title     string
-				completed bool
-			)
-
-			err := rows.Scan(&id, &title, &completed)
-			if err != nil {
-				fmt.Printf("Error reading row: %v\n", err)
-				return
-			}
-
+		for _, todo := range todos {
+			title := todo.Title
 			// If todo is completed, apply strikethrough to the title
-			if completed {
+			if todo.Completed {
 				title = strikethrough(title)
 			}
 
 			status := "Pending"
-			if completed {
+			if todo.Completed {
 				status = "Done"
 			}
 
 			table.Append([]string{
-				fmt.Sprintf("%d", id),
+				fmt.Sprintf("%d", todo.ID),
 				title,
 				status,
 			})
 		}
 
 		table.Render()
-
-		if err := rows.Err(); err != nil {
-			fmt.Printf("Error iterating over rows: %v\n", err)
-		}
 	},
 }
 
@@ -100,20 +84,19 @@ var GetCmdLong = &cobra.Command{
 			utilities.ClearScreen()
 		}
 
-		var rows *sql.Rows
+		var todos []models.Todo
 		var err error
 
 		if allTodos {
-			rows, err = TodoService.GetAllTodos_LONG()
+			todos, err = TodoService.GetAllTodos_LONG()
 		} else {
-			rows, err = TodoService.GetTodosForFilepath_LONG()
+			todos, err = TodoService.GetTodosForFilepath_LONG()
 		}
 
 		if err != nil {
 			fmt.Printf("%v.\n", err)
 			return
 		}
-		defer rows.Close()
 
 		table := tablewriter.NewWriter(os.Stdout)
 		table.SetHeader([]string{"ID", "Todo", "Description", "Project Id", "Created At", "Updated At", "Status"})
@@ -122,29 +105,14 @@ var GetCmdLong = &cobra.Command{
 
 		strikethrough := color.New(color.CrossedOut).SprintFunc()
 
-		for rows.Next() {
-			var (
-				id          int
-				title       string
-				completed   bool
-				description sql.NullString
-				projectId   int
-				createdAt   time.Time
-				updatedAt   time.Time
-			)
-
-			err := rows.Scan(&id, &title, &description, &projectId, &createdAt, &updatedAt, &completed)
-			if err != nil {
-				fmt.Printf("Error reading row: %v\n", err)
-				return
-			}
-
-			if completed {
+		for _, todo := range todos {
+			title := todo.Title
+			if todo.Completed {
 				title = strikethrough(title)
 			}
 
 			status := "Pending"
-			if completed {
+			if todo.Completed {
 				status = "Done"
 			}
 
@@ -154,21 +122,17 @@ var GetCmdLong = &cobra.Command{
 			}
 
 			table.Append([]string{
-				fmt.Sprintf("%d", id),
+				fmt.Sprintf("%d", todo.ID),
 				title,
-				description.String,
-				strconv.Itoa(projectId),
-				createdAt.Format(dateFormat),
-				updatedAt.Format(dateFormat),
+				todo.Description,
+				strconv.Itoa(todo.ProjectId),
+				todo.CreatedAt.Format(dateFormat),
+				todo.UpdatedAt.Format(dateFormat),
 				status,
 			})
 		}
 
 		table.Render()
-
-		if err := rows.Err(); err != nil {
-			fmt.Printf("Error iterating over rows: %v\n", err)
-		}
 	},
 }
 
@@ -182,20 +146,19 @@ var LsCmd = &cobra.Command{
 			utilities.ClearScreen()
 		}
 
-		var rows *sql.Rows
+		var todos []models.Todo
 		var err error
 
 		if allTodos {
-			rows, err = TodoService.GetAllTodos()
+			todos, err = TodoService.GetAllTodos()
 		} else {
-			rows, err = TodoService.GetTodosForFilepath()
+			todos, err = TodoService.GetTodosForFilepath()
 		}
 
 		if err != nil {
 			fmt.Printf("%v.\n", err)
 			return
 		}
-		defer rows.Close()
 
 		table := tablewriter.NewWriter(os.Stdout)
 		table.SetHeader([]string{"ID", "Todo", "Status"})
@@ -204,41 +167,26 @@ var LsCmd = &cobra.Command{
 
 		strikethrough := color.New(color.CrossedOut).SprintFunc()
 
-		for rows.Next() {
-			var (
-				id        int
-				title     string
-				completed bool
-			)
-
-			err := rows.Scan(&id, &title, &completed)
-			if err != nil {
-				fmt.Printf("Error reading row: %v\n", err)
-				return
-			}
-
+		for _, todo := range todos {
+			title := todo.Title
 			// If todo is completed, apply strikethrough to the title
-			if completed {
+			if todo.Completed {
 				title = strikethrough(title)
 			}
 
 			status := "Pending"
-			if completed {
+			if todo.Completed {
 				status = "Done"
 			}
 
 			table.Append([]string{
-				fmt.Sprintf("%d", id),
+				fmt.Sprintf("%d", todo.ID),
 				title,
 				status,
 			})
 		}
 
 		table.Render()
-
-		if err := rows.Err(); err != nil {
-			fmt.Printf("Error iterating over rows: %v\n", err)
-		}
 	},
 }
 
@@ -252,20 +200,19 @@ var LsCmdLong = &cobra.Command{
 			utilities.ClearScreen()
 		}
 
-		var rows *sql.Rows
+		var todos []models.Todo
 		var err error
 
 		if allTodos {
-			rows, err = TodoService.GetAllTodos_LONG()
+			todos, err = TodoService.GetAllTodos_LONG()
 		} else {
-			rows, err = TodoService.GetTodosForFilepath_LONG()
+			todos, err = TodoService.GetTodosForFilepath_LONG()
 		}
 
 		if err != nil {
 			fmt.Printf("%v.\n", err)
 			return
 		}
-		defer rows.Close()
 
 		table := tablewriter.NewWriter(os.Stdout)
 		table.SetHeader([]string{"ID", "Todo", "Description", "ProjectId", "Created At", "Updated At", "Status", "Completed At"})
@@ -274,62 +221,46 @@ var LsCmdLong = &cobra.Command{
 
 		strikethrough := color.New(color.CrossedOut).SprintFunc()
 
-		for rows.Next() {
-			var (
-				id          int
-				title       string
-				completed   bool
-				description sql.NullString
-				projectId   int
-				createdAt   time.Time
-				updatedAt   time.Time
-				completedAt sql.NullTime
-			)
-
-			err := rows.Scan(&id, &title, &description, &projectId, &createdAt, &updatedAt, &completed, &completedAt)
-			if err != nil {
-				fmt.Printf("Error reading row: %v\n", err)
-				return
-			}
-
+		for _, todo := range todos {
+			title := todo.Title
 			// If todo is completed, apply strikethrough to the title
-			if completed {
+			if todo.Completed {
 				title = strikethrough(title)
 			}
 
 			status := "Pending"
-			if completed {
+			if todo.Completed {
 				status = "Done"
 			}
 
 			completedAtString := "-"
-			if completedAt.Valid {
+			if todo.CompletedAt.Valid {
 				if fullDate {
-					completedAtString = completedAt.Time.Format(time.RFC3339)
+					completedAtString = todo.CompletedAt.Time.Format(time.RFC3339)
 				} else {
-					completedAtString = completedAt.Time.Format("02-01-2006")
+					completedAtString = todo.CompletedAt.Time.Format("02-01-2006")
 				}
 			}
 
 			if fullDate {
 				table.Append([]string{
-					fmt.Sprintf("%d", id),
+					fmt.Sprintf("%d", todo.ID),
 					title,
-					description.String,
-					strconv.Itoa(projectId),
-					createdAt.Format(time.RFC3339),
-					updatedAt.Format(time.RFC3339),
+					todo.Description,
+					strconv.Itoa(todo.ProjectId),
+					todo.CreatedAt.Format(time.RFC3339),
+					todo.UpdatedAt.Format(time.RFC3339),
 					status,
 					completedAtString,
 				})
 			} else {
 				table.Append([]string{
-					fmt.Sprintf("%d", id),
+					fmt.Sprintf("%d", todo.ID),
 					title,
-					description.String,
-					strconv.Itoa(projectId),
-					createdAt.Format("02-01-2006"),
-					updatedAt.Format("02-01-2006"),
+					todo.Description,
+					strconv.Itoa(todo.ProjectId),
+					todo.CreatedAt.Format("02-01-2006"),
+					todo.UpdatedAt.Format("02-01-2006"),
 					status,
 					completedAtString,
 				})
@@ -337,10 +268,6 @@ var LsCmdLong = &cobra.Command{
 		}
 
 		table.Render()
-
-		if err := rows.Err(); err != nil {
-			fmt.Printf("Error iterating over rows: %v\n", err)
-		}
 	},
 }
 
@@ -354,7 +281,7 @@ var LslCmdLong = &cobra.Command{
 			utilities.ClearScreen()
 		}
 
-		rows, err := TodoService.GetAllTodos_LONG()
+		todos, err := TodoService.GetAllTodos_LONG()
 		if err != nil {
 			fmt.Printf("%v.\n", err)
 			return
@@ -367,62 +294,46 @@ var LslCmdLong = &cobra.Command{
 
 		strikethrough := color.New(color.CrossedOut).SprintFunc()
 
-		for rows.Next() {
-			var (
-				id          int
-				title       string
-				completed   bool
-				description sql.NullString
-				projectId   int
-				createdAt   time.Time
-				updatedAt   time.Time
-				completedAt sql.NullTime
-			)
-
-			err := rows.Scan(&id, &title, &description, &projectId, &createdAt, &updatedAt, &completed, &completedAt)
-			if err != nil {
-				fmt.Printf("Error reading row: %v\n", err)
-				return
-			}
-
+		for _, todo := range todos {
+			title := todo.Title
 			// If todo is completed, apply strikethrough to the title
-			if completed {
+			if todo.Completed {
 				title = strikethrough(title)
 			}
 
 			status := "Pending"
-			if completed {
+			if todo.Completed {
 				status = "Done"
 			}
 
 			completedAtString := "-"
-			if completedAt.Valid {
+			if todo.CompletedAt.Valid {
 				if fullDate {
-					completedAtString = completedAt.Time.Format(time.RFC3339)
+					completedAtString = todo.CompletedAt.Time.Format(time.RFC3339)
 				} else {
-					completedAtString = completedAt.Time.Format("02-01-2006")
+					completedAtString = todo.CompletedAt.Time.Format("02-01-2006")
 				}
 			}
 
 			if fullDate {
 				table.Append([]string{
-					fmt.Sprintf("%d", id),
+					fmt.Sprintf("%d", todo.ID),
 					title,
-					description.String,
-					strconv.Itoa(projectId),
-					createdAt.Format(time.RFC3339),
-					updatedAt.Format(time.RFC3339),
+					todo.Description,
+					strconv.Itoa(todo.ProjectId),
+					todo.CreatedAt.Format(time.RFC3339),
+					todo.UpdatedAt.Format(time.RFC3339),
 					status,
 					completedAtString,
 				})
 			} else {
 				table.Append([]string{
-					fmt.Sprintf("%d", id),
+					fmt.Sprintf("%d", todo.ID),
 					title,
-					description.String,
-					strconv.Itoa(projectId),
-					createdAt.Format("02-01-2006"),
-					updatedAt.Format("02-01-2006"),
+					todo.Description,
+					strconv.Itoa(todo.ProjectId),
+					todo.CreatedAt.Format("02-01-2006"),
+					todo.UpdatedAt.Format("02-01-2006"),
 					status,
 					completedAtString,
 				})
@@ -430,10 +341,6 @@ var LslCmdLong = &cobra.Command{
 		}
 
 		table.Render()
-
-		if err := rows.Err(); err != nil {
-			fmt.Printf("Error iterating over rows: %v\n", err)
-		}
 	},
 }
 

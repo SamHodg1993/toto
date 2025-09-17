@@ -1,7 +1,6 @@
 package models
 
 import (
-	"database/sql"
 	"time"
 )
 
@@ -22,6 +21,13 @@ type NewProject struct {
 	Filepath    string `db:"filepath" json:"filepath"`
 }
 
-type ProjectService struct {
-	db *sql.DB
+// IsValid checks if a project has valid data
+func (p *Project) IsValid() bool {
+	return p.Title != "" && p.Filepath != ""
 }
+
+// IsArchived returns whether the project is archived
+func (p *Project) IsArchived() bool {
+	return p.Archived
+}
+

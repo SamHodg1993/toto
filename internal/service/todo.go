@@ -6,6 +6,7 @@ import (
 	"os"
 	"time"
 
+	"github.com/samhodg1993/toto-todo-cli/internal/models"
 	"github.com/samhodg1993/toto-todo-cli/internal/utilities"
 )
 
@@ -23,8 +24,22 @@ func NewTodoService(db *sql.DB) *TodoService {
 	}
 }
 
+// scanRowToTodo converts a SQL row to a Todo model (for detailed queries)
+func scanRowToTodo(rows *sql.Rows) (models.Todo, error) {
+	var t models.Todo
+	err := rows.Scan(&t.ID, &t.Title, &t.Description, &t.ProjectId, &t.CreatedAt, &t.UpdatedAt, &t.Completed, &t.CompletedAt)
+	return t, err
+}
+
+// scanRowToSimpleTodo converts a SQL row to a Todo model (for simple queries: id, title, completed)
+func scanRowToSimpleTodo(rows *sql.Rows) (models.Todo, error) {
+	var t models.Todo
+	err := rows.Scan(&t.ID, &t.Title, &t.Completed)
+	return t, err
+}
+
 // GetTodosForFilepath gets todos for the current directory's project
-func (s *TodoService) GetTodosForFilepath() (*sql.Rows, error) {
+func (s *TodoService) GetTodosForFilepath() ([]models.Todo, error) {
 	var projectId int = 0
 
 	currentDir, err := os.Getwd()
@@ -57,74 +72,96 @@ func (s *TodoService) GetTodosForFilepath() (*sql.Rows, error) {
 		fmt.Printf("%v\n", err)
 		return nil, err
 	}
+	defer rows.Close()
 
-	if err = rows.Err(); err != nil {
-		return nil, err
+	var todos []models.Todo
+	for rows.Next() {
+		todo, err := scanRowToSimpleTodo(rows)
+		if err != nil {
+			return nil, fmt.Errorf("error scanning todo: %w", err)
+		}
+		todos = append(todos, todo)
 	}
 
-	return rows, nil
+	return todos, rows.Err()
 }
 
-// GetAllTodosForFilepath gets todos for the current directory's project
-func (s *TodoService) GetAllTodosForFilepath() (*sql.Rows, error) {
+// GetAllTodosForFilepath gets all todos regardless of project
+func (s *TodoService) GetAllTodosForFilepath() ([]models.Todo, error) {
 	rows, err := s.db.Query("SELECT id, title, completed FROM todos")
-
 	if err != nil {
 		fmt.Printf("%v\n", err)
 		return nil, err
 	}
+	defer rows.Close()
 
-	if err = rows.Err(); err != nil {
-		return nil, err
+	var todos []models.Todo
+	for rows.Next() {
+		todo, err := scanRowToSimpleTodo(rows)
+		if err != nil {
+			return nil, fmt.Errorf("error scanning todo: %w", err)
+		}
+		todos = append(todos, todo)
 	}
 
-	return rows, nil
+	return todos, rows.Err()
 }
 
 // GetAllTodos_LONG gets all todos with detailed information
-func (s *TodoService) GetAllTodos_LONG() (*sql.Rows, error) {
+func (s *TodoService) GetAllTodos_LONG() ([]models.Todo, error) {
 	rows, err := s.db.Query(
-		`SELECT 
-			id, 
-			title, 
-			description, 
-			project_id, 
-			created_at, 
-			updated_at, 
-			completed, 	
+		`SELECT
+			id,
+			title,
+			description,
+			project_id,
+			created_at,
+			updated_at,
+			completed,
 		  completed_at
-		FROM todos 
+		FROM todos
 		`)
 	if err != nil {
 		fmt.Printf("%v\n", err)
 		return nil, err
 	}
+	defer rows.Close()
 
-	if err = rows.Err(); err != nil {
-		return nil, err
+	var todos []models.Todo
+	for rows.Next() {
+		todo, err := scanRowToTodo(rows)
+		if err != nil {
+			return nil, fmt.Errorf("error scanning todo: %w", err)
+		}
+		todos = append(todos, todo)
 	}
 
-	return rows, nil
+	return todos, rows.Err()
 }
 
 // GetAllTodos gets all todos regardless of filepath
-func (s *TodoService) GetAllTodos() (*sql.Rows, error) {
+func (s *TodoService) GetAllTodos() ([]models.Todo, error) {
 	rows, err := s.db.Query("SELECT id, title, completed FROM todos")
-
 	if err != nil {
 		fmt.Printf("%v\n", err)
 		return nil, err
 	}
+	defer rows.Close()
 
-	if err = rows.Err(); err != nil {
-		return nil, err
+	var todos []models.Todo
+	for rows.Next() {
+		todo, err := scanRowToSimpleTodo(rows)
+		if err != nil {
+			return nil, fmt.Errorf("error scanning todo: %w", err)
+		}
+		todos = append(todos, todo)
 	}
 
-	return rows, nil
+	return todos, rows.Err()
 }
 
 // GetTodosForFilepath_LONG gets detailed todos for the current directory's project
-func (s *TodoService) GetTodosForFilepath_LONG() (*sql.Rows, error) {
+func (s *TodoService) GetTodosForFilepath_LONG() ([]models.Todo, error) {
 	var projectId int = 0
 
 	currentDir, err := os.Getwd()
@@ -137,22 +174,16 @@ func (s *TodoService) GetTodosForFilepath_LONG() (*sql.Rows, error) {
 
 	err = row.Scan(&projectId)
 	if err != nil {
-		var cancel string
-		fmt.Println(`There is currently no project for this filepath. 
-			Would you like to 
-			0 - Cancel 
-			1 - Add to the global todo list? 
-			OR 
-			2 - Create a new project for this filepath?`)
-		fmt.Scanf("%s", &cancel)
-		if cancel == "1" {
+		choice, err := s.projectService.HandleNoExistingProject()
+		if err != nil {
+			return nil, err
+		}
+		if choice == 1 {
 			projectId = 1
-			err = nil
-		} else if cancel == "2" {
+		} else if choice == 2 {
 			s.projectService.AddNewProjectWithPrompt()
 			return s.GetTodosForFilepath_LONG()
 		} else {
-			fmt.Println("Aborting.")
 			return nil, fmt.Errorf("operation cancelled by user")
 		}
 	}
@@ -163,28 +194,34 @@ func (s *TodoService) GetTodosForFilepath_LONG() (*sql.Rows, error) {
 	}
 
 	rows, err := s.db.Query(
-		`SELECT 
-			id, 
-			title, 
-			description, 
-			project_id, 
-			created_at, 
-			updated_at, 
+		`SELECT
+			id,
+			title,
+			description,
+			project_id,
+			created_at,
+			updated_at,
 			completed,
 		  completed_at
-		FROM todos 
+		FROM todos
 		WHERE project_id = ?
 		`, projectId)
 	if err != nil {
 		fmt.Printf("%v\n", err)
 		return nil, err
 	}
+	defer rows.Close()
 
-	if err = rows.Err(); err != nil {
-		return nil, err
+	var todos []models.Todo
+	for rows.Next() {
+		todo, err := scanRowToTodo(rows)
+		if err != nil {
+			return nil, fmt.Errorf("error scanning todo: %w", err)
+		}
+		todos = append(todos, todo)
 	}
 
-	return rows, nil
+	return todos, rows.Err()
 }
 
 // AddTodo adds a new todo

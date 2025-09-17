@@ -30,9 +30,31 @@ func NewProjectService(db *sql.DB) *ProjectService {
 	return &ProjectService{db: db}
 }
 
-// ListProjects returns all projects
-func (s *ProjectService) ListProjects() (*sql.Rows, error) {
-	return s.db.Query("SELECT id, title, description, filepath, archived FROM projects")
+// scanRowToProject converts a SQL row to a Project model
+func scanRowToProject(rows *sql.Rows) (models.Project, error) {
+	var p models.Project
+	err := rows.Scan(&p.ID, &p.Title, &p.Description, &p.Filepath, &p.Archived, &p.CreatedAt, &p.UpdatedAt)
+	return p, err
+}
+
+// ListProjects returns all projects as a slice of Project models
+func (s *ProjectService) ListProjects() ([]models.Project, error) {
+	rows, err := s.db.Query("SELECT id, title, description, filepath, archived, created_at, updated_at FROM projects")
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var projects []models.Project
+	for rows.Next() {
+		project, err := scanRowToProject(rows)
+		if err != nil {
+			return nil, fmt.Errorf("error scanning project: %w", err)
+		}
+		projects = append(projects, project)
+	}
+
+	return projects, rows.Err()
 }
 
 // GetProjectIdByFilepath returns the project ID for the current directory
