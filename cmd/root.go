@@ -44,6 +44,7 @@ func Execute() {
 
 	// Add the jira commands
 	RootCmd.AddCommand(jira.JiraAuth)
+	RootCmd.AddCommand(jira.JiraTest)
 
 	// Add todo commands
 	RootCmd.AddCommand(todo.AddCmd)

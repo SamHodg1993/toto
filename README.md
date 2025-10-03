@@ -20,7 +20,7 @@ Right now, just that we base projects around the current working directory. Soon
 - Edit title and description information
 - Reset the database
 - Projects based on the current working directory
-- **Jira integration** - Link todos to Jira tickets, sync status, create tickets
+- **Jira OAuth authentication** - Securely authenticate with Atlassian (ticket management coming soon)
 - Simple and intuitive command-line interface
 - Build so you spend less time planning...
 
@@ -154,11 +154,8 @@ toto --help
 | `project-add`     | `proj-add`  | Add a new project                                  | `-t`: specify title, `-d`: specify description, `-f`: specify project filepath |
 | `project-delete`  | `proj-del`  | Delete an existing project                         | `-i`: target project id                                     |
 | -                 | `proj-edit` | Update a single project                            | `-t`: text for title update, `-f`: text for filepath update , `-i`: target project id, `-d`: text for description update |
-| **Jira Integration** | -         | **Jira ticket management**                        | -                                                            |
-| `jira create`     | -           | Create Jira ticket from todo                       | `-i`: target todo id                                        |
-| `jira link`       | -           | Link existing Jira ticket to todo                 | `-i`: target todo id, `-j`: Jira ticket key                |
-| `jira sync`       | -           | Sync status between todos and Jira tickets        | `--dry-run`: preview changes without applying               |
-| `jira config`     | -           | Manage Jira configuration                          | `set`, `get`, `test` subcommands                            |
+| **Jira Integration** | -         | **Jira authentication (in development)**          | -                                                            |
+| `jira-auth`       | -           | Authenticate with Jira using OAuth 2.0            | Stores tokens securely in OS keyring                        |
 | `completion`      | -           | Generate autocompletion script for specified shell | Run `toto completion --help` for shell options               |
 
 ## Examples
@@ -175,60 +172,56 @@ toto ls
 
 Mark task as complete:
 ```bash
-toto comp 1
+toto comp -i 1
 ```
 
-**Jira Integration Examples:**
+**Jira Authentication Example (in development):**
 
-Create a Jira ticket from an existing todo:
+Authenticate with Jira:
 ```bash
-toto jira create -i 5
+toto jira-auth
 ```
-
-Link an existing Jira ticket to a todo:
-```bash
-toto jira link -i 3 -j PROJ-123
-```
-
-Sync all linked todos with their Jira tickets:
-```bash
-toto jira sync
-```
-
-Configure Jira connection:
-```bash
-toto jira config set url https://your-company.atlassian.net
-toto jira config set token your-api-token
-toto jira config test
-```
+This opens your browser to authenticate with Atlassian and securely stores your tokens.
 
 ## Roadmap
-- ✅ **Jira integration** - Link todos to Jira tickets, bidirectional sync
+- 🚧 **Jira integration** - OAuth authentication complete, ticket management in progress
 - Complete projects/workspaces
 - Add monday.com integration
 - Add priority levels for todos
 - Add due dates and reminders
 
-## Jira Integration Setup
+## Jira Integration Setup (In Development)
 
-To use Jira integration features:
+Jira integration is currently under active development. OAuth 2.0 authentication is complete!
 
-1. **Get your Jira API token:**
-   - Go to https://id.atlassian.com/manage-profile/security/api-tokens
-   - Create a new API token
+### Current Status
+✅ **Completed:**
+- OAuth 2.0 authentication with Atlassian
+- Secure token storage in OS keyring
+- Database schema for Jira tickets
 
-2. **Configure toto:**
+🚧 **In Progress:**
+- REST API client for Jira operations
+- Ticket creation, linking, and sync commands
+
+### Setup (for developers/testers)
+
+1. **Create a `.env` file in the project root:**
    ```bash
-   toto jira config set url https://your-company.atlassian.net
-   toto jira config set token your-api-token
-   toto jira config set project YOUR-PROJECT-KEY
-   toto jira config test  # Verify connection
+   JIRA_CLIENT_ID=your-oauth-client-id
+   JIRA_CLIENT_SECRET=your-oauth-client-secret
    ```
 
-3. **Start using Jira features:**
-   - Create tickets from todos: `toto jira create -i <todo-id>`
-   - Link existing tickets: `toto jira link -i <todo-id> -j <ticket-key>`
-   - Keep everything in sync: `toto jira sync`
+2. **Authenticate with Jira:**
+   ```bash
+   toto jira-auth
+   ```
+   This will open your browser to authenticate with Atlassian and securely store tokens.
+
+3. **Coming soon:**
+   - `toto jira create -i <todo-id>` - Create Jira ticket from todo
+   - `toto jira link -i <todo-id> -j <ticket-key>` - Link existing ticket
+   - `toto jira sync` - Sync status between todos and Jira
 
 ## Prerequisites
 

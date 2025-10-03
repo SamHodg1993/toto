@@ -245,6 +245,54 @@ cd test-directory
 - All tables have UPDATE triggers that automatically set updated_at to CURRENT_TIMESTAMP
 - Allows tracking when records were last modified
 
+## Jira Integration Progress
+
+### Completed ✅
+1. **OAuth 2.0 Authentication** (`cmd/jira/jiraAuth.go`)
+   - Browser-based OAuth flow with Atlassian
+   - Callback server implementation with state validation (port 8989)
+   - Token exchange (authorization code → access token + refresh token)
+   - Secure token storage using OS keyring (`github.com/zalando/go-keyring`)
+   - Environment variable support via `.env` file (`github.com/joho/godotenv`)
+
+2. **Data Models** (`internal/models/jira.go`)
+   - `JiraTicket` model with validation methods
+   - `JiraConfig` model for configuration management
+   - `TokenResponse` model for OAuth responses
+
+3. **Infrastructure**
+   - Database schema for `jira_tickets` table
+   - Callback server service (`internal/service/jira.go`)
+   - Browser opening utility (`internal/utilities/general.go`)
+
+### Environment Setup
+Required `.env` file in project root:
+```
+JIRA_CLIENT_ID=your-client-id
+JIRA_CLIENT_SECRET=your-client-secret
+```
+
+### OAuth Scopes
+- `read:jira-work` - Read Jira data
+- `write:jira-work` - Create/update Jira tickets
+- `offline_access` - Get refresh token for long-term access
+
+### Keyring Storage Keys
+- Service: `toto-cli`
+- Keys: `jira-access-token`, `jira-refresh-token`
+
+### Pending Implementation
+- Token refresh functionality (when access token expires)
+- Jira REST API client (fetch tickets, create tickets, update status)
+- `jira create` command - Create Jira ticket from todo
+- `jira link` command - Link existing Jira ticket to todo
+- `jira sync` command - Sync status between todos and Jira
+- `jira config` command - Manage Jira configuration
+- Service layer for Jira operations
+- Display Jira keys in list commands
+- Error handling and logging
+- Tests for Jira functionality
+
 ## Tips
 - The project uses directory-based project management
 - Always test from test-directory to avoid polluting main project
