@@ -1,14 +1,12 @@
 package jira
 
 import (
-	"encoding/json"
 	"fmt"
 	"net/http"
 	"net/url"
 	"os"
 
 	"github.com/google/uuid"
-	"github.com/samhodg1993/toto-todo-cli/internal/models"
 	"github.com/samhodg1993/toto-todo-cli/internal/service"
 	"github.com/samhodg1993/toto-todo-cli/internal/utilities"
 
@@ -65,22 +63,7 @@ var JiraAuth = &cobra.Command{
 			return
 		}
 
-		var tokenResp models.TokenResponse
-		if err := json.NewDecoder(resp.Body).Decode(&tokenResp); err != nil {
-			fmt.Printf("Failed to decode response: %v\n", err)
-			return
-		}
-
-		err = keyring.Set("toto-cli", "jira-access-token", tokenResp.AccessToken)
-		if err != nil {
-			fmt.Printf("Failed to store access token: %v\n", err)
-			return
-		}
-		err = keyring.Set("toto-cli", "jira-refresh-token", tokenResp.RefreshToken)
-		if err != nil {
-			fmt.Printf("Failed to store refresh token: %v\n", err)
-			return
-		}
+		utilities.StoreJiraCredentialsInKeyring(resp)
 	},
 }
 
