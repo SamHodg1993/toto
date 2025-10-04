@@ -184,11 +184,20 @@ toto jira-auth
 This opens your browser to authenticate with Atlassian and securely stores your tokens.
 
 ## Roadmap
-- 🚧 **Jira integration** - OAuth authentication complete, ticket management in progress
-- Complete projects/workspaces
-- Add monday.com integration
-- Add priority levels for todos
-- Add due dates and reminders
+
+### In Progress
+- 🚧 **Jira integration** - OAuth authentication complete, REST API client next
+
+### Planned Features
+- **Terminal UI (TUI)** - Interactive browser for Jira tickets and todos (lazygit-style)
+- **LLM Integration** - Claude API for AI-assisted todo management:
+  - Auto-generate titles from brief descriptions
+  - Improve/rename existing todos
+  - Expand descriptions with context
+  - Suggest criticality levels and completion order (future)
+- **Priority/Criticality System** - Add priority levels for todos
+- **Monday.com integration** - Similar integration to Jira
+- **github.com integration** - Similar integration to Jira
 
 ## Jira Integration Setup (In Development)
 

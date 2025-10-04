@@ -282,16 +282,51 @@ JIRA_CLIENT_SECRET=your-client-secret
 - Keys: `jira-access-token`, `jira-refresh-token`
 
 ### Pending Implementation
-- Token refresh functionality (when access token expires)
+- ~~Token refresh functionality (when access token expires)~~ ✅ Complete
 - Jira REST API client (fetch tickets, create tickets, update status)
-- `jira create` command - Create Jira ticket from todo
-- `jira link` command - Link existing Jira ticket to todo
+- `jira pull` command - Pull specific Jira ticket to local todo (e.g., `toto jira-pull -i MBA-1`)
+- `jira push` command - Push local todo to Jira as new ticket
 - `jira sync` command - Sync status between todos and Jira
 - `jira config` command - Manage Jira configuration
 - Service layer for Jira operations
 - Display Jira keys in list commands
 - Error handling and logging
 - Tests for Jira functionality
+
+### Implementation Strategy
+**Phase 1 (Current):** Simple CLI commands with ticket ID flags
+- `jira-pull -i TICKET-123` - Pull specific ticket by ID
+- `jira-push -i <todo-id>` - Push todo to Jira
+- `jira-sync` - Sync all linked tickets
+
+**Phase 2 (Future):** Interactive TUI for browsing and managing
+- `jira-pull` (no ID) - Opens interactive browser
+- `jira-browse` - Dedicated ticket browser with filtering
+- Built with [Bubbletea](https://github.com/charmbracelet/bubbletea) for cross-platform support
+
+## Future Enhancements
+
+### TUI (Terminal User Interface)
+Plan to add an interactive terminal UI (similar to lazygit) for:
+f Browsing and selecting Jira tickets
+- Exploring and managing todos with rich context
+- Interactive filtering and search
+- Multi-select operations
+
+**Tech Stack:** [Bubbletea](https://github.com/charmbracelet/bubbletea) - Cross-platform TUI framework
+
+### LLM Integration (Claude API)
+Plan to integrate Claude API for AI-assisted todo management:
+- **Title generation** - Generate descriptive titles from brief inputs
+- **Renaming** - Improve existing todo titles
+- **Description editing** - Expand or refine todo descriptions
+- **Criticality assignment** - Suggest priority levels (requires database schema update)
+- **Completion order** - Suggest optimal order of completion (future feature)
+
+**Implementation Notes:**
+- Initial integration with Claude API via Anthropic's official SDK
+- Criticality and order features depend on database schema additions
+- Will require API key storage (similar to Jira token storage in keyring)
 
 ## Tips
 - The project uses directory-based project management

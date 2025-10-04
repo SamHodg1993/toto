@@ -24,8 +24,6 @@ var JiraAuth = &cobra.Command{
 
 		redirectUrl := "http://localhost:8989/callback"
 
-		authUrl := "https://auth.atlassian.com/authorize?audience=api.atlassian.com&client_id=aJjbbYpk9l3k3xzZ2YR7s0giptkT9ppg&scope=read%3Ajira-work%20write%3Ajira-work%20offline_access&redirect_uri=" + url.QueryEscape(redirectUrl) + "&state=" + uuid + "&response_type=code&prompt=consent"
-
 		// Load credentials from env
 		clientId := os.Getenv("JIRA_CLIENT_ID")
 		clientSecret := os.Getenv("JIRA_CLIENT_SECRET")
@@ -34,6 +32,7 @@ var JiraAuth = &cobra.Command{
 			return
 		}
 
+		authUrl := "https://auth.atlassian.com/authorize?audience=api.atlassian.com&client_id=" + clientId + "&scope=read%3Ajira-work%20write%3Ajira-work%20offline_access&redirect_uri=" + url.QueryEscape(redirectUrl) + "&state=" + uuid + "&response_type=code&prompt=consent"
 		utilities.OpenBrowser(authUrl)
 
 		code, err := service.StartCallbackServer(uuid)

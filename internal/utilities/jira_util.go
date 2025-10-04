@@ -42,6 +42,9 @@ func HandleJiraSessionBeforeCall() (string, error) {
 
 	clientId := os.Getenv("JIRA_CLIENT_ID")
 	clientSecret := os.Getenv("JIRA_CLIENT_SECRET")
+	if clientId == "" || clientSecret == "" {
+		return "", fmt.Errorf("Failed to collect the client secret of client id from environment variables during routine HandleJiraSessionBeforeCall")
+	}
 	data := url.Values{
 		"grant_type":    {"refresh_token"},
 		"client_id":     {clientId},
@@ -54,6 +57,9 @@ func HandleJiraSessionBeforeCall() (string, error) {
 		return "", fmt.Errorf("Failed to refresh token: %v", err)
 	}
 	defer resp.Body.Close()
+	if resp.StatusCode != 200 {
+		return "", fmt.Errorf("Failed to refresh token, status code: %d received", resp.StatusCode)
+	}
 
 	token, err := StoreJiraCredentialsInKeyring(resp)
 	if err != nil {
@@ -71,16 +77,13 @@ func StoreJiraCredentialsInKeyring(resp *http.Response) (string, error) {
 	}
 
 	expiryTime := time.Now().Add(time.Duration(tokenResp.ExpiresIn) * time.Second)
-	err := keyring.Set("toto-cli", "jira-access-token", tokenResp.AccessToken)
-	if err != nil {
+	if err := keyring.Set("toto-cli", "jira-access-token", tokenResp.AccessToken); err != nil {
 		return "", fmt.Errorf("Failed to store access token: %v\n", err)
 	}
-	err = keyring.Set("toto-cli", "jira-refresh-token", tokenResp.RefreshToken)
-	if err != nil {
+	if err := keyring.Set("toto-cli", "jira-refresh-token", tokenResp.RefreshToken); err != nil {
 		return "", fmt.Errorf("Failed to store refresh token: %v\n", err)
 	}
-	err = keyring.Set("toto-cli", "access-token-expiry", strconv.FormatInt(expiryTime.Unix(), 10))
-	if err != nil {
+	if err := keyring.Set("toto-cli", "access-token-expiry", strconv.FormatInt(expiryTime.Unix(), 10)); err != nil {
 		return "", fmt.Errorf("Failed to store access token expiry: %v\n", err)
 	}
 	return tokenResp.AccessToken, nil
