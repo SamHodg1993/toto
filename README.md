@@ -205,13 +205,16 @@ Jira integration is currently under active development. OAuth 2.0 authentication
 
 ### Current Status
 ✅ **Completed:**
-- OAuth 2.0 authentication with Atlassian
+- OAuth 2.0 authentication with Atlassian with automatic token refresh
 - Secure token storage in OS keyring
+- Cloud ID management (automatic fetch + manual override)
 - Database schema for Jira tickets
+- REST API client for fetching individual tickets
+- ADF (Atlassian Document Format) description parsing
 
 🚧 **In Progress:**
-- REST API client for Jira operations
-- Ticket creation, linking, and sync commands
+- `jira-pull` command - Fetch working, database save pending
+- Ticket creation and sync commands
 
 ### Setup (for developers/testers)
 
@@ -227,10 +230,16 @@ Jira integration is currently under active development. OAuth 2.0 authentication
    ```
    This will open your browser to authenticate with Atlassian and securely store tokens.
 
-3. **Coming soon:**
-   - `toto jira create -i <todo-id>` - Create Jira ticket from todo
-   - `toto jira link -i <todo-id> -j <ticket-key>` - Link existing ticket
-   - `toto jira sync` - Sync status between todos and Jira
+3. **Pull a Jira ticket:** (In Progress)
+   ```bash
+   toto jira-pull -i MBA-123
+   ```
+   Fetches the ticket from Jira (database save coming soon).
+
+4. **Coming soon:**
+   - Complete database integration for `jira-pull`
+   - `toto jira-push -i <todo-id>` - Create Jira ticket from todo
+   - `toto jira-sync` - Sync status between todos and Jira
 
 ## Prerequisites
 

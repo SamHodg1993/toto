@@ -90,7 +90,7 @@ func GetSingleJiraTicket(issueKey string) (*models.JiraBasedTicket, error) {
 	}
 	defer resp.Body.Close()
 	if resp.StatusCode != 200 {
-		return nil, fmt.Errorf("Request for issue failed with status code: %d", resp.StatusCode)
+		return nil, fmt.Errorf("Request for issue failed with status code: %d. This issue likely doesn't exist. Please check the input id.", resp.StatusCode)
 	}
 
 	var ticket models.JiraBasedTicket

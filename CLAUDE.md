@@ -252,18 +252,38 @@ cd test-directory
    - Browser-based OAuth flow with Atlassian
    - Callback server implementation with state validation (port 8989)
    - Token exchange (authorization code → access token + refresh token)
+   - Automatic token refresh with expiry tracking
    - Secure token storage using OS keyring (`github.com/zalando/go-keyring`)
    - Environment variable support via `.env` file (`github.com/joho/godotenv`)
 
-2. **Data Models** (`internal/models/jira.go`)
-   - `JiraTicket` model with validation methods
+2. **Cloud ID Management** (`internal/utilities/jira_util.go`, `cmd/jira/jiraAuth.go`)
+   - `GetUsersJiraCloudId()` - Automatic cloud ID fetch and storage
+   - `jira-set-cloud-id` command - Manual cloud ID override
+   - Automatic fallback if cloud ID is missing
+
+3. **Jira REST API Client** (`internal/service/jira.go`)
+   - `GetSingleJiraTicket()` - Fetch individual tickets by issue key
+   - Automatic token refresh integration
+   - Automatic cloud ID fallback
+   - Proper error handling with user-friendly messages
+
+4. **Data Models** (`internal/models/jira.go`)
+   - `JiraTicket` model with validation methods (database storage)
+   - `JiraBasedTicket` model for API responses with ADF support
+   - `GetDescriptionText()` - Extracts plain text from Atlassian Document Format
    - `JiraConfig` model for configuration management
    - `TokenResponse` model for OAuth responses
 
-3. **Infrastructure**
+5. **Commands** (`cmd/jira/`)
+   - `jira-auth` - OAuth authentication
+   - `jira-set-cloud-id` - Manual cloud ID configuration
+   - `jira-pull -i <issue-key>` - Pull Jira ticket (fetch working, DB save pending)
+
+6. **Infrastructure**
    - Database schema for `jira_tickets` table
    - Callback server service (`internal/service/jira.go`)
    - Browser opening utility (`internal/utilities/general.go`)
+   - Token session management (`HandleJiraSessionBeforeCall()`)
 
 ### Environment Setup
 Required `.env` file in project root:
@@ -279,18 +299,16 @@ JIRA_CLIENT_SECRET=your-client-secret
 
 ### Keyring Storage Keys
 - Service: `toto-cli`
-- Keys: `jira-access-token`, `jira-refresh-token`
+- Keys: `jira-access-token`, `jira-refresh-token`, `access-token-expiry`, `jira-cloud-id`
 
 ### Pending Implementation
 - ~~Token refresh functionality (when access token expires)~~ ✅ Complete
-- Jira REST API client (fetch tickets, create tickets, update status)
-- `jira pull` command - Pull specific Jira ticket to local todo (e.g., `toto jira-pull -i MBA-1`)
-- `jira push` command - Push local todo to Jira as new ticket
-- `jira sync` command - Sync status between todos and Jira
-- `jira config` command - Manage Jira configuration
-- Service layer for Jira operations
+- ~~Jira REST API client (fetch tickets)~~ ✅ Complete
+- ~~`jira-pull` command skeleton~~ ✅ Complete
+- **Complete `jira-pull` command** - Save fetched ticket to database and create linked todo
+- `jira-push` command - Push local todo to Jira as new ticket
+- `jira-sync` command - Sync status between todos and Jira
 - Display Jira keys in list commands
-- Error handling and logging
 - Tests for Jira functionality
 
 ### Implementation Strategy
@@ -308,7 +326,7 @@ JIRA_CLIENT_SECRET=your-client-secret
 
 ### TUI (Terminal User Interface)
 Plan to add an interactive terminal UI (similar to lazygit) for:
-f Browsing and selecting Jira tickets
+- Browsing and selecting Jira tickets
 - Exploring and managing todos with rich context
 - Interactive filtering and search
 - Multi-select operations

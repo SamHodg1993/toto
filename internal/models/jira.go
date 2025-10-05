@@ -2,6 +2,7 @@ package models
 
 import (
 	"database/sql"
+	"strings"
 	"time"
 )
 
@@ -25,8 +26,19 @@ type JiraBasedTicket struct {
 	Key    string `json:"key"`
 	Self   string `json:"self"`
 	Fields struct {
-		Summary string `json:"summary"`
-		Status  struct {
+		Summary     string `json:"summary"`
+		Description struct {
+			Type    string `json:"type"`
+			Version int    `json:"version"`
+			Content []struct {
+				Type    string `json:"type"`
+				Content []struct {
+					Type string `json:"type"`
+					Text string `json:"text"`
+				} `json:"content"`
+			} `json:"content"`
+		} `json:"description"`
+		Status struct {
 			Name string `json:"name"`
 		} `json:"status"`
 		IssueType struct {
@@ -37,6 +49,16 @@ type JiraBasedTicket struct {
 			Name string `json:"name"`
 		} `json:"project"`
 	} `json:"fields"`
+}
+
+func (j *JiraBasedTicket) GetDescriptionText() string {
+	var text string
+	for _, paragraph := range j.Fields.Description.Content {
+		for _, content := range paragraph.Content {
+			text += content.Text + " "
+		}
+	}
+	return strings.TrimSpace(text)
 }
 
 // IsValid checks if a Jira ticket has valid data

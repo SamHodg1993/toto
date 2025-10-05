@@ -71,7 +71,7 @@ var JiraAuth = &cobra.Command{
 var JiraSetCloudId = &cobra.Command{
 	Use:   "jira-set-cloud-id",
 	Short: "Manually set cloud id",
-	Long:  "To be used in the event a user needs to manually set their jira cloude id",
+	Long:  "To be used in the event a user needs to manually set their jira cloud id",
 	Args:  cobra.NoArgs,
 	Run: func(cmd *cobra.Command, args []string) {
 		if cloudId == "" {
