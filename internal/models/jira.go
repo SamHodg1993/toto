@@ -19,6 +19,26 @@ type JiraTicket struct {
 	UpdatedAt    time.Time    `db:"updated_at" json:"updatedAt"`
 }
 
+// JiraBasedTicket represents a Jira ticket coming from Jira
+type JiraBasedTicket struct {
+	ID     string `json:"id"`
+	Key    string `json:"key"`
+	Self   string `json:"self"`
+	Fields struct {
+		Summary string `json:"summary"`
+		Status  struct {
+			Name string `json:"name"`
+		} `json:"status"`
+		IssueType struct {
+			Name string `json:"name"`
+		} `json:"issuetype"`
+		Project struct {
+			Key  string `json:"key"`
+			Name string `json:"name"`
+		} `json:"project"`
+	} `json:"fields"`
+}
+
 // IsValid checks if a Jira ticket has valid data
 func (j *JiraTicket) IsValid() bool {
 	return j.JiraKey != "" && j.Title != "" && j.URL != ""

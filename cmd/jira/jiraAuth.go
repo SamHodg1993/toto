@@ -9,10 +9,12 @@ import (
 	"github.com/google/uuid"
 	"github.com/samhodg1993/toto-todo-cli/internal/service"
 	"github.com/samhodg1993/toto-todo-cli/internal/utilities"
+	"github.com/zalando/go-keyring"
 
 	"github.com/spf13/cobra"
-	"github.com/zalando/go-keyring"
 )
+
+var cloudId string = ""
 
 var JiraAuth = &cobra.Command{
 	Use:   "jira-auth",
@@ -66,24 +68,24 @@ var JiraAuth = &cobra.Command{
 	},
 }
 
-var JiraTest = &cobra.Command{
-	Use:   "jira-test-print",
-	Short: "testing real quick",
-	Long:  "",
+var JiraSetCloudId = &cobra.Command{
+	Use:   "jira-set-cloud-id",
+	Short: "Manually set cloud id",
+	Long:  "To be used in the event a user needs to manually set their jira cloude id",
 	Args:  cobra.NoArgs,
 	Run: func(cmd *cobra.Command, args []string) {
-
-		accessToken, err := keyring.Get("toto-cli", "jira-access-token")
-		if err != nil {
-			fmt.Printf("There was an error %v\n", err)
+		if cloudId == "" {
+			fmt.Println("Cloud id not presented. Please use -i <cloud id here>")
+			return
 		}
 
-		refreshToken, err := keyring.Get("toto-cli", "jira-refresh-token")
-		if err != nil {
-			fmt.Printf("There was an error %v\n", err)
+		if err := keyring.Set("toto-cli", "jira-cloud-id", cloudId); err != nil {
+			return
 		}
-
-		fmt.Printf("acc: %s\n\n", accessToken)
-		fmt.Printf("ref: %s\n\n", refreshToken)
+		fmt.Println("Cloud ID stored successfully")
 	},
+}
+
+func init() {
+	JiraSetCloudId.PersistentFlags().StringVarP(&cloudId, "cloudId", "i", "", "Cloud ID to be set")
 }
