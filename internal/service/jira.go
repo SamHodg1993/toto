@@ -22,6 +22,32 @@ func NewJiraService(db *sql.DB) *JiraService {
 	return &JiraService{db: db}
 }
 
+func (j *JiraService) AddJiraTicket(ticket *models.JiraTicket) (int64, error) {
+	result, err := j.db.Exec(
+		`INSERT INTO jira_tickets (
+		  jira_key, title, status, project_key, issue_type, url, last_synced_at
+		) VALUES (?,?,?,?,?,?,?)`,
+		ticket.JiraKey,
+		ticket.Title,
+		ticket.Status,
+		ticket.ProjectKey,
+		ticket.IssueType,
+		ticket.URL,
+		time.Now(),
+	)
+
+	if err != nil {
+		return 0, fmt.Errorf("Could not insert new jira ticket, err: %v", err)
+	}
+
+	returnId, err := result.LastInsertId()
+	if err != nil {
+		return 0, fmt.Errorf("Insert Jira ticket success, but failed to get row ID, err: %v", err)
+	}
+
+	return returnId, nil
+}
+
 func (j *JiraService) GetSingleJiraTicket(issueKey string) (*models.JiraBasedTicket, error) {
 	accessToken, err := utilities.HandleJiraSessionBeforeCall()
 	if err != nil {
