@@ -277,7 +277,7 @@ cd test-directory
 5. **Commands** (`cmd/jira/`)
    - `jira-auth` - OAuth authentication
    - `jira-set-cloud-id` - Manual cloud ID configuration
-   - `jira-pull -i <issue-key>` - Pull Jira ticket (fetch working, DB save pending)
+   - `jira-pull -i <issue-key>` - Pull Jira ticket, save to database, create linked todo
 
 6. **Infrastructure**
    - Database schema for `jira_tickets` table
@@ -304,8 +304,7 @@ JIRA_CLIENT_SECRET=your-client-secret
 ### Pending Implementation
 - ~~Token refresh functionality (when access token expires)~~ ✅ Complete
 - ~~Jira REST API client (fetch tickets)~~ ✅ Complete
-- ~~`jira-pull` command skeleton~~ ✅ Complete
-- **Complete `jira-pull` command** - Save fetched ticket to database and create linked todo
+- ~~`jira-pull` command~~ ✅ Complete - Fetches Jira ticket, saves to database, creates linked todo
 - `jira-push` command - Push local todo to Jira as new ticket
 - `jira-sync` command - Sync status between todos and Jira
 - Display Jira keys in list commands

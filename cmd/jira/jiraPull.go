@@ -53,7 +53,7 @@ var JiraPull = &cobra.Command{
 		if err = todo.TodoService.AddTodo(
 			jiraTicket.Title,
 			ticket.GetDescriptionText(),
-			int64(projectId),
+			projectId,
 			time.Now(),
 			time.Now(),
 			jiraInsertId,

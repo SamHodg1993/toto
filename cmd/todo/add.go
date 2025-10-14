@@ -84,7 +84,7 @@ var AddCmd = &cobra.Command{
 		}
 
 		// Update the todo
-		err := TodoService.AddTodo(todoTitle, todoDescription, releventProject, createdAt, updatedAt)
+		err := TodoService.AddTodo(todoTitle, todoDescription, releventProject, createdAt, updatedAt, 0)
 		if err != nil {
 			fmt.Printf("There was an error adding the todo: %v\n", err)
 			return

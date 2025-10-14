@@ -228,7 +228,7 @@ func (s *TodoService) GetTodosForFilepath_LONG() ([]models.Todo, error) {
 func (s *TodoService) AddTodo(
 	title string,
 	description string,
-	projectId int64,
+	projectId int,
 	createdAt,
 	updatedAt time.Time,
 	jiraTicketRowId int64,
