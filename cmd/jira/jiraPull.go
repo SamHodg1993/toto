@@ -6,7 +6,7 @@ import (
 
 	"github.com/samhodg1993/toto-todo-cli/cmd/projects"
 	"github.com/samhodg1993/toto-todo-cli/cmd/todo"
-	"github.com/samhodg1993/toto-todo-cli/internal/service"
+	"github.com/samhodg1993/toto-todo-cli/internal/models"
 	"github.com/spf13/cobra"
 )
 
@@ -23,25 +23,46 @@ var JiraPull = &cobra.Command{
 			return
 		}
 
-		ticket, err := service.GetSingleJiraTicket(jiraTicketId)
+		ticket, err := JiraService.GetSingleJiraTicket(jiraTicketId)
 		if err != nil {
 			fmt.Println(err)
 			return
 		}
 
-		// Collate the data used by both inserts
-		createdAt := time.Now()
-		updatedAt := time.Now()
+		jiraTicket := &models.JiraTicket{
+			JiraKey:    ticket.Key,
+			Title:      ticket.Fields.Summary,
+			Status:     ticket.Fields.Status.Name,
+			ProjectKey: ticket.Fields.Project.Key,
+			IssueType:  ticket.Fields.IssueType.Name,
+			URL:        ticket.Self,
+		}
+
+		jiraInsertId, err := JiraService.InsertJiraTicket(jiraTicket)
+		if err != nil {
+			fmt.Printf("Failed to insert jira ticket. Err: %v", err)
+			return
+		}
+
 		projectId, err := projects.ProjectService.GetProjectIdByFilepath()
 		if err != nil {
 			fmt.Printf("Error occured when collecting filepath project when pulling jira ticket. Exited with error: %v", err)
+			return
 		}
-		title := ticket.Fields.Summary
-		desc := ticket.GetDescriptionText()
-		// Make a service to add a jira ticket to the jira ticket table here
 
-		// Once added the jira ticket table row, add the todo and reference the jira ticket table row
-		err = todo.TodoService.AddTodo(title, desc)
+		if err = todo.TodoService.AddTodo(
+			jiraTicket.Title,
+			ticket.GetDescriptionText(),
+			int64(projectId),
+			time.Now(),
+			time.Now(),
+			jiraInsertId,
+		); err != nil {
+			fmt.Printf("Failed to store new Todo, jira table row created. Error: %v", err)
+			return
+		}
+
+		fmt.Printf("Successfully pulled Jira ticket %s and created todo!\n", ticket.Key)
 	},
 }
 

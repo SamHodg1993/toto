@@ -22,7 +22,7 @@ func NewJiraService(db *sql.DB) *JiraService {
 	return &JiraService{db: db}
 }
 
-func (j *JiraService) AddJiraTicket(ticket *models.JiraTicket) (int64, error) {
+func (j *JiraService) InsertJiraTicket(ticket *models.JiraTicket) (int64, error) {
 	result, err := j.db.Exec(
 		`INSERT INTO jira_tickets (
 		  jira_key, title, status, project_key, issue_type, url, last_synced_at

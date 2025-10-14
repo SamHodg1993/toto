@@ -35,6 +35,7 @@ func Execute() {
 	// Pass database to command packages
 	projects.SetDatabase(Database)
 	todo.SetDatabase(Database)
+	jira.SetDatabase(Database)
 	utilityCommands.SetDatabase(Database)
 	utilityCommands.InitDBService(Database)
 

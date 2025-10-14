@@ -225,7 +225,14 @@ func (s *TodoService) GetTodosForFilepath_LONG() ([]models.Todo, error) {
 }
 
 // AddTodo adds a new todo
-func (s *TodoService) AddTodo(title string, description string, projectId int, createdAt, updatedAt time.Time) error {
+func (s *TodoService) AddTodo(
+	title string,
+	description string,
+	projectId int64,
+	createdAt,
+	updatedAt time.Time,
+	jiraTicketRowId int64,
+) error {
 	var relevantProject int = 1
 
 	sanitisedTitle := utilities.SanitizeInput(title, "title")
@@ -265,8 +272,8 @@ func (s *TodoService) AddTodo(title string, description string, projectId int, c
 
 	// Insert the todo
 	_, err := s.db.Exec(
-		"INSERT INTO todos (title, description, created_at, updated_at, project_id) VALUES (?,?,?,?,?)",
-		sanitisedTitle, sanitisedDesc, createdAt, updatedAt, relevantProject)
+		"INSERT INTO todos (title, description, created_at, updated_at, project_id, jira_ticket_id) VALUES (?,?,?,?,?,?)",
+		sanitisedTitle, sanitisedDesc, createdAt, updatedAt, relevantProject, jiraTicketRowId)
 	if err != nil {
 		return fmt.Errorf("error adding todo: %w", err)
 	}
