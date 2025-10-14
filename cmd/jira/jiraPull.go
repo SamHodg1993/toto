@@ -41,7 +41,7 @@ var JiraPull = &cobra.Command{
 		// Make a service to add a jira ticket to the jira ticket table here
 
 		// Once added the jira ticket table row, add the todo and reference the jira ticket table row
-		err = todo.TodoService.AddTodo()
+		err = todo.TodoService.AddTodo(title, desc)
 	},
 }
 

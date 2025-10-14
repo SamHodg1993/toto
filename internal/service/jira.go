@@ -2,6 +2,7 @@ package service
 
 import (
 	"context"
+	"database/sql"
 	"encoding/json"
 	"fmt"
 	"time"
@@ -13,49 +14,15 @@ import (
 	"github.com/zalando/go-keyring"
 )
 
-func StartCallbackServer(expectedState string) (string, error) {
-	codeChan := make(chan string, 1)
-	errorChan := make(chan error, 1)
-
-	http.HandleFunc("/callback", func(w http.ResponseWriter, r *http.Request) {
-		code := r.URL.Query().Get("code")
-		state := r.URL.Query().Get("state")
-
-		// Make sure the state is what we expect
-		if state != expectedState {
-			errorChan <- fmt.Errorf("invalid state parameter")
-			return
-		}
-
-		fmt.Println("We have the users creds. Store in keyring next!")
-
-		// Success, tell the user to close the browser window
-		w.WriteHeader(200)
-		w.Write([]byte("Authentication successful! You can close this window."))
-
-		// Send code to channel
-		codeChan <- code
-	})
-
-	// Start server
-	server := &http.Server{Addr: ":8989"} // Port is specific to the app. Configured in atlassian developer console
-	go server.ListenAndServe()
-
-	// Wait for callback or timeout
-	select {
-	case code := <-codeChan:
-		server.Shutdown(context.Background())
-		return code, nil
-	case err := <-errorChan:
-		server.Shutdown(context.Background())
-		return "", err
-	case <-time.After(2 * time.Minute):
-		server.Shutdown(context.Background())
-		return "", fmt.Errorf("authentication timeout")
-	}
+type JiraService struct {
+	db *sql.DB
 }
 
-func GetSingleJiraTicket(issueKey string) (*models.JiraBasedTicket, error) {
+func NewJiraService(db *sql.DB) *JiraService {
+	return &JiraService{db: db}
+}
+
+func (j *JiraService) GetSingleJiraTicket(issueKey string) (*models.JiraBasedTicket, error) {
 	accessToken, err := utilities.HandleJiraSessionBeforeCall()
 	if err != nil {
 		return nil, fmt.Errorf("%v\n", err)
@@ -99,4 +66,46 @@ func GetSingleJiraTicket(issueKey string) (*models.JiraBasedTicket, error) {
 	}
 
 	return &ticket, nil
+}
+
+func StartCallbackServer(expectedState string) (string, error) {
+	codeChan := make(chan string, 1)
+	errorChan := make(chan error, 1)
+
+	http.HandleFunc("/callback", func(w http.ResponseWriter, r *http.Request) {
+		code := r.URL.Query().Get("code")
+		state := r.URL.Query().Get("state")
+
+		// Make sure the state is what we expect
+		if state != expectedState {
+			errorChan <- fmt.Errorf("invalid state parameter")
+			return
+		}
+
+		fmt.Println("We have the users creds. Store in keyring next!")
+
+		// Success, tell the user to close the browser window
+		w.WriteHeader(200)
+		w.Write([]byte("Authentication successful! You can close this window."))
+
+		// Send code to channel
+		codeChan <- code
+	})
+
+	// Start server
+	server := &http.Server{Addr: ":8989"} // Port is specific to the app. Configured in atlassian developer console
+	go server.ListenAndServe()
+
+	// Wait for callback or timeout
+	select {
+	case code := <-codeChan:
+		server.Shutdown(context.Background())
+		return code, nil
+	case err := <-errorChan:
+		server.Shutdown(context.Background())
+		return "", err
+	case <-time.After(2 * time.Minute):
+		server.Shutdown(context.Background())
+		return "", fmt.Errorf("authentication timeout")
+	}
 }
