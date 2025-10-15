@@ -1,4 +1,3 @@
-for this session, you can refactor.
 # Claude Code Knowledge Base - Toto CLI Project
 
 ## Project Overview
@@ -10,6 +9,7 @@ Toto is a command-line todo application written in Go that manages tasks based o
 - **Database**: SQLite3 (`github.com/mattn/go-sqlite3`) with automatic timestamp triggers
 - **UI**: Table output using `github.com/olekukonko/tablewriter`
 - **Colors**: `github.com/fatih/color`
+- **Service Architecture**: Sub-package by domain pattern for scalability and maintainability
 
 ## Project Structure
 ```
@@ -38,15 +38,34 @@ Toto is a command-line todo application written in Go that manages tasks based o
 │       └── utilityCommands.go  # Utility service setup
 ├── internal/
 │   ├── db/db.go               # Database initialization with auto-timestamp triggers
-│   ├── service/               # Business logic
-│   │   ├── todo.go            # Todo operations with input sanitization
-│   │   ├── projects.go        # Project operations with input sanitization
-│   │   ├── db.go              # Database utilities (reset)
-│   │   └── utilityCommandsService.go # Utility command operations
-│   ├── models/                # Data structures (projects.go, todo.go)
+│   ├── service/               # Business logic (refactored to sub-packages)
+│   │   ├── todo/              # Todo service package
+│   │   │   ├── service.go     # Service struct + interfaces
+│   │   │   ├── queries.go     # GetTodos, list operations
+│   │   │   ├── crud.go        # Add, Update, Delete
+│   │   │   └── complete.go    # Toggle/Remove complete
+│   │   ├── project/           # Project service package
+│   │   │   ├── service.go     # Service struct
+│   │   │   ├── queries.go     # List, GetById operations
+│   │   │   ├── crud.go        # Add, Update, Delete
+│   │   │   └── prompts.go     # User interaction logic
+│   │   ├── jira/              # Jira service package
+│   │   │   ├── service.go     # Service struct
+│   │   │   ├── client.go      # API calls
+│   │   │   ├── storage.go     # Database operations
+│   │   │   ├── auth.go        # OAuth/callback
+│   │   │   └── pull.go        # Business logic handlers
+│   │   ├── claude/            # Claude AI service package
+│   │   │   └── service.go     # AI ticket breakdown
+│   │   ├── utility/           # Utility commands service
+│   │   │   └── service.go     # Clean command logic
+│   │   └── database/          # Database utilities service
+│   │       └── service.go     # Reset operations
+│   ├── models/                # Data structures (projects.go, todo.go, jira.go)
 │   └── utilities/             # Helper functions
-│       ├── general.go         # ClearScreen functionality
-│       └── sanitisation.go   # Input sanitization (ANSI escape prevention)
+│       ├── general.go         # ClearScreen, browser opening
+│       ├── sanitisation.go    # Input sanitization (ANSI escape prevention)
+│       └── jira_util.go       # Jira session management
 └── test-directory/            # Test directory (in .gitignore)
 ```
 
@@ -361,9 +380,45 @@ Plan to add an interactive terminal UI (similar to lazygit) for:
 - **Criticality assignment** - Suggest priority levels (requires database schema update)
 - **Completion order** - Suggest optimal order of completion
 
+## Service Architecture (Refactored October 2024)
+
+The service layer has been refactored from monolithic files to **sub-packages by domain**:
+
+### Benefits
+- **Modular Organization**: Each domain has its own package
+- **Logical File Separation**: No more 400+ line service files
+- **Easy Navigation**: Clear file names indicate purpose
+- **Scalability**: Easy to add new features within each domain
+- **Testability**: Easier to unit test smaller, focused files
+- **Consistent Pattern**: All services follow the same structure
+
+### Service Package Structure
+Each service package typically contains:
+- `service.go` - Service struct, constructor (`New()`), and interfaces
+- `queries.go` - Read/List operations
+- `crud.go` - Create, Update, Delete operations
+- Domain-specific files (e.g., `complete.go` for todo completion, `prompts.go` for user interaction)
+
+### Dependency Injection
+Services that depend on other services use **interface-based dependency injection**:
+- Interfaces defined in the consuming service
+- Dependencies injected via `SetDependencies()` or `SetProjectService()` methods
+- Wired together in `cmd/root.go` after all services are initialized
+
+Example from `root.go`:
+```go
+// Jira service needs todo and project services
+jira.JiraService.SetDependencies(todo.TodoService, projects.ProjectService)
+// Todo service needs project service
+todo.TodoService.SetProjectService(projects.ProjectService)
+// Utility service needs todo and project services
+utilityCommands.UtilityService.SetDependencies(todo.TodoService, projects.ProjectService)
+```
+
 ## Tips
 - The project uses directory-based project management
 - Always test from test-directory to avoid polluting main project
 - Flag variables are shared across commands (potential for bugs)
 - ClearScreen utility is in `/home/sam/coding/toto/internal/utilities/general.go`
 - Database connection is passed down from root to subcommands
+- Services are organized by domain in sub-packages under `internal/service/`
