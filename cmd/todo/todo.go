@@ -3,13 +3,13 @@ package todo
 import (
 	"database/sql"
 
-	"github.com/samhodg1993/toto/internal/service"
+	"github.com/samhodg1993/toto/internal/service/todo"
 
 	"github.com/spf13/cobra"
 )
 
 var db *sql.DB
-var TodoService *service.TodoService
+var TodoService *todo.Service
 
 // TodoCmd represents the todo command group
 var TodoCmd = &cobra.Command{
@@ -21,5 +21,5 @@ var TodoCmd = &cobra.Command{
 // SetDatabase sets the database connection for the todo commands
 func SetDatabase(database *sql.DB) {
 	db = database
-	TodoService = service.NewTodoService(db)
+	TodoService = todo.New(db)
 }

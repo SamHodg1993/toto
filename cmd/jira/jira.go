@@ -3,13 +3,13 @@ package jira
 import (
 	"database/sql"
 
-	"github.com/samhodg1993/toto/internal/service"
+	"github.com/samhodg1993/toto/internal/service/jira"
 
 	"github.com/spf13/cobra"
 )
 
 var db *sql.DB
-var JiraService *service.JiraService
+var JiraService *jira.Service
 
 // JiraCmd represents the jira command group
 var JiraCmd = &cobra.Command{
@@ -21,5 +21,5 @@ var JiraCmd = &cobra.Command{
 // SetDatabase sets the database connection for the jira commands
 func SetDatabase(database *sql.DB) {
 	db = database
-	JiraService = service.NewJiraService(db)
+	JiraService = jira.New(db)
 }

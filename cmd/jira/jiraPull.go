@@ -2,11 +2,7 @@ package jira
 
 import (
 	"fmt"
-	"time"
 
-	"github.com/samhodg1993/toto/cmd/projects"
-	"github.com/samhodg1993/toto/cmd/todo"
-	"github.com/samhodg1993/toto/internal/models"
 	"github.com/spf13/cobra"
 )
 
@@ -18,51 +14,10 @@ var JiraPull = &cobra.Command{
 	Long:  "Pull a ticket from Jira and create a new todo based on the tickets available information",
 	Args:  cobra.NoArgs,
 	Run: func(cmd *cobra.Command, args []string) {
-		if jiraTicketId == "" {
-			fmt.Println("You must provide this function with a jira ticket id using the -i flag.")
-			return
-		}
-
-		ticket, err := JiraService.GetSingleJiraTicket(jiraTicketId)
-		if err != nil {
+		if err := JiraService.HandlePullTicket(jiraTicketId); err != nil {
 			fmt.Println(err)
 			return
 		}
-
-		jiraTicket := &models.JiraTicket{
-			JiraKey:    ticket.Key,
-			Title:      ticket.Fields.Summary,
-			Status:     ticket.Fields.Status.Name,
-			ProjectKey: ticket.Fields.Project.Key,
-			IssueType:  ticket.Fields.IssueType.Name,
-			URL:        ticket.Self,
-		}
-
-		jiraInsertId, err := JiraService.InsertJiraTicket(jiraTicket)
-		if err != nil {
-			fmt.Printf("Failed to insert jira ticket. Err: %v", err)
-			return
-		}
-
-		projectId, err := projects.ProjectService.GetProjectIdByFilepath()
-		if err != nil {
-			fmt.Printf("Error occured when collecting filepath project when pulling jira ticket. Exited with error: %v", err)
-			return
-		}
-
-		if err = todo.TodoService.AddTodo(
-			jiraTicket.Title,
-			ticket.GetDescriptionText(),
-			projectId,
-			time.Now(),
-			time.Now(),
-			jiraInsertId,
-		); err != nil {
-			fmt.Printf("Failed to store new Todo, jira table row created. Error: %v", err)
-			return
-		}
-
-		fmt.Printf("Successfully pulled Jira ticket %s and created todo!\n", ticket.Key)
 	},
 }
 

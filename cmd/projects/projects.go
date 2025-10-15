@@ -3,13 +3,13 @@ package projects
 import (
 	"database/sql"
 
-	"github.com/samhodg1993/toto/internal/service"
+	"github.com/samhodg1993/toto/internal/service/project"
 
 	"github.com/spf13/cobra"
 )
 
 var db *sql.DB
-var ProjectService *service.ProjectService
+var ProjectService *project.Service
 
 // ProjectsCmd represents the projects command group
 var ProjectsCmd = &cobra.Command{
@@ -21,5 +21,5 @@ var ProjectsCmd = &cobra.Command{
 // SetDatabase sets the database connection for the projects commands
 func SetDatabase(database *sql.DB) {
 	db = database
-	ProjectService = service.NewProjectService(db)
+	ProjectService = project.New(db)
 }

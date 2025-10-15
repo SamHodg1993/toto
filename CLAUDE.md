@@ -1,3 +1,4 @@
+for this session, you can refactor.
 # Claude Code Knowledge Base - Toto CLI Project
 
 ## Project Overview

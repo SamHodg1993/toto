@@ -7,7 +7,7 @@ import (
 	"os"
 
 	"github.com/google/uuid"
-	"github.com/samhodg1993/toto/internal/service"
+	"github.com/samhodg1993/toto/internal/service/jira"
 	"github.com/samhodg1993/toto/internal/utilities"
 	"github.com/zalando/go-keyring"
 
@@ -37,7 +37,7 @@ var JiraAuth = &cobra.Command{
 		authUrl := "https://auth.atlassian.com/authorize?audience=api.atlassian.com&client_id=" + clientId + "&scope=read%3Ajira-work%20write%3Ajira-work%20offline_access&redirect_uri=" + url.QueryEscape(redirectUrl) + "&state=" + uuid + "&response_type=code&prompt=consent"
 		utilities.OpenBrowser(authUrl)
 
-		code, err := service.StartCallbackServer(uuid)
+		code, err := jira.StartCallbackServer(uuid)
 		if err != nil {
 			fmt.Printf("Authentication failed: %v\n", err)
 			return

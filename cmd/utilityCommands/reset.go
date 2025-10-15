@@ -5,14 +5,14 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/samhodg1993/toto/internal/service"
+	"github.com/samhodg1993/toto/internal/service/database"
 
 	"github.com/spf13/cobra"
 )
 
 var (
 	confirmFlag bool
-	dbService   *service.DBService
+	dbService   *database.Service
 )
 
 var ResetCmd = &cobra.Command{
@@ -45,8 +45,8 @@ var ResetCmd = &cobra.Command{
 }
 
 // InitDBService initializes the DB service with a database connection
-func InitDBService(database *sql.DB) {
-	dbService = service.NewDBService(database)
+func InitDBService(db *sql.DB) {
+	dbService = database.New(db)
 }
 
 func init() {

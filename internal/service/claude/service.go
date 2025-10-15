@@ -1,4 +1,4 @@
-package service
+package claude
 
 import (
 	"context"
@@ -12,11 +12,13 @@ import (
 	"github.com/zalando/go-keyring"
 )
 
+// SubTask represents a task broken down by Claude AI
 type SubTask struct {
 	Title       string `json:"title"`
 	Description string `json:"description"`
 }
 
+// GetClaudeAPIKey retrieves the Claude API key from environment or keyring
 func GetClaudeAPIKey() (string, error) {
 	// Try environment variable
 	if apiKey := os.Getenv("CLAUDE_API_KEY"); apiKey != "" {
@@ -31,6 +33,7 @@ func GetClaudeAPIKey() (string, error) {
 	return apiKey, nil
 }
 
+// BreakdownJiraTicketWithClaude uses Claude AI to break down a Jira ticket into subtasks
 func BreakdownJiraTicketWithClaude(ticketKey, title, description string) ([]SubTask, error) {
 	apiKey, err := GetClaudeAPIKey()
 	if err != nil {

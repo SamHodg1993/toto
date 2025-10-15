@@ -1,22 +1,22 @@
-package service
+package database
 
 import (
 	"database/sql"
 	"fmt"
 )
 
-// DBService handles database-wide operations
-type DBService struct {
+// Service handles database-wide operations
+type Service struct {
 	db *sql.DB
 }
 
-// NewDBService creates a new database service
-func NewDBService(db *sql.DB) *DBService {
-	return &DBService{db: db}
+// New creates a new database service
+func New(db *sql.DB) *Service {
+	return &Service{db: db}
 }
 
 // ResetDatabase clears all data from the database and resets auto-increment values
-func (s *DBService) ResetDatabase() error {
+func (s *Service) ResetDatabase() error {
 	// Use a transaction to ensure all operations complete successfully
 	tx, err := s.db.Begin()
 	if err != nil {

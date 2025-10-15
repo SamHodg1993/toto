@@ -1,4 +1,4 @@
-package service
+package project
 
 import (
 	"bufio"
@@ -12,92 +12,8 @@ import (
 	"github.com/samhodg1993/toto/internal/utilities"
 )
 
-var sql_insert_project string = `
-	INSERT INTO projects (
-		title, 
-		description, 
-		archived, 
-		filepath, 
-		created_at, 
-		updated_at
-	) VALUES (?,?,?,?,?,?)`
-
-type ProjectService struct {
-	db *sql.DB
-}
-
-func NewProjectService(db *sql.DB) *ProjectService {
-	return &ProjectService{db: db}
-}
-
-// scanRowToProject converts a SQL row to a Project model
-func scanRowToProject(rows *sql.Rows) (models.Project, error) {
-	var p models.Project
-	err := rows.Scan(&p.ID, &p.Title, &p.Description, &p.Filepath, &p.Archived, &p.CreatedAt, &p.UpdatedAt)
-	return p, err
-}
-
-// ListProjects returns all projects as a slice of Project models
-func (s *ProjectService) ListProjects() ([]models.Project, error) {
-	rows, err := s.db.Query("SELECT id, title, description, filepath, archived, created_at, updated_at FROM projects")
-	if err != nil {
-		return nil, err
-	}
-	defer rows.Close()
-
-	var projects []models.Project
-	for rows.Next() {
-		project, err := scanRowToProject(rows)
-		if err != nil {
-			return nil, fmt.Errorf("error scanning project: %w", err)
-		}
-		projects = append(projects, project)
-	}
-
-	return projects, rows.Err()
-}
-
-// GetProjectIdByFilepath returns the project ID for the current directory
-func (s *ProjectService) GetProjectIdByFilepath() (int, error) {
-	var projectId int = 0
-
-	currentDir, err := os.Getwd()
-	if err != nil {
-		return 0, fmt.Errorf("error getting current directory: %w", err)
-	}
-
-	row := s.db.QueryRow("SELECT id FROM projects WHERE filepath = ?", currentDir)
-
-	err = row.Scan(&projectId)
-	if err != nil {
-		return 0, fmt.Errorf("no project exists for this filepath")
-	}
-
-	return projectId, nil
-}
-
-// AddNewProjectWithPrompt prompts the user for project details and adds the project
-func (s *ProjectService) AddNewProjectWithPrompt() error {
-	var (
-		project models.NewProject
-		reader  = bufio.NewReader(os.Stdin)
-	)
-
-	fmt.Println("Please enter the title of your new project...")
-	projectTitle, _ := reader.ReadString('\n')
-	sanitisedTitle := utilities.SanitizeInput(projectTitle, "title")
-	project.Title = strings.TrimSpace(sanitisedTitle)
-
-	fmt.Println("Please enter the description of your new project...")
-	projectDescription, _ := reader.ReadString('\n')
-	sanitisedDesc := utilities.SanitizeInput(projectDescription, "description")
-	project.Description = strings.TrimSpace(sanitisedDesc)
-
-	return s.AddNewProject(project)
-}
-
 // AddNewProject adds a new project to the database
-func (s *ProjectService) AddNewProject(project models.NewProject) error {
+func (s *Service) AddNewProject(project models.NewProject) error {
 	if strings.TrimSpace(project.Title) == "" {
 		return fmt.Errorf("project title cannot be empty")
 	}
@@ -126,8 +42,69 @@ func (s *ProjectService) AddNewProject(project models.NewProject) error {
 	return nil
 }
 
+// AddNewProjectWithPrompt prompts the user for project details and adds the project
+func (s *Service) AddNewProjectWithPrompt() error {
+	var (
+		project models.NewProject
+		reader  = bufio.NewReader(os.Stdin)
+	)
+
+	fmt.Println("Please enter the title of your new project...")
+	projectTitle, _ := reader.ReadString('\n')
+	sanitisedTitle := utilities.SanitizeInput(projectTitle, "title")
+	project.Title = strings.TrimSpace(sanitisedTitle)
+
+	fmt.Println("Please enter the description of your new project...")
+	projectDescription, _ := reader.ReadString('\n')
+	sanitisedDesc := utilities.SanitizeInput(projectDescription, "description")
+	project.Description = strings.TrimSpace(sanitisedDesc)
+
+	return s.AddNewProject(project)
+}
+
+// HandleAddNewProject takes title and description from CLI and adds a project
+func (s *Service) HandleAddNewProject(projectTitle string, projectDescription string) error {
+	var project models.NewProject
+	var reader = bufio.NewReader(os.Stdin)
+
+	if projectTitle == "" {
+		fmt.Println("Please enter the title of your new project...")
+		input, _ := reader.ReadString('\n')
+		project.Title = strings.TrimSpace(input)
+	} else {
+		project.Title = projectTitle
+	}
+
+	if projectDescription == "" {
+		fmt.Println("Please enter the description of your new project...")
+		input, _ := reader.ReadString('\n')
+		project.Description = strings.TrimSpace(input)
+	} else {
+		project.Description = projectDescription
+	}
+
+	project.Title = utilities.SanitizeInput(project.Title, "title")
+	project.Description = utilities.SanitizeInput(project.Description, "description")
+
+	currentDir, err := os.Getwd()
+	if err != nil {
+		return fmt.Errorf("error getting current directory: %w", err)
+	}
+	// Set the filepath
+	project.Filepath = currentDir
+
+	// Add the new project
+	err = s.AddNewProject(project)
+	if err != nil {
+		return err
+	}
+
+	fmt.Printf("New project added: %s\n", project.Title)
+	return nil
+}
+
 // DeleteProject deletes a project and its associated todos
-func (s *ProjectService) DeleteProject(id int) error {
+func (s *Service) DeleteProject(id int) error {
 	if id <= 0 {
 		return fmt.Errorf("invalid project id")
 	}
@@ -175,29 +152,8 @@ func (s *ProjectService) DeleteProject(id int) error {
 	return nil
 }
 
-// HandleNoExistingProject prompts the user for actions when no project exists
-func (s *ProjectService) HandleNoExistingProject() (int, error) {
-	var cancel string
-
-	fmt.Println(`There is currently no project for this filepath. 
-			Would you like to 
-			0 - Cancel 
-			1 - Add to the global todo list? 
-			OR 
-			2 - Create a new project for this filepath?`)
-	fmt.Scanf("%s", &cancel)
-	if cancel == "1" {
-		return 1, nil
-	} else if cancel == "2" {
-		return 2, nil
-	} else {
-		fmt.Println("Aborting.")
-		return 0, fmt.Errorf("operation cancelled by user")
-	}
-}
-
 // UpdateProject updates a project's title, description, or filepath
-func (s *ProjectService) UpdateProject(projectID int, title string, description, filepath string, titleProvided, descProvided, filepathProvided bool) (string, error) {
+func (s *Service) UpdateProject(projectID int, title string, description, filepath string, titleProvided, descProvided, filepathProvided bool) (string, error) {
 	// Check if ID is valid
 	if projectID <= 0 {
 		return "", fmt.Errorf("invalid project ID")
@@ -247,8 +203,8 @@ func (s *ProjectService) UpdateProject(projectID int, title string, description,
 
 	// Update project
 	_, err = s.db.Exec(
-		`UPDATE projects 
-		 SET title = ?, description = ?, filepath = ?, updated_at = ? 
+		`UPDATE projects
+		 SET title = ?, description = ?, filepath = ?, updated_at = ?
 		 WHERE id = ?`,
 		finalTitle, finalDesc, finalFilepath, time.Now(), projectID,
 	)
@@ -277,45 +233,4 @@ func (s *ProjectService) UpdateProject(projectID int, title string, description,
 	}
 
 	return message, nil
-}
-
-// HandleAddNewProject takes title and description from CLI and adds a project
-func (s *ProjectService) HandleAddNewProject(projectTitle string, projectDescription string) error {
-	var project models.NewProject
-	var reader = bufio.NewReader(os.Stdin)
-
-	if projectTitle == "" {
-		fmt.Println("Please enter the title of your new project...")
-		input, _ := reader.ReadString('\n')
-		project.Title = strings.TrimSpace(input)
-	} else {
-		project.Title = projectTitle
-	}
-
-	if projectDescription == "" {
-		fmt.Println("Please enter the description of your new project...")
-		input, _ := reader.ReadString('\n')
-		project.Description = strings.TrimSpace(input)
-	} else {
-		project.Description = projectDescription
-	}
-
-	project.Title = utilities.SanitizeInput(project.Title, "title")
-	project.Description = utilities.SanitizeInput(project.Description, "description")
-
-	currentDir, err := os.Getwd()
-	if err != nil {
-		return fmt.Errorf("error getting current directory: %w", err)
-	}
-	// Set the filepath
-	project.Filepath = currentDir
-
-	// Add the new project
-	err = s.AddNewProject(project)
-	if err != nil {
-		return err
-	}
-
-	fmt.Printf("New project added: %s\n", project.Title)
-	return nil
 }

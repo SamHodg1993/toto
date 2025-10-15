@@ -1,4 +1,4 @@
-package service
+package utility
 
 import (
 	"database/sql"
@@ -11,22 +11,38 @@ import (
 	"github.com/samhodg1993/toto/internal/utilities"
 )
 
-type UtilityCommandsService struct {
-	db             *sql.DB
-	todoService    *TodoService
-	projectService *ProjectService
+// TodoServiceInterface defines methods needed from todo service
+type TodoServiceInterface interface {
+	RemoveCompletedTodosForProject(projectId int) error
 }
 
-// NewUtilityCommandsService creates a new utility commands service
-func NewUtilityCommandsService(db *sql.DB) *UtilityCommandsService {
-	return &UtilityCommandsService{
-		db:             db,
-		todoService:    NewTodoService(db),
-		projectService: NewProjectService(db),
+// ProjectServiceInterface defines methods needed from project service
+type ProjectServiceInterface interface {
+	HandleNoExistingProject() (int, error)
+}
+
+// Service handles utility command operations
+type Service struct {
+	db             *sql.DB
+	todoService    TodoServiceInterface
+	projectService ProjectServiceInterface
+}
+
+// New creates a new utility commands service
+func New(db *sql.DB) *Service {
+	return &Service{
+		db: db,
 	}
 }
 
-func (s *UtilityCommandsService) CleanAndPrintTodos() error {
+// SetDependencies allows injecting service dependencies
+func (s *Service) SetDependencies(todoService TodoServiceInterface, projectService ProjectServiceInterface) {
+	s.todoService = todoService
+	s.projectService = projectService
+}
+
+// CleanAndPrintTodos clears screen, removes completed todos, and displays remaining todos
+func (s *Service) CleanAndPrintTodos() error {
 	utilities.ClearScreen()
 
 	currentDir, err := os.Getwd()

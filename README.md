@@ -33,7 +33,38 @@ Right now, just that we base projects around the current working directory. Soon
 go install github.com/samhodg1993/toto@latest
 ```
 
-The `toto` command will be available in your terminal once `$GOPATH/bin` is in your PATH.
+### Ensuring `toto` is in your PATH
+
+After installation, make sure `$GOPATH/bin` (typically `$HOME/go/bin`) is in your PATH.
+
+**Check if it's already in your PATH:**
+```bash
+echo $PATH | grep go/bin
+```
+
+**If not, add it to your shell configuration:**
+
+**Bash** (add to `~/.bashrc`):
+```bash
+export PATH="$HOME/go/bin:$PATH"
+```
+
+**Zsh** (add to `~/.zshrc`):
+```bash
+export PATH="$HOME/go/bin:$PATH"
+```
+
+**Fish** (add to `~/.config/fish/config.fish`):
+```fish
+set -gx PATH $HOME/go/bin $PATH
+```
+
+**Then reload your shell:**
+```bash
+source ~/.bashrc  # or source ~/.zshrc, or restart your terminal
+```
+
+The `toto` command will now be available globally.
 
 ### For Developers/Contributors
 

@@ -39,6 +39,14 @@ func Execute() {
 	utilityCommands.SetDatabase(Database)
 	utilityCommands.InitDBService(Database)
 
+	// Inject service dependencies
+	// Jira service needs todo and project services
+	jira.JiraService.SetDependencies(todo.TodoService, projects.ProjectService)
+	// Todo service needs project service
+	todo.TodoService.SetProjectService(projects.ProjectService)
+	// Utility service needs todo and project services
+	utilityCommands.UtilityService.SetDependencies(todo.TodoService, projects.ProjectService)
+
 	// Add utility commands
 	RootCmd.AddCommand(utilityCommands.ResetCmd)
 	RootCmd.AddCommand(utilityCommands.CleanUtility)
