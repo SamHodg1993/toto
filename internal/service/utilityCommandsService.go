@@ -8,7 +8,7 @@ import (
 
 	"github.com/fatih/color"
 	"github.com/olekukonko/tablewriter"
-	"github.com/samhodg1993/toto-todo-cli/internal/utilities"
+	"github.com/samhodg1993/toto/internal/utilities"
 )
 
 type UtilityCommandsService struct {

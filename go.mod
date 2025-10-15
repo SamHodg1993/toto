@@ -1,4 +1,4 @@
-module github.com/samhodg1993/toto-todo-cli
+module github.com/samhodg1993/toto
 
 go 1.23.4
 

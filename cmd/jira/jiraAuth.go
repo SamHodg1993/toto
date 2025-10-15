@@ -7,8 +7,8 @@ import (
 	"os"
 
 	"github.com/google/uuid"
-	"github.com/samhodg1993/toto-todo-cli/internal/service"
-	"github.com/samhodg1993/toto-todo-cli/internal/utilities"
+	"github.com/samhodg1993/toto/internal/service"
+	"github.com/samhodg1993/toto/internal/utilities"
 	"github.com/zalando/go-keyring"
 
 	"github.com/spf13/cobra"

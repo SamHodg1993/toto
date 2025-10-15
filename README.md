@@ -30,7 +30,7 @@ Right now, just that we base projects around the current working directory. Soon
 ```bash
 # Install directly with Go (requires Go 1.21+)
 # Works on Windows, Mac, and Linux
-go install github.com/samhodg1993/toto-todo-cli@latest
+go install github.com/samhodg1993/toto@latest
 ```
 
 The `toto` command will be available in your terminal once `$GOPATH/bin` is in your PATH.

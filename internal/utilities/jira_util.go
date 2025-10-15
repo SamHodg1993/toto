@@ -9,7 +9,7 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/samhodg1993/toto-todo-cli/internal/models"
+	"github.com/samhodg1993/toto/internal/models"
 
 	"github.com/zalando/go-keyring"
 )

@@ -4,9 +4,9 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/samhodg1993/toto-todo-cli/cmd/projects"
-	"github.com/samhodg1993/toto-todo-cli/cmd/todo"
-	"github.com/samhodg1993/toto-todo-cli/internal/models"
+	"github.com/samhodg1993/toto/cmd/projects"
+	"github.com/samhodg1993/toto/cmd/todo"
+	"github.com/samhodg1993/toto/internal/models"
 	"github.com/spf13/cobra"
 )
 
