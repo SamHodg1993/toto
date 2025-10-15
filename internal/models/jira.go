@@ -20,6 +20,13 @@ type JiraTicket struct {
 	UpdatedAt    time.Time    `db:"updated_at" json:"updatedAt"`
 }
 
+// ADFNode represents a node in Atlassian Document Format
+type ADFNode struct {
+	Type    string    `json:"type"`
+	Text    string    `json:"text,omitempty"`
+	Content []ADFNode `json:"content,omitempty"`
+}
+
 // JiraBasedTicket represents a Jira ticket coming from Jira
 type JiraBasedTicket struct {
 	ID     string `json:"id"`
@@ -28,15 +35,9 @@ type JiraBasedTicket struct {
 	Fields struct {
 		Summary     string `json:"summary"`
 		Description struct {
-			Type    string `json:"type"`
-			Version int    `json:"version"`
-			Content []struct {
-				Type    string `json:"type"`
-				Content []struct {
-					Type string `json:"type"`
-					Text string `json:"text"`
-				} `json:"content"`
-			} `json:"content"`
+			Type    string    `json:"type"`
+			Version int       `json:"version"`
+			Content []ADFNode `json:"content"`
 		} `json:"description"`
 		Status struct {
 			Name string `json:"name"`
@@ -51,13 +52,38 @@ type JiraBasedTicket struct {
 	} `json:"fields"`
 }
 
-func (j *JiraBasedTicket) GetDescriptionText() string {
+// extractTextFromADF recursively extracts text from ADF nodes
+func extractTextFromADF(nodes []ADFNode, depth int) string {
 	var text string
-	for _, paragraph := range j.Fields.Description.Content {
-		for _, content := range paragraph.Content {
-			text += content.Text + " "
+	for _, node := range nodes {
+		switch node.Type {
+		case "text":
+			text += node.Text
+		case "paragraph":
+			text += extractTextFromADF(node.Content, depth+1) + "\n\n"
+		case "bulletList", "orderedList":
+			text += extractTextFromADF(node.Content, depth+1)
+		case "listItem":
+			// Add bullet point or number prefix
+			prefix := "• "
+			if depth > 0 {
+				prefix = strings.Repeat("  ", depth-1) + prefix
+			}
+			text += prefix + strings.TrimSpace(extractTextFromADF(node.Content, depth+1)) + "\n"
+		case "hardBreak":
+			text += "\n"
+		default:
+			// For unknown types, try to extract content recursively
+			if len(node.Content) > 0 {
+				text += extractTextFromADF(node.Content, depth+1)
+			}
 		}
 	}
+	return text
+}
+
+func (j *JiraBasedTicket) GetDescriptionText() string {
+	text := extractTextFromADF(j.Fields.Description.Content, 0)
 	return strings.TrimSpace(text)
 }
 

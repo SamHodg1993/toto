@@ -23,6 +23,31 @@ func NewJiraService(db *sql.DB) *JiraService {
 }
 
 func (j *JiraService) InsertJiraTicket(ticket *models.JiraTicket) (int64, error) {
+	// Check if ticket already exists
+	var existingId int64
+	err := j.db.QueryRow("SELECT id FROM jira_tickets WHERE jira_key = ?", ticket.JiraKey).Scan(&existingId)
+
+	if err == nil {
+		// Ticket exists, update it and return existing ID
+		_, updateErr := j.db.Exec(
+			`UPDATE jira_tickets
+			SET title = ?, status = ?, project_key = ?, issue_type = ?, url = ?, last_synced_at = ?
+			WHERE jira_key = ?`,
+			ticket.Title,
+			ticket.Status,
+			ticket.ProjectKey,
+			ticket.IssueType,
+			ticket.URL,
+			time.Now(),
+			ticket.JiraKey,
+		)
+		if updateErr != nil {
+			return 0, fmt.Errorf("Failed to update existing jira ticket: %v", updateErr)
+		}
+		return existingId, nil
+	}
+
+	// Ticket doesn't exist, insert new one
 	result, err := j.db.Exec(
 		`INSERT INTO jira_tickets (
 		  jira_key, title, status, project_key, issue_type, url, last_synced_at

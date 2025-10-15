@@ -47,6 +47,7 @@ func Execute() {
 	RootCmd.AddCommand(jira.JiraAuth)
 	RootCmd.AddCommand(jira.JiraSetCloudId)
 	RootCmd.AddCommand(jira.JiraPull)
+	RootCmd.AddCommand(jira.JiraPullClaude)
 
 	// Add todo commands
 	RootCmd.AddCommand(todo.AddCmd)

@@ -154,8 +154,10 @@ toto --help
 | `project-add`     | `proj-add`  | Add a new project                                  | `-t`: specify title, `-d`: specify description, `-f`: specify project filepath |
 | `project-delete`  | `proj-del`  | Delete an existing project                         | `-i`: target project id                                     |
 | -                 | `proj-edit` | Update a single project                            | `-t`: text for title update, `-f`: text for filepath update , `-i`: target project id, `-d`: text for description update |
-| **Jira Integration** | -         | **Jira authentication (in development)**          | -                                                            |
+| **Jira Integration** | -         | **Jira ticket management**                        | -                                                            |
 | `jira-auth`       | -           | Authenticate with Jira using OAuth 2.0            | Stores tokens securely in OS keyring                        |
+| `jira-pull`       | -           | Pull a Jira ticket and create a linked todo       | `-i`: Jira ticket ID (e.g., PROJ-123)                       |
+| `jira-pull-claude` | -          | Pull Jira ticket and break it into subtasks with AI | `-i`: Jira ticket ID (e.g., PROJ-123)                       |
 | `completion`      | -           | Generate autocompletion script for specified shell | Run `toto completion --help` for shell options               |
 
 ## Examples
@@ -175,7 +177,7 @@ Mark task as complete:
 toto comp -i 1
 ```
 
-**Jira Authentication Example (in development):**
+**Jira Integration Examples:**
 
 Authenticate with Jira:
 ```bash
@@ -183,25 +185,38 @@ toto jira-auth
 ```
 This opens your browser to authenticate with Atlassian and securely stores your tokens.
 
+Pull a Jira ticket and create a todo:
+```bash
+toto jira-pull -i PROJ-123
+```
+
+Pull a Jira ticket and break it into subtasks with AI:
+```bash
+toto jira-pull-claude -i PROJ-123
+```
+This uses Claude AI to intelligently break down the ticket into actionable subtasks. If the description contains a bulleted list, it extracts each item. Otherwise, it analyzes the ticket and creates 3-8 subtasks.
+
 ## Roadmap
 
-### In Progress
-- 🚧 **Jira integration** - OAuth authentication complete, REST API client next
+### Completed ✅
+- ✅ **Jira integration** - OAuth authentication, ticket fetching, and AI-powered breakdown
+- ✅ **LLM Integration (Phase 1)** - Claude API for Jira ticket breakdown into subtasks
 
 ### Planned Features
 - **Terminal UI (TUI)** - Interactive browser for Jira tickets and todos (lazygit-style)
-- **LLM Integration** - Claude API for AI-assisted todo management:
+- **LLM Integration (Phase 2)** - Additional AI features:
   - Auto-generate titles from brief descriptions
   - Improve/rename existing todos
   - Expand descriptions with context
-  - Suggest criticality levels and completion order (future)
+  - Suggest criticality levels and completion order
+- **Jira Push/Sync** - Create Jira tickets from todos and sync status
 - **Priority/Criticality System** - Add priority levels for todos
 - **Monday.com integration** - Similar integration to Jira
 - **github.com integration** - Similar integration to Jira
 
-## Jira Integration Setup (In Development)
+## Jira Integration Setup
 
-Jira integration is currently under active development. OAuth 2.0 authentication is complete!
+Jira integration is fully functional with OAuth 2.0 authentication and AI-powered ticket breakdown!
 
 ### Current Status
 ✅ **Completed:**
@@ -210,18 +225,21 @@ Jira integration is currently under active development. OAuth 2.0 authentication
 - Cloud ID management (automatic fetch + manual override)
 - Database schema for Jira tickets
 - REST API client for fetching individual tickets
-- ADF (Atlassian Document Format) description parsing
+- ADF (Atlassian Document Format) description parsing (supports bullet lists, ordered lists, etc.)
+- `jira-pull` command - Fetch ticket and create linked todo
+- `jira-pull-claude` command - AI-powered ticket breakdown using Claude 3.5 Sonnet
 
-🚧 **In Progress:**
-- `jira-pull` command - Fetch working, database save pending
-- Ticket creation and sync commands
+🚧 **Coming Soon:**
+- `toto jira-push -i <todo-id>` - Create Jira ticket from todo
+- `toto jira-sync` - Sync status between todos and Jira
 
-### Setup (for developers/testers)
+### Setup
 
 1. **Create a `.env` file in the project root:**
    ```bash
    JIRA_CLIENT_ID=your-oauth-client-id
    JIRA_CLIENT_SECRET=your-oauth-client-secret
+   CLAUDE_API_KEY=your-claude-api-key
    ```
 
 2. **Authenticate with Jira:**
@@ -230,16 +248,17 @@ Jira integration is currently under active development. OAuth 2.0 authentication
    ```
    This will open your browser to authenticate with Atlassian and securely store tokens.
 
-3. **Pull a Jira ticket:** (In Progress)
+3. **Pull a Jira ticket:**
    ```bash
-   toto jira-pull -i MBA-123
+   toto jira-pull -i PROJ-123
    ```
-   Fetches the ticket from Jira (database save coming soon).
+   Fetches the ticket from Jira, saves it to the database, and creates a linked todo.
 
-4. **Coming soon:**
-   - Complete database integration for `jira-pull`
-   - `toto jira-push -i <todo-id>` - Create Jira ticket from todo
-   - `toto jira-sync` - Sync status between todos and Jira
+4. **Pull a Jira ticket with AI breakdown:**
+   ```bash
+   toto jira-pull-claude -i PROJ-123
+   ```
+   Uses Claude AI to intelligently break down the ticket into multiple subtasks.
 
 ## Prerequisites
 
@@ -247,6 +266,7 @@ Jira integration is currently under active development. OAuth 2.0 authentication
 - Git (for development)
 - SQLite3 (automatically handled by Go modules)
 - **For Jira integration:** Jira account with API access
+- **For AI features:** Anthropic API key (get one at https://console.anthropic.com/)
 
 ## Contributing
 
