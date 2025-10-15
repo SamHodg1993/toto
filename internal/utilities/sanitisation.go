@@ -13,7 +13,7 @@ import (
 // print the following to the console
 //
 // Banned characters were detected in the title. They have been removed.
-// To see the full list of banned characters, please view the documentation at github.com/samhodg1993/toto-todo-cli
+// To see the full list of banned characters, please view the documentation at github.com/samhodg1993/toto
 func SanitizeInput(input string, fieldName string) string {
 	// Remove ANSI escape sequences including \033[C and other variants
 	// This covers ESC[ followed by any combination of digits, semicolons, and letters
@@ -42,7 +42,7 @@ func SanitizeInput(input string, fieldName string) string {
 
 	if sanitisedInput != input {
 		fmt.Printf("Banned characters were detected in the %s. They have been removed.", fieldName)
-		fmt.Println("To see the full list of banned characters, please view the documentation at github.com/samhodg1993/toto-todo-cli")
+		fmt.Println("To see the full list of banned characters, please view the documentation at github.com/samhodg1993/toto")
 	}
 
 	return sanitisedInput

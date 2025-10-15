@@ -39,10 +39,10 @@ The `toto` command will be available in your terminal once `$GOPATH/bin` is in y
 
 ```bash
 # Clone the repository
-git clone https://github.com/samhodg1993/toto-todo-cli.git
+git clone https://github.com/samhodg1993/toto.git
 
 # Navigate to the directory
-cd toto-todo-cli
+cd toto
 
 # Build locally
 go build -o toto .
@@ -52,14 +52,14 @@ go build -o toto .
 - Powershell
 ```powershell
 # Run the install script
-cd toto-todo-cli
+cd toto
 ./install.ps1
 ```
 
 #### Linux & Mac
 ```bash
 # Run the install script
-cd toto-todo-cli
+cd toto
 ./install.sh
 ```
 
