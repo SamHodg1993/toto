@@ -1,5 +1,14 @@
 package jira
 
+// ============================================================================
+// OAuth 2.0 Callback Server (DEPRECATED - Kept for potential future use)
+// ============================================================================
+// This callback server was used for OAuth 2.0 authentication flow.
+// Has been replaced with API token authentication (no callback needed).
+// Keeping this code commented out in case OAuth support is needed in the future.
+// ============================================================================
+
+/*
 import (
 	"context"
 	"fmt"
@@ -47,3 +56,4 @@ func StartCallbackServer(expectedState string) (string, error) {
 		return "", fmt.Errorf("authentication timeout")
 	}
 }
+*/

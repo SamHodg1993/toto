@@ -20,7 +20,7 @@ Right now, just that we base projects around the current working directory. Soon
 - Edit title and description information
 - Reset the database
 - Projects based on the current working directory
-- **Jira OAuth authentication** - Securely authenticate with Atlassian (ticket management coming soon)
+- **Jira API token authentication** - Simple, secure authentication with Atlassian (ticket management coming soon)
 - Simple and intuitive command-line interface
 - Build so you spend less time planning...
 
@@ -186,7 +186,7 @@ toto --help
 | `project-delete`  | `proj-del`  | Delete an existing project                         | `-i`: target project id                                     |
 | -                 | `proj-edit` | Update a single project                            | `-t`: text for title update, `-f`: text for filepath update , `-i`: target project id, `-d`: text for description update |
 | **Jira Integration** | -         | **Jira ticket management**                        | -                                                            |
-| `jira-auth`       | -           | Authenticate with Jira using OAuth 2.0            | Stores tokens securely in OS keyring                        |
+| `jira-auth`       | -           | Authenticate with Jira using API token            | Stores credentials securely in OS keyring                   |
 | `jira-pull`       | -           | Pull a Jira ticket and create a linked todo       | `-i`: Jira ticket ID (e.g., PROJ-123)                       |
 | `jira-pull-claude` | -          | Pull Jira ticket and break it into subtasks with AI | `-i`: Jira ticket ID (e.g., PROJ-123)                       |
 | `completion`      | -           | Generate autocompletion script for specified shell | Run `toto completion --help` for shell options               |
@@ -214,7 +214,7 @@ Authenticate with Jira:
 ```bash
 toto jira-auth
 ```
-This opens your browser to authenticate with Atlassian and securely stores your tokens.
+This will prompt you to create a Jira API token and securely stores your credentials.
 
 Pull a Jira ticket and create a todo:
 ```bash
@@ -247,12 +247,12 @@ This uses Claude AI to intelligently break down the ticket into actionable subta
 
 ## Jira Integration Setup
 
-Jira integration is fully functional with OAuth 2.0 authentication and AI-powered ticket breakdown!
+Jira integration is fully functional with API token authentication and AI-powered ticket breakdown!
 
 ### Current Status
 ✅ **Completed:**
-- OAuth 2.0 authentication with Atlassian with automatic token refresh
-- Secure token storage in OS keyring
+- API token authentication with Atlassian (simple, no OAuth app setup required)
+- Secure credential storage in OS keyring
 - Cloud ID management (automatic fetch + manual override)
 - Database schema for Jira tickets
 - REST API client for fetching individual tickets
@@ -266,18 +266,21 @@ Jira integration is fully functional with OAuth 2.0 authentication and AI-powere
 
 ### Setup
 
-1. **Create a `.env` file in the project root:**
-   ```bash
-   JIRA_CLIENT_ID=your-oauth-client-id
-   JIRA_CLIENT_SECRET=your-oauth-client-secret
-   CLAUDE_API_KEY=your-claude-api-key
-   ```
-
-2. **Authenticate with Jira:**
+1. **Authenticate with Jira:**
    ```bash
    toto jira-auth
    ```
-   This will open your browser to authenticate with Atlassian and securely store tokens.
+   This will guide you through creating a Jira API token:
+   - Opens https://id.atlassian.com/manage-profile/security/api-tokens
+   - Prompts for your Jira account email and API token
+   - Securely stores credentials in OS keyring
+
+2. **(Optional) For AI features, set up Claude API:**
+   Create a `.env` file in the project root:
+   ```bash
+   CLAUDE_API_KEY=your-claude-api-key
+   ```
+   Get an API key at https://console.anthropic.com/
 
 3. **Pull a Jira ticket:**
    ```bash

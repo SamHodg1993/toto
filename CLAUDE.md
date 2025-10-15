@@ -268,22 +268,21 @@ cd test-directory
 ## Jira Integration Progress
 
 ### Completed ✅
-1. **OAuth 2.0 Authentication** (`cmd/jira/jiraAuth.go`)
-   - Browser-based OAuth flow with Atlassian
-   - Callback server implementation with state validation (port 8989)
-   - Token exchange (authorization code → access token + refresh token)
-   - Automatic token refresh with expiry tracking
-   - Secure token storage using OS keyring (`github.com/zalando/go-keyring`)
-   - Environment variable support via `.env` file (`github.com/joho/godotenv`)
+1. **API Token Authentication** (`cmd/jira/jiraAuth.go`)
+   - Simple API token authentication (no OAuth app setup required)
+   - Interactive credential prompting with setup instructions
+   - Secure credential storage using OS keyring (`github.com/zalando/go-keyring`)
+   - Basic Auth with email:token base64 encoding
+   - OAuth 2.0 code kept for potential future use (commented out)
 
 2. **Cloud ID Management** (`internal/utilities/jira_util.go`, `cmd/jira/jiraAuth.go`)
-   - `GetUsersJiraCloudId()` - Automatic cloud ID fetch and storage
+   - `GetUsersJiraCloudId()` - Automatic cloud ID fetch and storage (updated for API tokens)
    - `jira-set-cloud-id` command - Manual cloud ID override
    - Automatic fallback if cloud ID is missing
 
-3. **Jira REST API Client** (`internal/service/jira.go`)
+3. **Jira REST API Client** (`internal/service/jira/client.go`)
    - `GetSingleJiraTicket()` - Fetch individual tickets by issue key
-   - Automatic token refresh integration
+   - Basic Auth with API token (email:token base64 encoded)
    - Automatic cloud ID fallback
    - Proper error handling with user-friendly messages
    - Duplicate ticket handling - UPDATE existing records on re-pull
@@ -295,15 +294,14 @@ cd test-directory
    - `extractTextFromADF()` - Recursive ADF parser supporting bulletList, orderedList, listItem, paragraph, text, hardBreak
    - `GetDescriptionText()` - Extracts plain text from complex ADF structures including bullet points
    - `JiraConfig` model for configuration management
-   - `TokenResponse` model for OAuth responses
 
 5. **Commands** (`cmd/jira/`)
-   - `jira-auth` - OAuth authentication
+   - `jira-auth` - API token authentication with interactive setup
    - `jira-set-cloud-id` - Manual cloud ID configuration
    - `jira-pull -i <issue-key>` - Pull Jira ticket, save to database, create linked todo
    - `jira-pull-claude -i <issue-key>` - Pull Jira ticket and use Claude AI to break it into subtasks
 
-6. **Claude AI Integration** (`internal/service/claude.go`)
+6. **Claude AI Integration** (`internal/service/claude/service.go`)
    - `BreakdownJiraTicketWithClaude()` - Uses Claude 3.5 Sonnet to intelligently break down Jira tickets
    - Smart prompt that detects explicit task lists vs high-level descriptions
    - Extracts bullet-pointed lists directly or breaks down complex tasks into 3-8 subtasks
@@ -312,26 +310,23 @@ cd test-directory
 
 7. **Infrastructure**
    - Database schema for `jira_tickets` table
-   - Callback server service (`internal/service/jira.go`)
    - Browser opening utility (`internal/utilities/general.go`)
-   - Token session management (`HandleJiraSessionBeforeCall()`)
+   - Base64 encoding helper for Basic Auth
 
 ### Environment Setup
-Required `.env` file in project root:
+Optional `.env` file in project root (only needed for AI features):
 ```
-JIRA_CLIENT_ID=your-client-id
-JIRA_CLIENT_SECRET=your-client-secret
 CLAUDE_API_KEY=your-claude-api-key
 ```
 
-### OAuth Scopes
-- `read:jira-work` - Read Jira data
-- `write:jira-work` - Create/update Jira tickets
-- `offline_access` - Get refresh token for long-term access
+For Jira authentication:
+- No `.env` file needed - credentials are stored in OS keyring
+- Run `toto jira-auth` and follow interactive prompts
+- Credentials: email + API token (created at https://id.atlassian.com/manage-profile/security/api-tokens)
 
 ### Keyring Storage Keys
 - Service: `toto-cli`
-- Keys: `jira-access-token`, `jira-refresh-token`, `access-token-expiry`, `jira-cloud-id`
+- Keys: `jira-email`, `jira-api-token`, `jira-cloud-id`
 
 ### Pending Implementation
 - ~~Token refresh functionality (when access token expires)~~ ✅ Complete

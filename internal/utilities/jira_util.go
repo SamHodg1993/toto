@@ -1,19 +1,23 @@
 package utilities
 
 import (
+	"encoding/base64"
 	"encoding/json"
 	"fmt"
 	"net/http"
-	"net/url"
-	"os"
-	"strconv"
-	"time"
-
-	"github.com/samhodg1993/toto/internal/models"
 
 	"github.com/zalando/go-keyring"
 )
 
+// ============================================================================
+// OAuth 2.0 Token Refresh Logic (DEPRECATED - Kept for potential future use)
+// ============================================================================
+// The functions below implement OAuth 2.0 token refresh logic for Jira.
+// This has been replaced with API token authentication (simpler, no OAuth app needed).
+// Keeping this code commented out in case OAuth support is needed in the future.
+// ============================================================================
+
+/*
 func HandleJiraSessionBeforeCall() (string, error) {
 	accessTokenExpiry, err := keyring.Get("toto-cli", "access-token-expiry")
 	if err != nil {
@@ -103,26 +107,42 @@ func StoreJiraCredentialsInKeyring(resp *http.Response) (string, error) {
 	}
 	return tokenResp.AccessToken, nil
 }
+*/
 
-func GetUsersJiraCloudId(accessToken string) (string, error) {
+func GetUsersJiraCloudId() error {
 	fmt.Println("Getting users cloud ID")
+
+	// Get API token credentials from keyring
+	jiraEmail, err := keyring.Get("toto-cli", "jira-email")
+	if err != nil {
+		return fmt.Errorf("Jira credentials not found. Please run 'toto jira-auth' first")
+	}
+
+	jiraApiToken, err := keyring.Get("toto-cli", "jira-api-token")
+	if err != nil {
+		return fmt.Errorf("Jira API token not found. Please run 'toto jira-auth' first")
+	}
 
 	req, err := http.NewRequest("GET", "https://api.atlassian.com/oauth/token/accessible-resources", nil)
 	if err != nil {
-		return "", fmt.Errorf("Failed to create request: %v", err)
+		return fmt.Errorf("Failed to create request: %v", err)
 	}
-	req.Header.Set("Authorization", "Bearer "+accessToken)
+
+	// Use Basic Auth with email:apiToken base64 encoded
+	auth := jiraEmail + ":" + jiraApiToken
+	encodedAuth := base64Encode(auth)
+	req.Header.Set("Authorization", "Basic "+encodedAuth)
 	req.Header.Set("Accept", "application/json")
 
 	client := &http.Client{}
 	resp, err := client.Do(req)
 	if err != nil {
-		return "", fmt.Errorf("Unable to get users cloud id: %v", err)
+		return fmt.Errorf("Unable to get users cloud id: %v", err)
 	}
 	defer resp.Body.Close()
 
 	if resp.StatusCode != 200 {
-		return "", fmt.Errorf("Unable to get users cloud id. Request returned status code: %d", resp.StatusCode)
+		return fmt.Errorf("Unable to get users cloud id. Request returned status code: %d", resp.StatusCode)
 	}
 
 	var resources []struct {
@@ -131,17 +151,22 @@ func GetUsersJiraCloudId(accessToken string) (string, error) {
 		Name string `json:"name"`
 	}
 	if err := json.NewDecoder(resp.Body).Decode(&resources); err != nil {
-		return "", fmt.Errorf("Failed to decode response: %v", err)
+		return fmt.Errorf("Failed to decode response: %v", err)
 	}
 
 	if len(resources) == 0 {
-		return "", fmt.Errorf("User has no available cloud id's. User must manually set their own using command jira-set-cloud-id -i <client id string>")
+		return fmt.Errorf("User has no available cloud id's. User must manually set their own using command jira-set-cloud-id -i <client id string>")
 	}
 
 	if err := keyring.Set("toto-cli", "jira-cloud-id", resources[0].ID); err != nil {
-		return "", fmt.Errorf("Failed to set jira cloud ID in keyring with error: %v", err)
+		return fmt.Errorf("Failed to set jira cloud ID in keyring with error: %v", err)
 	}
 
 	fmt.Println("Cloud ID stored successfully")
-	return resources[0].ID, nil
+	return nil
+}
+
+// Helper function to encode base64
+func base64Encode(s string) string {
+	return base64.StdEncoding.EncodeToString([]byte(s))
 }
