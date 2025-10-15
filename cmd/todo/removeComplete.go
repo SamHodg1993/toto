@@ -3,7 +3,7 @@ package todo
 import (
 	"fmt"
 
-	"github.com/samhodg1993/toto-todo-cli/cmd/projects"
+	"github.com/samhodg1993/toto/cmd/projects"
 
 	"github.com/spf13/cobra"
 )

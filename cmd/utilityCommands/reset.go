@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/samhodg1993/toto-todo-cli/internal/service"
+	"github.com/samhodg1993/toto/internal/service"
 
 	"github.com/spf13/cobra"
 )

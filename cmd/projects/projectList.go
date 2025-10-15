@@ -4,13 +4,12 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/samhodg1993/toto-todo-cli/internal/utilities"
+	"github.com/samhodg1993/toto/internal/utilities"
 
 	"github.com/fatih/color"
 	"github.com/olekukonko/tablewriter"
 	"github.com/spf13/cobra"
 )
-
 
 var clearTerm bool = false
 

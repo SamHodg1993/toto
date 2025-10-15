@@ -9,8 +9,8 @@ import (
 
 	"net/http"
 
-	"github.com/samhodg1993/toto-todo-cli/internal/models"
-	"github.com/samhodg1993/toto-todo-cli/internal/utilities"
+	"github.com/samhodg1993/toto/internal/models"
+	"github.com/samhodg1993/toto/internal/utilities"
 	"github.com/zalando/go-keyring"
 )
 

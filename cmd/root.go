@@ -5,11 +5,11 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/samhodg1993/toto-todo-cli/cmd/jira"
-	"github.com/samhodg1993/toto-todo-cli/cmd/projects"
-	"github.com/samhodg1993/toto-todo-cli/cmd/todo"
-	"github.com/samhodg1993/toto-todo-cli/cmd/utilityCommands"
-	"github.com/samhodg1993/toto-todo-cli/internal/db"
+	"github.com/samhodg1993/toto/cmd/jira"
+	"github.com/samhodg1993/toto/cmd/projects"
+	"github.com/samhodg1993/toto/cmd/todo"
+	"github.com/samhodg1993/toto/cmd/utilityCommands"
+	"github.com/samhodg1993/toto/internal/db"
 
 	"github.com/spf13/cobra"
 )
