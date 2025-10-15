@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/samhodg1993/toto-todo-cli/cmd/jira"
 	"github.com/samhodg1993/toto-todo-cli/cmd/projects"
 	"github.com/samhodg1993/toto-todo-cli/cmd/todo"
 	"github.com/samhodg1993/toto-todo-cli/cmd/utilityCommands"
@@ -34,12 +35,19 @@ func Execute() {
 	// Pass database to command packages
 	projects.SetDatabase(Database)
 	todo.SetDatabase(Database)
+	jira.SetDatabase(Database)
 	utilityCommands.SetDatabase(Database)
 	utilityCommands.InitDBService(Database)
 
 	// Add utility commands
 	RootCmd.AddCommand(utilityCommands.ResetCmd)
 	RootCmd.AddCommand(utilityCommands.CleanUtility)
+
+	// Add the jira commands
+	RootCmd.AddCommand(jira.JiraAuth)
+	RootCmd.AddCommand(jira.JiraSetCloudId)
+	RootCmd.AddCommand(jira.JiraPull)
+	RootCmd.AddCommand(jira.JiraPullClaude)
 
 	// Add todo commands
 	RootCmd.AddCommand(todo.AddCmd)

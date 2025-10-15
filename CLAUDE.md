@@ -201,6 +201,165 @@ cd test-directory
 4. **Add detailed todos**: Add todos to main project with specific implementation guidance
 5. **Provide analysis**: Give detailed suggestions on how to fix, but don't fix directly
 
+## Database Schema
+
+### Current Tables
+**todos table:**
+- id INTEGER PRIMARY KEY
+- title VARCHAR(255) NOT NULL
+- description TEXT
+- project_id INTEGER NOT NULL
+- jira_ticket_id INTEGER (nullable - links to jira_tickets.id)
+- completed BOOLEAN NOT NULL DEFAULT FALSE
+- completed_at DATETIME (nullable)
+- created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
+- updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
+
+**projects table:**
+- id INTEGER PRIMARY KEY
+- title VARCHAR(255) NOT NULL
+- description TEXT
+- archived BOOLEAN NOT NULL DEFAULT FALSE
+- filepath VARCHAR(255) NOT NULL
+- created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
+- updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
+
+**jira_tickets table:** (NEW - for Jira integration)
+- id INTEGER PRIMARY KEY
+- jira_key VARCHAR(50) NOT NULL UNIQUE (e.g., "PROJ-123")
+- title VARCHAR(500) NOT NULL
+- status VARCHAR(50) NOT NULL (e.g., "To Do", "In Progress", "Done")
+- project_key VARCHAR(50) (e.g., "PROJ", "DEV")
+- issue_type VARCHAR(50) NOT NULL (e.g., "Story", "Bug", "Task")
+- url VARCHAR(500) NOT NULL (full Jira URL)
+- last_synced_at DATETIME (nullable - tracks last sync)
+- created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
+- updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
+
+### Relationships
+- **One-to-Many**: jira_tickets → todos (one Jira ticket can have multiple todos)
+- **Many-to-One**: todos → projects (multiple todos belong to one project)
+- **Foreign Keys**: todos.jira_ticket_id → jira_tickets.id, todos.project_id → projects.id
+
+### Auto-Update Triggers
+- All tables have UPDATE triggers that automatically set updated_at to CURRENT_TIMESTAMP
+- Allows tracking when records were last modified
+
+## Jira Integration Progress
+
+### Completed ✅
+1. **OAuth 2.0 Authentication** (`cmd/jira/jiraAuth.go`)
+   - Browser-based OAuth flow with Atlassian
+   - Callback server implementation with state validation (port 8989)
+   - Token exchange (authorization code → access token + refresh token)
+   - Automatic token refresh with expiry tracking
+   - Secure token storage using OS keyring (`github.com/zalando/go-keyring`)
+   - Environment variable support via `.env` file (`github.com/joho/godotenv`)
+
+2. **Cloud ID Management** (`internal/utilities/jira_util.go`, `cmd/jira/jiraAuth.go`)
+   - `GetUsersJiraCloudId()` - Automatic cloud ID fetch and storage
+   - `jira-set-cloud-id` command - Manual cloud ID override
+   - Automatic fallback if cloud ID is missing
+
+3. **Jira REST API Client** (`internal/service/jira.go`)
+   - `GetSingleJiraTicket()` - Fetch individual tickets by issue key
+   - Automatic token refresh integration
+   - Automatic cloud ID fallback
+   - Proper error handling with user-friendly messages
+   - Duplicate ticket handling - UPDATE existing records on re-pull
+
+4. **Data Models** (`internal/models/jira.go`)
+   - `JiraTicket` model with validation methods (database storage)
+   - `JiraBasedTicket` model for API responses with ADF support
+   - `ADFNode` - Recursive structure for Atlassian Document Format parsing
+   - `extractTextFromADF()` - Recursive ADF parser supporting bulletList, orderedList, listItem, paragraph, text, hardBreak
+   - `GetDescriptionText()` - Extracts plain text from complex ADF structures including bullet points
+   - `JiraConfig` model for configuration management
+   - `TokenResponse` model for OAuth responses
+
+5. **Commands** (`cmd/jira/`)
+   - `jira-auth` - OAuth authentication
+   - `jira-set-cloud-id` - Manual cloud ID configuration
+   - `jira-pull -i <issue-key>` - Pull Jira ticket, save to database, create linked todo
+   - `jira-pull-claude -i <issue-key>` - Pull Jira ticket and use Claude AI to break it into subtasks
+
+6. **Claude AI Integration** (`internal/service/claude.go`)
+   - `BreakdownJiraTicketWithClaude()` - Uses Claude 3.5 Sonnet to intelligently break down Jira tickets
+   - Smart prompt that detects explicit task lists vs high-level descriptions
+   - Extracts bullet-pointed lists directly or breaks down complex tasks into 3-8 subtasks
+   - API key from `CLAUDE_API_KEY` environment variable (fallback to keyring)
+   - Uses `anthropic-sdk-go` v1.13.0
+
+7. **Infrastructure**
+   - Database schema for `jira_tickets` table
+   - Callback server service (`internal/service/jira.go`)
+   - Browser opening utility (`internal/utilities/general.go`)
+   - Token session management (`HandleJiraSessionBeforeCall()`)
+
+### Environment Setup
+Required `.env` file in project root:
+```
+JIRA_CLIENT_ID=your-client-id
+JIRA_CLIENT_SECRET=your-client-secret
+CLAUDE_API_KEY=your-claude-api-key
+```
+
+### OAuth Scopes
+- `read:jira-work` - Read Jira data
+- `write:jira-work` - Create/update Jira tickets
+- `offline_access` - Get refresh token for long-term access
+
+### Keyring Storage Keys
+- Service: `toto-cli`
+- Keys: `jira-access-token`, `jira-refresh-token`, `access-token-expiry`, `jira-cloud-id`
+
+### Pending Implementation
+- ~~Token refresh functionality (when access token expires)~~ ✅ Complete
+- ~~Jira REST API client (fetch tickets)~~ ✅ Complete
+- ~~`jira-pull` command~~ ✅ Complete - Fetches Jira ticket, saves to database, creates linked todo
+- ~~`jira-pull-claude` command~~ ✅ Complete - Uses Claude AI to break down tickets into subtasks
+- ~~ADF (Atlassian Document Format) parser~~ ✅ Complete - Supports bullet lists, ordered lists, paragraphs, etc.
+- `jira-push` command - Push local todo to Jira as new ticket
+- `jira-sync` command - Sync status between todos and Jira
+- Display Jira keys in list commands
+- Tests for Jira functionality
+
+### Implementation Strategy
+**Phase 1 (Completed):** Simple CLI commands with ticket ID flags
+- ✅ `jira-pull -i TICKET-123` - Pull specific ticket by ID
+- ✅ `jira-pull-claude -i TICKET-123` - Pull ticket and break down with Claude AI
+- 🚧 `jira-push -i <todo-id>` - Push todo to Jira (pending)
+- 🚧 `jira-sync` - Sync all linked tickets (pending)
+
+**Phase 2 (Future):** Interactive TUI for browsing and managing
+- `jira-pull` (no ID) - Opens interactive browser
+- `jira-browse` - Dedicated ticket browser with filtering
+- Built with [Bubbletea](https://github.com/charmbracelet/bubbletea) for cross-platform support
+
+## Future Enhancements
+
+### TUI (Terminal User Interface)
+Plan to add an interactive terminal UI (similar to lazygit) for:
+- Browsing and selecting Jira tickets
+- Exploring and managing todos with rich context
+- Interactive filtering and search
+- Multi-select operations
+
+**Tech Stack:** [Bubbletea](https://github.com/charmbracelet/bubbletea) - Cross-platform TUI framework
+
+### LLM Integration (Claude API)
+✅ **Completed:** Jira ticket breakdown using Claude 3.5 Sonnet
+- `jira-pull-claude` command breaks down Jira tickets into subtasks
+- Uses `anthropic-sdk-go` v1.13.0
+- Smart detection of explicit task lists vs high-level descriptions
+
+🚧 **Future AI Features:**
+- **Title generation** - Generate descriptive titles from brief inputs
+- **Renaming** - Improve existing todo titles
+- **Description editing** - Expand or refine todo descriptions
+- **Criticality assignment** - Suggest priority levels (requires database schema update)
+- **Completion order** - Suggest optimal order of completion
+
 ## Tips
 - The project uses directory-based project management
 - Always test from test-directory to avoid polluting main project
