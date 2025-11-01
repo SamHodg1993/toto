@@ -280,70 +280,66 @@ cd test-directory
 ## Jira Integration Progress
 
 ### Completed ✅
-1. **OAuth 2.0 Authentication** (`cmd/jira/jiraAuth.go`)
-   - Browser-based OAuth flow with Atlassian
-   - Callback server implementation with state validation (port 8989)
-   - Token exchange (authorization code → access token + refresh token)
-   - Automatic token refresh with expiry tracking
-   - Secure token storage using OS keyring (`github.com/zalando/go-keyring`)
-   - Environment variable support via `.env` file (`github.com/joho/godotenv`)
+1. **API Token Authentication** (`cmd/jira/jiraAuth.go`)
+   - Simple prompt-based authentication flow
+   - User provides: Jira URL, email, and API token
+   - Credentials validated with test API call before storage
+   - Secure storage using OS keyring (`github.com/zalando/go-keyring`)
+   - No OAuth app creation required - users create tokens at https://id.atlassian.com/manage-profile/security/api-tokens
 
-2. **Cloud ID Management** (`internal/utilities/jira_util.go`, `cmd/jira/jiraAuth.go`)
-   - `GetUsersJiraCloudId()` - Automatic cloud ID fetch and storage
-   - `jira-set-cloud-id` command - Manual cloud ID override
-   - Automatic fallback if cloud ID is missing
-
-3. **Jira REST API Client** (`internal/service/jira.go`)
+2. **Jira REST API Client** (`internal/service/jira/client.go`)
    - `GetSingleJiraTicket()` - Fetch individual tickets by issue key
-   - Automatic token refresh integration
-   - Automatic cloud ID fallback
+   - Uses Basic Auth with email:api_token
+   - Direct URL construction (no cloud ID lookup needed)
    - Proper error handling with user-friendly messages
    - Duplicate ticket handling - UPDATE existing records on re-pull
 
-4. **Data Models** (`internal/models/jira.go`)
+3. **Data Models** (`internal/models/jira.go`)
    - `JiraTicket` model with validation methods (database storage)
    - `JiraBasedTicket` model for API responses with ADF support
    - `ADFNode` - Recursive structure for Atlassian Document Format parsing
    - `extractTextFromADF()` - Recursive ADF parser supporting bulletList, orderedList, listItem, paragraph, text, hardBreak
    - `GetDescriptionText()` - Extracts plain text from complex ADF structures including bullet points
-   - `JiraConfig` model for configuration management
-   - `TokenResponse` model for OAuth responses
 
-5. **Commands** (`cmd/jira/`)
-   - `jira-auth` - OAuth authentication
-   - `jira-set-cloud-id` - Manual cloud ID configuration
+4. **Commands** (`cmd/jira/`)
+   - `jira-auth` - API token authentication
    - `jira-pull -i <issue-key>` - Pull Jira ticket, save to database, create linked todo
    - `jira-pull-claude -i <issue-key>` - Pull Jira ticket and use Claude AI to break it into subtasks
 
-6. **Claude AI Integration** (`internal/service/claude.go`)
-   - `BreakdownJiraTicketWithClaude()` - Uses Claude 3.5 Sonnet to intelligently break down Jira tickets
+5. **Claude AI Integration** (`internal/service/claude/service.go`)
+   - `BreakdownJiraTicketWithClaude()` - Uses Claude Sonnet to intelligently break down Jira tickets
    - Smart prompt that detects explicit task lists vs high-level descriptions
    - Extracts bullet-pointed lists directly or breaks down complex tasks into 3-8 subtasks
-   - API key from `CLAUDE_API_KEY` environment variable (fallback to keyring)
-   - Uses `anthropic-sdk-go` v1.13.0
+   - API key from `CLAUDE_API_KEY` environment variable
+   - Uses `anthropic-sdk-go` with model alias `claude-sonnet-4-5` (automatically uses latest version)
 
-7. **Infrastructure**
+6. **Infrastructure**
    - Database schema for `jira_tickets` table
-   - Callback server service (`internal/service/jira.go`)
-   - Browser opening utility (`internal/utilities/general.go`)
-   - Token session management (`HandleJiraSessionBeforeCall()`)
+   - Session management (`HandleJiraSessionBeforeCall()` in `internal/utilities/jira_util.go`)
+   - Credential validation during authentication
 
 ### Environment Setup
-Required `.env` file in project root:
+Optional `.env` file in project root:
 ```
-JIRA_CLIENT_ID=your-client-id
-JIRA_CLIENT_SECRET=your-client-secret
-CLAUDE_API_KEY=your-claude-api-key
+S_DEV_MODE=true
+
+# Optional: Claude API key for AI-powered ticket breakdown
+# Can also be set via: export CLAUDE_API_KEY=your-key
+# CLAUDE_API_KEY=your-claude-api-key
 ```
 
-### OAuth Scopes
-- `read:jira-work` - Read Jira data
-- `write:jira-work` - Create/update Jira tickets
-- `offline_access` - Get refresh token for long-term access
+### Authentication Flow
+1. User runs `toto jira-auth`
+2. Prompted for:
+   - Jira URL (e.g., https://mycompany.atlassian.net)
+   - Email address
+   - API token (created at https://id.atlassian.com/manage-profile/security/api-tokens)
+3. Credentials validated with test API call
+4. Stored securely in OS keyring for future use
 
 ### Keyring Storage Keys
 - Service: `toto-cli`
-- Keys: `jira-access-token`, `jira-refresh-token`, `access-token-expiry`, `jira-cloud-id`
+- Keys: `jiraURL`, `jiraEmail`, `jiraApiKey`
 
 ### Pending Implementation
 - ~~Token refresh functionality (when access token expires)~~ ✅ Complete
@@ -380,9 +376,9 @@ Plan to add an interactive terminal UI (similar to lazygit) for:
 **Tech Stack:** [Bubbletea](https://github.com/charmbracelet/bubbletea) - Cross-platform TUI framework
 
 ### LLM Integration (Claude API)
-✅ **Completed:** Jira ticket breakdown using Claude 3.5 Sonnet
+✅ **Completed:** Jira ticket breakdown using Claude Sonnet
 - `jira-pull-claude` command breaks down Jira tickets into subtasks
-- Uses `anthropic-sdk-go` v1.13.0
+- Uses `anthropic-sdk-go` with model alias `claude-sonnet-4-5`
 - Smart detection of explicit task lists vs high-level descriptions
 
 🚧 **Future AI Features:**

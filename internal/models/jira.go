@@ -96,24 +96,3 @@ func (j *JiraTicket) IsValid() bool {
 func (j *JiraTicket) IsStatusDone() bool {
 	return j.Status == "Done" || j.Status == "Closed" || j.Status == "Resolved"
 }
-
-// JiraConfig represents Jira configuration settings
-type JiraConfig struct {
-	BaseURL      string `json:"baseUrl"`      // e.g., "https://company.atlassian.net"
-	ClientID     string `json:"clientId"`     // OAuth Client ID
-	ClientSecret string `json:"clientSecret"` // OAuth Client Secret (from env)
-	AccessToken  string `json:"accessToken"`  // User's access token
-	ProjectKey   string `json:"projectKey"`   // Default project key
-}
-
-// IsConfigured checks if Jira is properly configured
-func (j *JiraConfig) IsConfigured() bool {
-	return j.BaseURL != "" && j.AccessToken != "" && j.ProjectKey != ""
-}
-
-type TokenResponse struct {
-	AccessToken  string `json:"access_token"`
-	RefreshToken string `json:"refresh_token"`
-	ExpiresIn    int    `json:"expires_in"`
-	Scope        string `json:"scope"`
-}

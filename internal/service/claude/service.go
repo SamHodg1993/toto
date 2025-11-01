@@ -64,7 +64,7 @@ Examples of what to extract:
 Return ONLY a JSON array with "title" and "description" fields. No other text.`, ticketKey, title, description)
 
 	message, err := client.Messages.New(context.Background(), anthropic.MessageNewParams{
-		Model:     "claude-3-5-sonnet-20241022",
+		Model:     "claude-sonnet-4-5",
 		MaxTokens: 2000,
 		Messages: []anthropic.MessageParam{
 			anthropic.NewUserMessage(anthropic.NewTextBlock(prompt)),

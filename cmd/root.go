@@ -53,7 +53,6 @@ func Execute() {
 
 	// Add the jira commands
 	RootCmd.AddCommand(jira.JiraAuth)
-	RootCmd.AddCommand(jira.JiraSetCloudId)
 	RootCmd.AddCommand(jira.JiraPull)
 	RootCmd.AddCommand(jira.JiraPullClaude)
 
