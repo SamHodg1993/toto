@@ -4,10 +4,12 @@ import (
 	"database/sql"
 	"fmt"
 	"os"
-	"strconv"
+	"slices"
 
 	"github.com/fatih/color"
 	"github.com/olekukonko/tablewriter"
+	"github.com/samhodg1993/toto/internal/models"
+	todoHelper "github.com/samhodg1993/toto/internal/service/todo"
 	"github.com/samhodg1993/toto/internal/utilities"
 )
 
@@ -42,7 +44,7 @@ func (s *Service) SetDependencies(todoService TodoServiceInterface, projectServi
 }
 
 // CleanAndPrintTodos clears screen, removes completed todos, and displays remaining todos
-func (s *Service) CleanAndPrintTodos() error {
+func (s *Service) CleanAndPrintTodos(reverseList bool) error {
 	utilities.ClearScreen()
 
 	currentDir, err := os.Getwd()
@@ -61,7 +63,7 @@ func (s *Service) CleanAndPrintTodos() error {
 			return err
 		}
 		if choice == 2 {
-			return s.CleanAndPrintTodos()
+			return s.CleanAndPrintTodos(reverseList)
 		}
 	}
 
@@ -89,29 +91,19 @@ func (s *Service) CleanAndPrintTodos() error {
 
 	strikethrough := color.New(color.CrossedOut).SprintFunc()
 
+	var todos []models.Todo
 	for rows.Next() {
-		var (
-			id        int
-			title     string
-			completed bool
-		)
-
-		err = rows.Scan(&id, &title, &completed)
-		if err != nil {
-			return err
-		}
-
-		status := "Pending"
-		if completed {
-			status = strikethrough("Completed")
-			title = strikethrough(title)
-		}
-
-		table.Append([]string{strconv.Itoa(id), title, status})
+		var todo models.Todo
+		err = rows.Scan(&todo.ID, &todo.Title, &todo.Completed)
+		todos = append(todos, todo)
 	}
 
-	if err = rows.Err(); err != nil {
-		return err
+	if reverseList {
+		slices.Reverse(todos)
+	}
+
+	for _, todo := range todos {
+		table.Append(todoHelper.FormatTodoTableRow(todo, strikethrough))
 	}
 
 	table.Render()

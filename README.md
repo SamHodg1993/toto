@@ -142,6 +142,11 @@ toto remove-complete
 # Or the shorthand
 toto cls-comp
 
+# Clean: clear screen, remove completed, and list remaining todos
+toto clean
+# With optional -r flag to reverse list order
+toto clean -r
+
 # Delete a task
 toto delete <task-id>
 # Or the shorthand
@@ -177,7 +182,7 @@ toto --help
 | `description`     | `desc`      | Get description for a single todo                  | `-i`: target todo id                                        |
 | `toggle-complete` | `comp`      | Mark a task as complete                            |                                                              |
 | `remove-complete` | `cls-comp`  | Remove all completed todos for the current project |                                                              |
-| `clean`           | -           | Clear screen, remove completed todos, and show remaining | -                                                            |
+| `clean`           | -           | Clear screen, remove completed todos, and show remaining | `-r`: reverse list order                                    |
 | `delete`          | `del`       | Remove a task                                      |                                                              |
 | `help`            | -           | Show help information                              |                                                              |
 | `reset`           | -           | Reset the database to its initial state            |                                                              |
@@ -216,6 +221,16 @@ toto lsl -D
 Mark task as complete:
 ```bash
 toto comp -i 1
+```
+
+Clean up completed tasks and display remaining:
+```bash
+toto clean
+```
+
+Clean up and display remaining tasks in reverse order:
+```bash
+toto clean -r
 ```
 
 **Jira Integration Examples:**

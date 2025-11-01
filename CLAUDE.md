@@ -97,6 +97,7 @@ Toto is a command-line todo application written in Go that manages tasks based o
 6. ~~**List command refactoring**: All list commands now use helper functions (FormatTodoTableRow, FormatTodoTableRowLong) to reduce code duplication~~
 7. ~~**Reverse list support**: All list commands now support -r flag using slices.Reverse() for cleaner code~~
 8. ~~**Flag registration**: All list commands (ls, list, lsl, list-long, lsla) now have proper flag registration for -C, -r, -A, -D flags~~
+9. ~~**Clean command refactoring**: Updated clean command to use FormatTodoTableRow helper and support -r flag for reverse order~~
 
 ### Known Issues (as of analysis)
 - All major known issues have been resolved
@@ -139,13 +140,17 @@ cd /home/sam/coding/toto && go build -o toto .
 
 ### Testing List Commands
 ```bash
-# All commands now support flags:
+# All list commands now support flags:
 /home/sam/coding/toto/toto ls -C        # Clear screen before listing
 /home/sam/coding/toto/toto list -r      # Reverse order
 /home/sam/coding/toto/toto lsl -C -r    # Clear screen and reverse
 /home/sam/coding/toto/toto list-long -A # Show all todos regardless of project
 /home/sam/coding/toto/toto lsl -D       # Show full date timestamps
 /home/sam/coding/toto/toto lsla -C -r -D # All flags combined
+
+# Clean command also supports -r flag:
+/home/sam/coding/toto/toto clean        # Clear, remove completed, list remaining
+/home/sam/coding/toto/toto clean -r     # Same but in reverse order
 ```
 
 ## Adding Todos to Project List
