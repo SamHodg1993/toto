@@ -77,9 +77,9 @@ Toto is a command-line todo application written in Go that manages tasks based o
 - `ls`/`list` - Basic todo list for current project
 - `lsl`/`list-long` - Detailed todo list with dates, descriptions
 - `lsla` - All todos regardless of project
-- `comp`/`toggle-complete` - Mark todos complete/incomplete
+- `comp`/`toggle-complete` - Mark todos complete/incomplete with -i (single id) or -I (bulk comma-separated ids)
 - `edit` - Update todo with -i (id), -t (title), -d (description)
-- `del`/`delete` - Delete specific todo
+- `del`/`delete` - Delete specific todo with -i (single id) or -I (bulk comma-separated ids)
 - `cls-comp`/`remove-complete` - Remove completed todos for project
 - `description`/`desc` - Get description for single todo with -i (id)
 - `clean` - Clear screen, remove completed todos, and display remaining todos
@@ -98,6 +98,8 @@ Toto is a command-line todo application written in Go that manages tasks based o
 7. ~~**Reverse list support**: All list commands now support -r flag using slices.Reverse() for cleaner code~~
 8. ~~**Flag registration**: All list commands (ls, list, lsl, list-long, lsla) now have proper flag registration for -C, -r, -A, -D flags~~
 9. ~~**Clean command refactoring**: Updated clean command to use FormatTodoTableRow helper and support -r flag for reverse order~~
+10. ~~**Bulk operations**: Added -I flag for bulk complete and delete operations with comma-separated IDs~~
+11. ~~**Jira command aliases**: Added `jp` (jira-pull) and `jpc` (jira-pull-claude) shorthand commands~~
 
 ### Known Issues (as of analysis)
 - All major known issues have been resolved
@@ -151,6 +153,16 @@ cd /home/sam/coding/toto && go build -o toto .
 # Clean command also supports -r flag:
 /home/sam/coding/toto/toto clean        # Clear, remove completed, list remaining
 /home/sam/coding/toto/toto clean -r     # Same but in reverse order
+
+# Bulk operations:
+/home/sam/coding/toto/toto comp -i 1    # Toggle single todo
+/home/sam/coding/toto/toto comp -I 1,2,3,4 # Toggle multiple todos
+/home/sam/coding/toto/toto del -i 1     # Delete single todo
+/home/sam/coding/toto/toto del -I 1,2,3,4  # Delete multiple todos
+
+# Jira shortcuts:
+/home/sam/coding/toto/toto jp -i PROJ-123    # Same as jira-pull
+/home/sam/coding/toto/toto jpc -i PROJ-123   # Same as jira-pull-claude
 ```
 
 ## Adding Todos to Project List
@@ -303,8 +315,8 @@ cd test-directory
 
 4. **Commands** (`cmd/jira/`)
    - `jira-auth` - API token authentication
-   - `jira-pull -i <issue-key>` - Pull Jira ticket, save to database, create linked todo
-   - `jira-pull-claude -i <issue-key>` - Pull Jira ticket and use Claude AI to break it into subtasks
+   - `jira-pull` / `jp -i <issue-key>` - Pull Jira ticket, save to database, create linked todo
+   - `jira-pull-claude` / `jpc -i <issue-key>` - Pull Jira ticket and use Claude AI to break it into subtasks
 
 5. **Claude AI Integration** (`internal/service/claude/service.go`)
    - `BreakdownJiraTicketWithClaude()` - Uses Claude Sonnet to intelligently break down Jira tickets

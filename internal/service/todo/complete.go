@@ -6,34 +6,42 @@ import (
 )
 
 // ToggleComplete toggles the completion status of a todo
-func (s *Service) ToggleComplete(id string) (bool, error) {
+func (s *Service) ToggleComplete(ids []int) {
 	var todoID string
 	var completed bool
 
 	// Query current status
-	err := s.db.QueryRow("SELECT id, completed FROM todos WHERE id = ?", id).Scan(&todoID, &completed)
-	if err == sql.ErrNoRows {
-		return false, fmt.Errorf("no todo found with ID %s", id)
-	}
-	if err != nil {
-		return false, fmt.Errorf("error querying todo: %w", err)
-	}
+	for _, id := range ids {
+		err := s.db.QueryRow("SELECT id, completed FROM todos WHERE id = ?", id).Scan(&todoID, &completed)
 
-	// Toggle status
-	newStatus := !completed
+		if err == sql.ErrNoRows {
+			fmt.Printf("no todo found with ID %d. Skipping...\n", id)
+			continue
+		}
+		if err != nil {
+			fmt.Printf("error querying todo: %w. Skipping...\n", err)
+			continue
+		}
 
-	// Update todo
-	result, err := s.db.Exec("UPDATE todos SET completed = ?, completed_at = CASE WHEN ? = 1 THEN CURRENT_TIMESTAMP ELSE NULL END WHERE id = ?", newStatus, newStatus, id)
-	if err != nil {
-		return false, fmt.Errorf("error updating todo: %w", err)
+		// Toggle status
+		newStatus := !completed
+
+		// Update todo
+		result, err := s.db.Exec("UPDATE todos SET completed = ?, completed_at = CASE WHEN ? = 1 THEN CURRENT_TIMESTAMP ELSE NULL END WHERE id = ?", newStatus, newStatus, id)
+		if err != nil {
+			fmt.Printf("error updating todo: %w. Skipping...\n", err)
+			continue
+		}
+
+		rowsAffected, _ := result.RowsAffected()
+		if rowsAffected == 0 {
+			fmt.Printf("todo with ID %d was not updated.\n", id)
+			continue
+		}
+
+		fmt.Printf("todo with ID %d successfully updated!\n", id)
 	}
-
-	rowsAffected, _ := result.RowsAffected()
-	if rowsAffected == 0 {
-		return false, fmt.Errorf("todo was not updated")
-	}
-
-	return newStatus, nil
+	fmt.Println("Completed todo toggling!")
 }
 
 // RemoveCompletedTodosForProject removes all completed todos for a given project

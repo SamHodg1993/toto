@@ -66,22 +66,30 @@ func (s *Service) AddTodo(
 }
 
 // DeleteTodo deletes a todo by ID
-func (s *Service) DeleteTodo(id string) error {
-	result, err := s.db.Exec("DELETE FROM todos WHERE id = ?", id)
-	if err != nil {
-		return fmt.Errorf("error deleting todo: %w", err)
+func (s *Service) DeleteTodo(ids []int) {
+	for _, id := range ids {
+		result, err := s.db.Exec("DELETE FROM todos WHERE id = ?", id)
+
+		if err != nil {
+			fmt.Printf("Unable to delete todo with ID: %d. Skipping...\n", id)
+			continue
+		}
+
+		rowsAffected, err := result.RowsAffected()
+		if err != nil {
+			fmt.Printf("Unable to delete todo with ID: %d. Skipping...\n", id)
+			continue
+		}
+
+		if rowsAffected == 0 {
+			fmt.Printf("No todo found with ID: %d. Skipping...\n", id)
+			continue
+		}
+
+		fmt.Printf("Successfully deleted todo with ID: %d.\n", id)
 	}
 
-	rowsAffected, err := result.RowsAffected()
-	if err != nil {
-		return fmt.Errorf("error checking rows affected: %w", err)
-	}
-
-	if rowsAffected == 0 {
-		return fmt.Errorf("no todo found with ID %s", id)
-	}
-
-	return nil
+	fmt.Println("Completed deleting todos")
 }
 
 // UpdateTodo updates a todo's title and/or description

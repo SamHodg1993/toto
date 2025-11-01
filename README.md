@@ -132,10 +132,13 @@ toto lsla
 # Edit a todo
 toto edit -i <todo-id (required)> -t <"New title" (optional)> -d <"New description" (optional)> 
 
-# Mark task as complete
-toto toggle-complete <task-id>
+# Mark task as complete (single)
+toto toggle-complete -i <task-id>
 # Or the shorthand
-toto comp <task-id>
+toto comp -i <task-id>
+
+# Mark multiple tasks as complete (bulk)
+toto comp -I 1,2,3,4
 
 # Clear the completed todos for the current project
 toto remove-complete
@@ -147,10 +150,13 @@ toto clean
 # With optional -r flag to reverse list order
 toto clean -r
 
-# Delete a task
-toto delete <task-id>
+# Delete a task (single)
+toto delete -i <task-id>
 # Or the shorthand
-toto del <task-id>
+toto del -i <task-id>
+
+# Delete multiple tasks (bulk)
+toto del -I 1,2,3,4
 
 # Reset the database
 # the confirm flag is optional, if it does not exist, you will be prompted to confirm the action
@@ -180,10 +186,10 @@ toto --help
 | -                 | `lsla`      | Show detailed task list for all projects          | `-D`: get full date, `-C`: clear terminal before render, `-r`: reverse list order |
 | `edit`            | -           | Edit an existing task's title or description       | `-t`: text for title update, `-d`: description for update, `-i`: target todo id |
 | `description`     | `desc`      | Get description for a single todo                  | `-i`: target todo id                                        |
-| `toggle-complete` | `comp`      | Mark a task as complete                            |                                                              |
+| `toggle-complete` | `comp`      | Mark a task as complete                            | `-i`: single todo id, `-I`: comma-separated todo ids for bulk operations |
 | `remove-complete` | `cls-comp`  | Remove all completed todos for the current project |                                                              |
 | `clean`           | -           | Clear screen, remove completed todos, and show remaining | `-r`: reverse list order                                    |
-| `delete`          | `del`       | Remove a task                                      |                                                              |
+| `delete`          | `del`       | Remove a task                                      | `-i`: single todo id, `-I`: comma-separated todo ids for bulk operations |
 | `help`            | -           | Show help information                              |                                                              |
 | `reset`           | -           | Reset the database to its initial state            |                                                              |
 | `project-list`    | `proj-ls`   | Show all projects                                  | `-C`: clear terminal before render                          |
@@ -192,8 +198,8 @@ toto --help
 | -                 | `proj-edit` | Update a single project                            | `-t`: text for title update, `-f`: text for filepath update , `-i`: target project id, `-d`: text for description update |
 | **Jira Integration** | -         | **Jira ticket management**                        | -                                                            |
 | `jira-auth`       | -           | Authenticate with Jira using API token            | Prompts for Jira URL, email, and API token. Stores securely in OS keyring |
-| `jira-pull`       | -           | Pull a Jira ticket and create a linked todo       | `-i`: Jira ticket ID (e.g., PROJ-123)                       |
-| `jira-pull-claude` | -          | Pull Jira ticket and break it into subtasks with AI | `-i`: Jira ticket ID (e.g., PROJ-123)                       |
+| `jira-pull`       | `jp`        | Pull a Jira ticket and create a linked todo       | `-i`: Jira ticket ID (e.g., PROJ-123)                       |
+| `jira-pull-claude` | `jpc`      | Pull Jira ticket and break it into subtasks with AI | `-i`: Jira ticket ID (e.g., PROJ-123)                       |
 | `completion`      | -           | Generate autocompletion script for specified shell | Run `toto completion --help` for shell options               |
 
 ## Examples
@@ -221,6 +227,11 @@ toto lsl -D
 Mark task as complete:
 ```bash
 toto comp -i 1
+```
+
+Mark multiple tasks as complete (bulk):
+```bash
+toto comp -I 1,2,3,4
 ```
 
 Clean up completed tasks and display remaining:
