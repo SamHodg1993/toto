@@ -3,10 +3,10 @@ package todo
 import (
 	"fmt"
 	"os"
-	"strconv"
-	"time"
+	"slices"
 
 	"github.com/samhodg1993/toto/internal/models"
+	todoHelper "github.com/samhodg1993/toto/internal/service/todo"
 	"github.com/samhodg1993/toto/internal/utilities"
 
 	"github.com/fatih/color"
@@ -15,9 +15,10 @@ import (
 )
 
 var (
-	fullDate  bool = false
-	allTodos  bool = false
-	clearTerm bool = false
+	fullDate    bool = false
+	allTodos    bool = false
+	clearTerm   bool = false
+	reverseList bool = false
 )
 
 var GetCmd = &cobra.Command{
@@ -44,6 +45,10 @@ var GetCmd = &cobra.Command{
 			return
 		}
 
+		if reverseList {
+			slices.Reverse(todos)
+		}
+
 		table := tablewriter.NewWriter(os.Stdout)
 		table.SetHeader([]string{"ID", "Todo", "Status"})
 		table.SetBorder(true)
@@ -52,22 +57,7 @@ var GetCmd = &cobra.Command{
 		strikethrough := color.New(color.CrossedOut).SprintFunc()
 
 		for _, todo := range todos {
-			title := todo.Title
-			// If todo is completed, apply strikethrough to the title
-			if todo.Completed {
-				title = strikethrough(title)
-			}
-
-			status := "Pending"
-			if todo.Completed {
-				status = "Done"
-			}
-
-			table.Append([]string{
-				fmt.Sprintf("%d", todo.ID),
-				title,
-				status,
-			})
+			table.Append(todoHelper.FormatTodoTableRow(todo, strikethrough))
 		}
 
 		table.Render()
@@ -98,38 +88,19 @@ var GetCmdLong = &cobra.Command{
 			return
 		}
 
+		if reverseList {
+			slices.Reverse(todos)
+		}
+
 		table := tablewriter.NewWriter(os.Stdout)
-		table.SetHeader([]string{"ID", "Todo", "Description", "Project Id", "Created At", "Updated At", "Status"})
+		table.SetHeader([]string{"ID", "Todo", "Description", "Project Id", "Created At", "Updated At", "Status", "Completed At"})
 		table.SetBorder(true)
 		table.SetRowLine(true)
 
 		strikethrough := color.New(color.CrossedOut).SprintFunc()
 
 		for _, todo := range todos {
-			title := todo.Title
-			if todo.Completed {
-				title = strikethrough(title)
-			}
-
-			status := "Pending"
-			if todo.Completed {
-				status = "Done"
-			}
-
-			dateFormat := "02-01-2006"
-			if fullDate {
-				dateFormat = time.RFC3339
-			}
-
-			table.Append([]string{
-				fmt.Sprintf("%d", todo.ID),
-				title,
-				todo.Description,
-				strconv.Itoa(todo.ProjectId),
-				todo.CreatedAt.Format(dateFormat),
-				todo.UpdatedAt.Format(dateFormat),
-				status,
-			})
+			table.Append(todoHelper.FormatTodoTableRowLong(todo, fullDate, strikethrough))
 		}
 
 		table.Render()
@@ -160,6 +131,10 @@ var LsCmd = &cobra.Command{
 			return
 		}
 
+		if reverseList {
+			slices.Reverse(todos)
+		}
+
 		table := tablewriter.NewWriter(os.Stdout)
 		table.SetHeader([]string{"ID", "Todo", "Status"})
 		table.SetBorder(true)
@@ -168,22 +143,7 @@ var LsCmd = &cobra.Command{
 		strikethrough := color.New(color.CrossedOut).SprintFunc()
 
 		for _, todo := range todos {
-			title := todo.Title
-			// If todo is completed, apply strikethrough to the title
-			if todo.Completed {
-				title = strikethrough(title)
-			}
-
-			status := "Pending"
-			if todo.Completed {
-				status = "Done"
-			}
-
-			table.Append([]string{
-				fmt.Sprintf("%d", todo.ID),
-				title,
-				status,
-			})
+			table.Append(todoHelper.FormatTodoTableRow(todo, strikethrough))
 		}
 
 		table.Render()
@@ -214,6 +174,10 @@ var LsCmdLong = &cobra.Command{
 			return
 		}
 
+		if reverseList {
+			slices.Reverse(todos)
+		}
+
 		table := tablewriter.NewWriter(os.Stdout)
 		table.SetHeader([]string{"ID", "Todo", "Description", "ProjectId", "Created At", "Updated At", "Status", "Completed At"})
 		table.SetBorder(true)
@@ -222,49 +186,7 @@ var LsCmdLong = &cobra.Command{
 		strikethrough := color.New(color.CrossedOut).SprintFunc()
 
 		for _, todo := range todos {
-			title := todo.Title
-			// If todo is completed, apply strikethrough to the title
-			if todo.Completed {
-				title = strikethrough(title)
-			}
-
-			status := "Pending"
-			if todo.Completed {
-				status = "Done"
-			}
-
-			completedAtString := "-"
-			if todo.CompletedAt.Valid {
-				if fullDate {
-					completedAtString = todo.CompletedAt.Time.Format(time.RFC3339)
-				} else {
-					completedAtString = todo.CompletedAt.Time.Format("02-01-2006")
-				}
-			}
-
-			if fullDate {
-				table.Append([]string{
-					fmt.Sprintf("%d", todo.ID),
-					title,
-					todo.Description,
-					strconv.Itoa(todo.ProjectId),
-					todo.CreatedAt.Format(time.RFC3339),
-					todo.UpdatedAt.Format(time.RFC3339),
-					status,
-					completedAtString,
-				})
-			} else {
-				table.Append([]string{
-					fmt.Sprintf("%d", todo.ID),
-					title,
-					todo.Description,
-					strconv.Itoa(todo.ProjectId),
-					todo.CreatedAt.Format("02-01-2006"),
-					todo.UpdatedAt.Format("02-01-2006"),
-					status,
-					completedAtString,
-				})
-			}
+			table.Append(todoHelper.FormatTodoTableRowLong(todo, fullDate, strikethrough))
 		}
 
 		table.Render()
@@ -287,6 +209,10 @@ var LslCmdLong = &cobra.Command{
 			return
 		}
 
+		if reverseList {
+			slices.Reverse(todos)
+		}
+
 		table := tablewriter.NewWriter(os.Stdout)
 		table.SetHeader([]string{"ID", "Todo", "Description", "ProjectId", "Created At", "Updated At", "Status", "Completed At"})
 		table.SetBorder(true)
@@ -295,49 +221,7 @@ var LslCmdLong = &cobra.Command{
 		strikethrough := color.New(color.CrossedOut).SprintFunc()
 
 		for _, todo := range todos {
-			title := todo.Title
-			// If todo is completed, apply strikethrough to the title
-			if todo.Completed {
-				title = strikethrough(title)
-			}
-
-			status := "Pending"
-			if todo.Completed {
-				status = "Done"
-			}
-
-			completedAtString := "-"
-			if todo.CompletedAt.Valid {
-				if fullDate {
-					completedAtString = todo.CompletedAt.Time.Format(time.RFC3339)
-				} else {
-					completedAtString = todo.CompletedAt.Time.Format("02-01-2006")
-				}
-			}
-
-			if fullDate {
-				table.Append([]string{
-					fmt.Sprintf("%d", todo.ID),
-					title,
-					todo.Description,
-					strconv.Itoa(todo.ProjectId),
-					todo.CreatedAt.Format(time.RFC3339),
-					todo.UpdatedAt.Format(time.RFC3339),
-					status,
-					completedAtString,
-				})
-			} else {
-				table.Append([]string{
-					fmt.Sprintf("%d", todo.ID),
-					title,
-					todo.Description,
-					strconv.Itoa(todo.ProjectId),
-					todo.CreatedAt.Format("02-01-2006"),
-					todo.UpdatedAt.Format("02-01-2006"),
-					status,
-					completedAtString,
-				})
-			}
+			table.Append(todoHelper.FormatTodoTableRowLong(todo, fullDate, strikethrough))
 		}
 
 		table.Render()
@@ -360,4 +244,10 @@ func init() {
 	LsCmdLong.Flags().BoolVarP(&clearTerm, "Clear terminal first", "C", false, "Clear the terminal before listing the todos")
 	GetCmdLong.Flags().BoolVarP(&clearTerm, "Clear terminal first", "C", false, "Clear the terminal before listing the todos")
 	LslCmdLong.Flags().BoolVarP(&clearTerm, "Clear terminal first", "C", false, "Clear the terminal before listing the todos")
+	// Reversr order (userful for when there are laods of todo's and they were created important to least important)
+	GetCmd.Flags().BoolVarP(&reverseList, "Reverse the todo order", "r", false, "Reverse the list of todo's. Useful when you created todos most important -> least important")
+	LsCmd.Flags().BoolVarP(&reverseList, "Reverse the todo order", "r", false, "Reverse the list of todo's. Useful when you created todos most important -> least important")
+	LsCmdLong.Flags().BoolVarP(&reverseList, "Reverse the todo order", "r", false, "Reverse the list of todo's. Useful when you created todos most important -> least important")
+	GetCmdLong.Flags().BoolVarP(&reverseList, "Reverse the todo order", "r", false, "Reverse the list of todo's. Useful when you created todos most important -> least important")
+	LslCmdLong.Flags().BoolVarP(&reverseList, "Reverse the todo order", "r", false, "Reverse the list of todo's. Useful when you created todos most important -> least important")
 }

@@ -170,9 +170,9 @@ toto --help
 | Command           | Shorthand   | Description                                        | Flags                                                        |
 | ----------------- | ----------- | -------------------------------------------------- | ------------------------------------------------------------ |
 | `add`             | -           | Add a new task                                     | `-t`: specify title, `-d`: specify description, `-c`: specify created-at, `-u`: specify updated-at, `-p`: specify project-id |
-| `list`            | `ls`        | Show all tasks                                     | `-C`: clear terminal before render                          |
-| `list-long`       | `lsl`       | Show detailed task list                            | `-D`: get full date, `-C`: clear terminal before render      |
-| -                 | `lsla`      | Show detailed task list for all projects          | `-D`: get full date, `-C`: clear terminal before render      |
+| `list`            | `ls`        | Show all tasks                                     | `-C`: clear terminal before render, `-r`: reverse list order, `-A`: show all projects |
+| `list-long`       | `lsl`       | Show detailed task list                            | `-D`: get full date, `-C`: clear terminal before render, `-r`: reverse list order, `-A`: show all projects |
+| -                 | `lsla`      | Show detailed task list for all projects          | `-D`: get full date, `-C`: clear terminal before render, `-r`: reverse list order |
 | `edit`            | -           | Edit an existing task's title or description       | `-t`: text for title update, `-d`: description for update, `-i`: target todo id |
 | `description`     | `desc`      | Get description for a single todo                  | `-i`: target todo id                                        |
 | `toggle-complete` | `comp`      | Mark a task as complete                            |                                                              |
@@ -201,6 +201,16 @@ toto add -t "Implement login feature" -d "Add user authentication to the API"
 List tasks in current project:
 ```bash
 toto ls
+```
+
+List tasks in reverse order (newest first):
+```bash
+toto ls -r
+```
+
+List detailed tasks with full dates:
+```bash
+toto lsl -D
 ```
 
 Mark task as complete:

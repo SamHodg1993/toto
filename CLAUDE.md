@@ -43,7 +43,8 @@ Toto is a command-line todo application written in Go that manages tasks based o
 │   │   │   ├── service.go     # Service struct + interfaces
 │   │   │   ├── queries.go     # GetTodos, list operations
 │   │   │   ├── crud.go        # Add, Update, Delete
-│   │   │   └── complete.go    # Toggle/Remove complete
+│   │   │   ├── complete.go    # Toggle/Remove complete
+│   │   │   └── generateList.go # Helper functions for table formatting
 │   │   ├── project/           # Project service package
 │   │   │   ├── service.go     # Service struct
 │   │   │   ├── queries.go     # List, GetById operations
@@ -93,23 +94,29 @@ Toto is a command-line todo application written in Go that manages tasks based o
 3. ~~**Completed_at timestamp**: Fixed ToggleComplete to properly set/unset completed_at timestamps~~
 4. ~~**Input sanitization**: Added ANSI escape sequence prevention in titles and descriptions~~
 5. ~~**Flag consistency**: All commands confirmed to use -i flag correctly, no positional arguments remain~~
+6. ~~**List command refactoring**: All list commands now use helper functions (FormatTodoTableRow, FormatTodoTableRowLong) to reduce code duplication~~
+7. ~~**Reverse list support**: All list commands now support -r flag using slices.Reverse() for cleaner code~~
+8. ~~**Flag registration**: All list commands (ls, list, lsl, list-long, lsla) now have proper flag registration for -C, -r, -A, -D flags~~
 
 ### Known Issues (as of analysis)
 - All major known issues have been resolved
 
 ## Key Files for Bug Fixes
 
-### Flag Issues Location
+### List Commands Architecture
 - **File**: `/home/sam/coding/toto/cmd/todo/list.go`
-- **Lines 392-395**: Flag registration only for long commands
-- **Missing**: Flag registration for `LsCmd` and `GetCmd`
+- **Helper Functions**: `/home/sam/coding/toto/internal/service/todo/generateList.go`
+  - `FormatTodoTableRow()` - Formats simple 3-column rows (ID, Todo, Status)
+  - `FormatTodoTableRowLong()` - Formats detailed 8-column rows with dates and descriptions
+- **All commands now support**: `-r` (reverse), `-C` (clear terminal), `-A` (all todos), `-D` (full dates for long commands)
 
 ### Flag Variables
 ```go
 var (
-    fullDate  bool = false  // -D flag for full timestamps
-    allTodos  bool = false  // -A flag for all projects
-    clearTerm bool = false  // -C flag for clearing terminal
+    fullDate    bool = false  // -D flag for full timestamps
+    allTodos    bool = false  // -A flag for all projects
+    clearTerm   bool = false  // -C flag for clearing terminal
+    reverseList bool = false  // -r flag for reversing list order
 )
 ```
 
@@ -130,15 +137,15 @@ cd /home/sam/coding/toto && go build -o toto .
 /home/sam/coding/toto/toto add -t "Test Todo" -d "Description"
 ```
 
-### Testing Flag Issues
+### Testing List Commands
 ```bash
-# These work (should clear screen):
-/home/sam/coding/toto/toto lsl -C
-/home/sam/coding/toto/toto list-long -C
-
-# These fail:
-/home/sam/coding/toto/toto ls -C    # Error: unknown shorthand flag: 'C'
-/home/sam/coding/toto/toto list -C  # Error: unknown shorthand flag: 'C'
+# All commands now support flags:
+/home/sam/coding/toto/toto ls -C        # Clear screen before listing
+/home/sam/coding/toto/toto list -r      # Reverse order
+/home/sam/coding/toto/toto lsl -C -r    # Clear screen and reverse
+/home/sam/coding/toto/toto list-long -A # Show all todos regardless of project
+/home/sam/coding/toto/toto lsl -D       # Show full date timestamps
+/home/sam/coding/toto/toto lsla -C -r -D # All flags combined
 ```
 
 ## Adding Todos to Project List
