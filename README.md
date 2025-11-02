@@ -200,6 +200,8 @@ toto --help
 | `jira-auth`       | -           | Authenticate with Jira using API token            | Prompts for Jira URL, email, and API token. Stores securely in OS keyring |
 | `jira-pull`       | `jp`        | Pull a Jira ticket and create a linked todo       | `-i`: Jira ticket ID (e.g., PROJ-123)                       |
 | `jira-pull-claude` | `jpc`      | Pull Jira ticket and break it into subtasks with AI | `-i`: Jira ticket ID (e.g., PROJ-123)                       |
+| `jira-set-default-url` | -       | Update the global default Jira URL               | `-u`: Jira URL (e.g., mycompany.atlassian.net). Stored in keyring as fallback for all projects |
+| `set-project-jira-url` | -       | Set project-specific Jira URL                    | `-p`: project ID, `-u`: Jira URL. Overrides default for specific project |
 | `completion`      | -           | Generate autocompletion script for specified shell | Run `toto completion --help` for shell options               |
 
 ## Examples
@@ -263,6 +265,16 @@ toto jira-pull-claude -i PROJ-123
 ```
 This uses Claude AI to intelligently break down the ticket into actionable subtasks. If the description contains a bulleted list, it extracts each item. Otherwise, it analyzes the ticket and creates 3-8 subtasks.
 
+Set a global default Jira URL (used as fallback for all projects):
+```bash
+toto jira-set-default-url -u mycompany.atlassian.net
+```
+
+Set a project-specific Jira URL (overrides the default):
+```bash
+toto set-project-jira-url -p 3 -u customjira.atlassian.net
+```
+
 ## Roadmap
 
 ### Completed ✅
@@ -290,11 +302,16 @@ Jira integration is fully functional with simple API token authentication and AI
 - API token authentication (no OAuth app creation needed!)
 - Secure credential storage in OS keyring
 - Direct Jira URL support (works with any Jira instance)
+- **Project-specific Jira URLs** - Different projects can use different Jira instances
+- Smart fallback system - Global default with per-project overrides
+- Automatic URL protocol handling (accepts URLs with or without `https://`)
 - Database schema for Jira tickets
 - REST API client for fetching individual tickets
 - ADF (Atlassian Document Format) description parsing (supports bullet lists, ordered lists, etc.)
 - `jira-pull` command - Fetch ticket and create linked todo
 - `jira-pull-claude` command - AI-powered ticket breakdown using Claude Sonnet
+- `jira-set-default-url` command - Update global default Jira URL
+- `set-project-jira-url` command - Set project-specific Jira URL
 
 🚧 **Coming Soon:**
 - `toto jira-push -i <todo-id>` - Create Jira ticket from todo

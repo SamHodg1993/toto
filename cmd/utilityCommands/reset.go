@@ -51,5 +51,4 @@ func InitDBService(db *sql.DB) {
 
 func init() {
 	ResetCmd.Flags().BoolVarP(&confirmFlag, "confirm", "c", false, "Skip confirmation prompt")
-	// ResetCmd will be added to RootCmd in the main root.go file
 }

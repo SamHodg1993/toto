@@ -1,6 +1,7 @@
 package project
 
 import (
+	"database/sql"
 	"fmt"
 	"os"
 
@@ -52,7 +53,7 @@ func (s *Service) GetProjectJiraURL() (string, error) {
 		return "", fmt.Errorf("error getting project ID: %w", err)
 	}
 
-	var jiraURL string
+	var jiraURL sql.NullString
 
 	// get jira url from the db and return it
 	row := s.db.QueryRow("SELECT jira_url FROM projects WHERE id = ?", projectID)
@@ -61,10 +62,16 @@ func (s *Service) GetProjectJiraURL() (string, error) {
 		return "", fmt.Errorf("error getting Jira URL for project %d: %w", projectID, err)
 	}
 
-	if jiraURL == "" {
-		keyringJiraUrl := s.HandleSetProjectJiraURL(projectID)
-		jiraURL = keyringJiraUrl
+	// Convert to NullString to regular string
+	jiraURLString := ""
+	if jiraURL.Valid {
+		jiraURLString = jiraURL.String
 	}
 
-	return jiraURL, nil
+	if jiraURLString == "" {
+		keyringJiraUrl := s.HandleSetProjectJiraURL(projectID)
+		jiraURLString = keyringJiraUrl
+	}
+
+	return jiraURLString, nil
 }

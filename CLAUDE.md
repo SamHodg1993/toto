@@ -163,6 +163,10 @@ cd /home/sam/coding/toto && go build -o toto .
 # Jira shortcuts:
 /home/sam/coding/toto/toto jp -i PROJ-123    # Same as jira-pull
 /home/sam/coding/toto/toto jpc -i PROJ-123   # Same as jira-pull-claude
+
+# Jira URL management:
+/home/sam/coding/toto/toto jira-set-default-url -u sta2020.atlassian.net  # Set global default
+/home/sam/coding/toto/toto set-project-jira-url -p 3 -u custom.atlassian.net  # Set project-specific URL
 ```
 
 ## Adding Todos to Project List
@@ -265,6 +269,7 @@ cd test-directory
 - description TEXT
 - archived BOOLEAN NOT NULL DEFAULT FALSE
 - filepath VARCHAR(255) NOT NULL
+- jira_url VARCHAR(500) (nullable - project-specific Jira URL)
 - created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
 - updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
 
@@ -352,6 +357,46 @@ S_DEV_MODE=true
 ### Keyring Storage Keys
 - Service: `toto-cli`
 - Keys: `jiraURL`, `jiraEmail`, `jiraApiKey`
+
+### Project-Specific Jira URL Architecture ✅
+
+**Overview:**
+The Jira URL system uses a smart two-tier fallback strategy: project-specific URLs stored in the database override a global default stored in the keyring.
+
+**Storage Strategy:**
+1. **Database (projects.jira_url)** - Project-specific Jira URL (overrides default)
+2. **Keyring (jiraURL)** - Global default Jira URL (fallback for all projects)
+
+**Fallback Logic Flow:**
+```
+User runs jira command (jp, jpc, etc.)
+  ↓
+Check project's jira_url field in database
+  ↓ (if NULL/empty)
+Check keyring for default jiraURL
+  ↓ (if found)
+Prompt: "Use default [URL] for this project? (y/n)"
+  - Yes → Save to project's jira_url, use it
+  - No → Prompt for new URL, save to project's jira_url, use it
+  ↓ (if no default)
+Prompt for URL, save as both project-specific AND default (for first-time setup)
+```
+
+**Key Functions:**
+- `GetProjectJiraURL()` (`internal/service/project/queries.go:49-76`) - Implements fallback logic with user prompts
+- `HandleSetProjectJiraURL()` (`internal/service/project/crud.go:21-68`) - Handles user interaction for choosing/entering Jira URL
+- `EnsureHTTPS()` (`internal/utilities/jira_util.go`) - Automatically adds `https://` protocol to URLs without it
+- `UpdateProjectsJiraUrl()` (`internal/service/project/crud.go:264-281`) - Updates project's jira_url field
+
+**New Commands:**
+- `jira-set-default-url -u <url>` (`cmd/utilityCommands/defaultJiraUrl.go`) - Update global default Jira URL in keyring
+- `set-project-jira-url -p <id> -u <url>` (`cmd/projects/setProjectJiraUrl.go`) - Set project-specific Jira URL manually
+
+**Benefits:**
+- Multi-tenant support (different projects can use different Jira instances)
+- User-friendly prompts on first use
+- Flexible: works for users with one or multiple Jira instances
+- Automatic protocol handling (accepts URLs with or without `https://`)
 
 ### Pending Implementation
 - ~~Token refresh functionality (when access token expires)~~ ✅ Complete

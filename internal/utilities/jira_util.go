@@ -3,6 +3,7 @@ package utilities
 import (
 	"fmt"
 	"net/http"
+	"strings"
 	"time"
 
 	"github.com/zalando/go-keyring"
@@ -58,8 +59,23 @@ func StoreJiraCredentialsInKeyring(jiraURL, email, apiKey string) error {
 	return nil
 }
 
+func EnsureHTTPS(url string) string {
+	url = strings.TrimSpace(url)
+
+	if strings.HasPrefix(url, "http://") {
+		return "https://" + strings.TrimPrefix(url, "http://")
+	}
+
+	if !strings.HasPrefix(url, "https://") {
+		return "https://" + url
+	}
+
+	return url
+}
+
 func HandleJiraSessionBeforeCall(projectService ProjectService) (jiraURL, email, apiKey string, err error) {
 	jiraURL, err = projectService.GetProjectJiraURL()
+	jiraURL = EnsureHTTPS(jiraURL)
 
 	email, err = keyring.Get("toto-cli", "jiraEmail")
 	if err != nil {

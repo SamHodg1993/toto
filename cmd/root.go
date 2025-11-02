@@ -50,6 +50,7 @@ func Execute() {
 	// Add utility commands
 	RootCmd.AddCommand(utilityCommands.ResetCmd)
 	RootCmd.AddCommand(utilityCommands.CleanUtility)
+	RootCmd.AddCommand(utilityCommands.SetDefaultJiraUrl)
 
 	// Add the jira commands
 	RootCmd.AddCommand(jira.JiraAuth)
@@ -83,6 +84,7 @@ func Execute() {
 	RootCmd.AddCommand(projects.ProjectLsCmd)
 	RootCmd.AddCommand(projects.ProjectListCmd)
 	RootCmd.AddCommand(projects.EditProject)
+	RootCmd.AddCommand(projects.SetProjectsJiraUrl)
 
 	// Execute the root command
 	if err := RootCmd.Execute(); err != nil {

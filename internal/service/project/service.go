@@ -28,8 +28,21 @@ func New(db *sql.DB) *Service {
 }
 
 // scanRowToProject converts a SQL row to a Project model
-func scanRowToProject(rows *sql.Rows) (models.Project, error) {
+func scanRowToProject(rows *sql.Rows) (models.Project,
+	error) {
 	var p models.Project
-	err := rows.Scan(&p.ID, &p.Title, &p.Description, &p.Filepath, &p.Archived, &p.CreatedAt, &p.UpdatedAt, &p.JiraURL)
+	var description, jiraURL sql.NullString
+	err := rows.Scan(&p.ID, &p.Title, &description,
+		&p.Filepath, &p.Archived, &p.CreatedAt, &p.UpdatedAt,
+		&jiraURL)
+
+	// Convert NullString to regular string
+	if description.Valid {
+		p.Description = description.String
+	}
+	if jiraURL.Valid {
+		p.JiraURL = jiraURL.String
+	}
+
 	return p, err
 }
