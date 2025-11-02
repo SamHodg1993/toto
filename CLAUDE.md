@@ -166,7 +166,7 @@ cd /home/sam/coding/toto && go build -o toto .
 
 # Jira URL management:
 /home/sam/coding/toto/toto jira-set-default-url -u sta2020.atlassian.net  # Set global default
-/home/sam/coding/toto/toto set-project-jira-url -p 3 -u custom.atlassian.net  # Set project-specific URL
+/home/sam/coding/toto/toto project-set-jira-url -p 3 -u custom.atlassian.net  # Set project-specific URL
 ```
 
 ## Adding Todos to Project List
@@ -262,6 +262,7 @@ cd test-directory
 - completed_at DATETIME (nullable)
 - created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
 - updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
+- criticality INTEGER NOT NULL DEFAULT 0 (reserved for future TUI/AI features - not yet exposed in CLI)
 
 **projects table:**
 - id INTEGER PRIMARY KEY
@@ -390,7 +391,7 @@ Prompt for URL, save as both project-specific AND default (for first-time setup)
 
 **New Commands:**
 - `jira-set-default-url -u <url>` (`cmd/utilityCommands/defaultJiraUrl.go`) - Update global default Jira URL in keyring
-- `set-project-jira-url -p <id> -u <url>` (`cmd/projects/setProjectJiraUrl.go`) - Set project-specific Jira URL manually
+- `project-set-jira-url -p <id> -u <url>` (`cmd/projects/setProjectJiraUrl.go`) - Set project-specific Jira URL manually
 
 **Benefits:**
 - Multi-tenant support (different projects can use different Jira instances)
@@ -429,8 +430,11 @@ Plan to add an interactive terminal UI (similar to lazygit) for:
 - Exploring and managing todos with rich context
 - Interactive filtering and search
 - Multi-select operations
+- **Priority/Criticality management** - Visual sliders and drag-to-reorder by priority
 
 **Tech Stack:** [Bubbletea](https://github.com/charmbracelet/bubbletea) - Cross-platform TUI framework
+
+**Note:** The `criticality` database field has been added (INTEGER NOT NULL DEFAULT 0) but CLI commands are intentionally postponed until TUI is implemented. Managing priorities via CLI flags is too tedious - TUI will make this feature delightful and actually useful.
 
 ### LLM Integration (Claude API)
 ✅ **Completed:** Jira ticket breakdown using Claude Sonnet
@@ -442,7 +446,7 @@ Plan to add an interactive terminal UI (similar to lazygit) for:
 - **Title generation** - Generate descriptive titles from brief inputs
 - **Renaming** - Improve existing todo titles
 - **Description editing** - Expand or refine todo descriptions
-- **Criticality assignment** - Suggest priority levels (requires database schema update)
+- **Criticality assignment** - Suggest priority levels (database field exists, awaiting TUI/AI implementation)
 - **Completion order** - Suggest optimal order of completion
 
 ## Service Architecture (Refactored October 2024)

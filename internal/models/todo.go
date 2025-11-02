@@ -16,6 +16,7 @@ type Todo struct {
 	CompletedAt  sql.NullTime `db:"completed_at" json:"completedAt"`
 	CreatedAt    time.Time    `db:"created_at" json:"createdAt"`
 	UpdatedAt    time.Time    `db:"updated_at" json:"updatedAt"`
+	Criticality  int          `db:"criticality" json:"criticality"`
 }
 
 // IsValid checks if a todo has valid data

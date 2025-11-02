@@ -33,18 +33,20 @@ func (s *Service) HandleSetProjectJiraURL(projectID int) string {
 			jiraUrlString = jiraURL
 		} else {
 			fmt.Println("This will be stored securely in the system keyring as the default for the next time you need it.")
-			fmt.Println("It can be overwritten using toto set-global-jira-url")
+			fmt.Println("It can be overwritten using toto jira-set-default-url")
 			fmt.Println("Please enter your jira url. e.g. `https://mycompany.atlassian.net`: ")
 			usersJiraURL, _ := reader.ReadString('\n')
 			jiraUrlString = strings.TrimSpace(usersJiraURL)
+			jiraUrlString = utilities.EnsureHTTPS(jiraUrlString)
 		}
 	} else {
 		fmt.Println("No default jira URL found. Please enter your own.")
 		fmt.Println("This will be stored securely in the system keyring as the default for the next time you need it.")
-		fmt.Println("It can be overwritten using toto set-global-jira-url")
+		fmt.Println("It can be overwritten using toto jira-set-default-url")
 		fmt.Println("Please enter your jira url. e.g. `https://mycompany.atlassian.net`: ")
 		usersJiraURL, _ := reader.ReadString('\n')
 		jiraUrlString = strings.TrimSpace(usersJiraURL)
+		jiraUrlString = utilities.EnsureHTTPS(jiraUrlString)
 
 		// Set the keyring jiraURL so that it can be used as default next time
 		keyring.Set("toto-cli", "jiraURL", jiraUrlString)

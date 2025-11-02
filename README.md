@@ -201,7 +201,7 @@ toto --help
 | `jira-pull`       | `jp`        | Pull a Jira ticket and create a linked todo       | `-i`: Jira ticket ID (e.g., PROJ-123)                       |
 | `jira-pull-claude` | `jpc`      | Pull Jira ticket and break it into subtasks with AI | `-i`: Jira ticket ID (e.g., PROJ-123)                       |
 | `jira-set-default-url` | -       | Update the global default Jira URL               | `-u`: Jira URL (e.g., mycompany.atlassian.net). Stored in keyring as fallback for all projects |
-| `set-project-jira-url` | -       | Set project-specific Jira URL                    | `-p`: project ID, `-u`: Jira URL. Overrides default for specific project |
+| `project-set-jira-url` | -       | Set project-specific Jira URL                    | `-p`: project ID, `-u`: Jira URL. Overrides default for specific project |
 | `completion`      | -           | Generate autocompletion script for specified shell | Run `toto completion --help` for shell options               |
 
 ## Examples
@@ -272,7 +272,7 @@ toto jira-set-default-url -u mycompany.atlassian.net
 
 Set a project-specific Jira URL (overrides the default):
 ```bash
-toto set-project-jira-url -p 3 -u customjira.atlassian.net
+toto project-set-jira-url -p 3 -u customjira.atlassian.net
 ```
 
 ## Roadmap
@@ -311,7 +311,7 @@ Jira integration is fully functional with simple API token authentication and AI
 - `jira-pull` command - Fetch ticket and create linked todo
 - `jira-pull-claude` command - AI-powered ticket breakdown using Claude Sonnet
 - `jira-set-default-url` command - Update global default Jira URL
-- `set-project-jira-url` command - Set project-specific Jira URL
+- `project-set-jira-url` command - Set project-specific Jira URL
 
 🚧 **Coming Soon:**
 - `toto jira-push -i <todo-id>` - Create Jira ticket from todo

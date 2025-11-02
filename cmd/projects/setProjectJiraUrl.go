@@ -13,7 +13,7 @@ var (
 )
 
 var SetProjectsJiraUrl = &cobra.Command{
-	Use:   "set-project-jira-url",
+	Use:   "project-set-jira-url",
 	Short: "Update a single projects jira url. Defaults to current project",
 	Long:  "Update a single projects jira url. e.g. `https://mycompany.atlassian.net`. Defaults to current project.",
 	Args:  cobra.NoArgs,
