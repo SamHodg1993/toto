@@ -64,7 +64,8 @@ func InitDB() (*sql.DB, error) {
 		archived BOOLEAN NOT NULL DEFAULT FALSE,
 		filepath VARCHAR(255) NOT NULL DEFAULT '` + filepath.Clean(homeDir) + `',
 		created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-		updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
+		updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+	  jira_url VARCHAR(500)
 	)
 	`
 

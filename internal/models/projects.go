@@ -12,6 +12,7 @@ type Project struct {
 	Filepath    string    `db:"filepath" json:"filepath"`
 	CreatedAt   time.Time `db:"created_at" json:"createdAt"`
 	UpdatedAt   time.Time `db:"updated_at" json:"updatedAt"`
+	JiraURL     string    `db:"jira_url" json:"jiraUrl"`
 }
 
 type NewProject struct {
@@ -30,4 +31,3 @@ func (p *Project) IsValid() bool {
 func (p *Project) IsArchived() bool {
 	return p.Archived
 }
-

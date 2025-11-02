@@ -8,6 +8,10 @@ import (
 	"github.com/zalando/go-keyring"
 )
 
+type ProjectService interface {
+	GetProjectJiraURL() (string, error)
+}
+
 func StoreJiraCredentialsInKeyring(jiraURL, email, apiKey string) error {
 	endpoint := fmt.Sprintf("%s/rest/api/3/myself", jiraURL)
 
@@ -29,14 +33,17 @@ func StoreJiraCredentialsInKeyring(jiraURL, email, apiKey string) error {
 	}
 	defer resp.Body.Close()
 
-	// If status code is not 200 then the email + api key combo is incorrect
+	// If status code is not 200 then the email + api + jira url combop is incorrect
 	if resp.StatusCode != 200 {
 		return fmt.Errorf("Status code %d returned. Incorrect URL, email, api key combination.", resp.StatusCode)
 	}
 
-	// Store in keyring for future use
-	if err := keyring.Set("toto-cli", "jiraURL", jiraURL); err != nil {
-		return fmt.Errorf("Failed to store Jira URL: %w", err)
+	// We only want to store the keyring at this point if there isn't already one stored.
+	existingKeyring, _ := keyring.Get("toto-cli", "jiraURL")
+	if existingKeyring == "" {
+		if err := keyring.Set("toto-cli", "jiraURL", jiraURL); err != nil {
+			return fmt.Errorf("Failed to store Jira URL: %w", err)
+		}
 	}
 
 	if err := keyring.Set("toto-cli", "jiraEmail", email); err != nil {
@@ -51,11 +58,8 @@ func StoreJiraCredentialsInKeyring(jiraURL, email, apiKey string) error {
 	return nil
 }
 
-func HandleJiraSessionBeforeCall() (jiraURL string, email string, apiKey string, err error) {
-	jiraURL, err = keyring.Get("toto-cli", "jiraURL")
-	if err != nil {
-		return "", "", "", fmt.Errorf("No Jira URL found. Please run 'toto jira-auth' to authenticate")
-	}
+func HandleJiraSessionBeforeCall(projectService ProjectService) (jiraURL, email, apiKey string, err error) {
+	jiraURL, err = projectService.GetProjectJiraURL()
 
 	email, err = keyring.Get("toto-cli", "jiraEmail")
 	if err != nil {

@@ -10,13 +10,71 @@ import (
 
 	"github.com/samhodg1993/toto/internal/models"
 	"github.com/samhodg1993/toto/internal/utilities"
+	"github.com/zalando/go-keyring"
 )
+
+// Thoughtfully handle the user interaction for them to choose what they want the project jira_url to be
+//
+// They can choose, the default keyring one, or to paste in their own one.
+//
+// This function updates the keyring if required, updates the projects jira_id and returns the jiraURL
+func (s *Service) HandleSetProjectJiraURL(projectID int) string {
+	reader := bufio.NewReader(os.Stdin)
+
+	var jiraUrlString string
+	jiraURL, _ := keyring.Get("toto-cli", "jiraURL")
+
+	if jiraURL != "" {
+		fmt.Printf("Default jira URL found. Would you like to set `%s` as the jiraURL for this project?\n0: No, let me paste a new one in\n1: Yes\n", jiraURL)
+		userChoice, _ := reader.ReadString('\n')
+		userChoice = strings.TrimSpace(userChoice)
+
+		if userChoice == "1" {
+			jiraUrlString = jiraURL
+		} else {
+			fmt.Println("This will be stored securely in the system keyring as the default for the next time you need it.")
+			fmt.Println("It can be overwritten using toto set-global-jira-url")
+			fmt.Println("Please enter your jira url. e.g. `https://mycompany.atlassian.net`: ")
+			usersJiraURL, _ := reader.ReadString('\n')
+			jiraUrlString = strings.TrimSpace(usersJiraURL)
+		}
+	} else {
+		fmt.Println("No default jira URL found. Please enter your own.")
+		fmt.Println("This will be stored securely in the system keyring as the default for the next time you need it.")
+		fmt.Println("It can be overwritten using toto set-global-jira-url")
+		fmt.Println("Please enter your jira url. e.g. `https://mycompany.atlassian.net`: ")
+		usersJiraURL, _ := reader.ReadString('\n')
+		jiraUrlString = strings.TrimSpace(usersJiraURL)
+
+		// Set the keyring jiraURL so that it can be used as default next time
+		keyring.Set("toto-cli", "jiraURL", jiraUrlString)
+	}
+
+	// If project ID is 0, then it hasn't been created yet
+	// Will be handled during the create logic
+	if projectID != 0 {
+		_, err := s.db.Exec(
+			"UPDATE projects SET jira_url = ? where id = ?",
+			jiraUrlString,
+			projectID,
+		)
+		if err != nil {
+			fmt.Printf("Error setting project jira_url. err: %v.", err)
+			fmt.Println("Updating keyring jiraURL")
+		}
+	}
+
+	return jiraUrlString
+}
 
 // AddNewProject adds a new project to the database
 func (s *Service) AddNewProject(project models.NewProject) error {
 	if strings.TrimSpace(project.Title) == "" {
 		return fmt.Errorf("project title cannot be empty")
 	}
+
+	// Pass in 0 so that it doesn't try to update the project before creation
+	jiraUrlString := s.HandleSetProjectJiraURL(0)
 
 	if strings.TrimSpace(project.Filepath) == "" {
 		currentDir, err := os.Getwd()
@@ -34,6 +92,7 @@ func (s *Service) AddNewProject(project models.NewProject) error {
 		project.Filepath,
 		time.Now(),
 		time.Now(),
+		jiraUrlString,
 	)
 	if err != nil {
 		return fmt.Errorf("error adding project: %w", err)
@@ -233,4 +292,24 @@ func (s *Service) UpdateProject(projectID int, title string, description, filepa
 	}
 
 	return message, nil
+}
+
+// UpdateProjectJiraUrl updates a project's jira_url in the database
+func (s *Service) UpdateProjectsJiraUrl(projectID int, jiraUrl string) error {
+	if projectID <= 0 {
+		return fmt.Errorf("invalid project ID")
+	}
+
+	// Update project
+	_, err := s.db.Exec(
+		`UPDATE projects
+		 SET jira_url = ?
+		 WHERE id = ?`,
+		jiraUrl, projectID,
+	)
+	if err != nil {
+		return fmt.Errorf("Error updating project: %w", err)
+	}
+
+	return nil
 }

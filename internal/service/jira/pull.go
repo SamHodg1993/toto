@@ -16,6 +16,7 @@ type TodoServiceInterface interface {
 // ProjectServiceInterface defines methods needed from project service
 type ProjectServiceInterface interface {
 	GetProjectIdByFilepath() (int, error)
+	GetProjectJiraURL() (string, error)
 }
 
 // SetDependencies allows injecting todo and project services

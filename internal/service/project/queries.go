@@ -9,7 +9,7 @@ import (
 
 // ListProjects returns all projects as a slice of Project models
 func (s *Service) ListProjects() ([]models.Project, error) {
-	rows, err := s.db.Query("SELECT id, title, description, filepath, archived, created_at, updated_at FROM projects")
+	rows, err := s.db.Query("SELECT id, title, description, filepath, archived, created_at, updated_at, jira_url FROM projects")
 	if err != nil {
 		return nil, err
 	}
@@ -44,4 +44,27 @@ func (s *Service) GetProjectIdByFilepath() (int, error) {
 	}
 
 	return projectId, nil
+}
+
+func (s *Service) GetProjectJiraURL() (string, error) {
+	projectID, err := s.GetProjectIdByFilepath()
+	if err != nil {
+		return "", fmt.Errorf("error getting project ID: %w", err)
+	}
+
+	var jiraURL string
+
+	// get jira url from the db and return it
+	row := s.db.QueryRow("SELECT jira_url FROM projects WHERE id = ?", projectID)
+	err = row.Scan(&jiraURL)
+	if err != nil {
+		return "", fmt.Errorf("error getting Jira URL for project %d: %w", projectID, err)
+	}
+
+	if jiraURL == "" {
+		keyringJiraUrl := s.HandleSetProjectJiraURL(projectID)
+		jiraURL = keyringJiraUrl
+	}
+
+	return jiraURL, nil
 }

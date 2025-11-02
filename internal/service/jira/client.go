@@ -11,7 +11,7 @@ import (
 
 // GetSingleJiraTicket fetches a single Jira ticket by issue key from the API
 func (s *Service) GetSingleJiraTicket(issueKey string) (*models.JiraBasedTicket, error) {
-	jiraURL, email, apiKey, err := utilities.HandleJiraSessionBeforeCall()
+	jiraURL, email, apiKey, err := utilities.HandleJiraSessionBeforeCall(s.projectService)
 	if err != nil {
 		return nil, fmt.Errorf("%v\n", err)
 	}
