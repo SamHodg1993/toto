@@ -24,6 +24,43 @@ Right now, just that we base projects around the current working directory. Soon
 - Simple and intuitive command-line interface
 - Build so you spend less time planning...
 
+## LLM & AI Assistant Support
+
+Toto includes comprehensive documentation specifically designed for Large Language Models and AI assistants like Claude Code, GitHub Copilot, and ChatGPT.
+
+**Access the LLM documentation:**
+
+```bash
+# Display comprehensive usage guide in terminal
+toto llm-help
+
+# Save to a file for reference
+toto llm-help > toto-guide.txt
+
+# Or access the auto-generated file directly
+cat ~/.config/toto/LLMs.txt
+```
+
+**What's included:**
+- Complete command reference with examples
+- Common workflows and usage patterns
+- Flag documentation and combinations
+- Jira integration workflows
+- Tips for AI assistants working with toto
+- Output format interpretation
+
+**For AI assistants:** The LLM documentation provides everything needed to effectively use toto, including:
+- How to pull Jira tickets and break them down with AI
+- Bulk operations for managing multiple todos
+- Directory-based project management patterns
+- Best practices for todo refinement and cleanup
+
+**File locations:**
+- **In repository:** `/internal/embedded/LLMs.txt` (embedded in binary)
+- **User system:** `~/.config/toto/LLMs.txt` (auto-updated on every run)
+
+This makes toto particularly powerful when combined with AI assistants - they can pull Jira tickets, create todo lists, refine descriptions, and help manage your workflow with full context of how toto works.
+
 ## Installation
 
 ### For Users (Recommended)

@@ -1,0 +1,650 @@
+# Toto CLI - Usage Guide for LLMs
+
+## Overview
+Toto is a directory-based CLI todo manager written in Go. It automatically associates todos with the current working directory, creating project context without manual configuration.
+
+**Binary Location:**
+- After `go install github.com/samhodg1993/toto@latest`: `~/go/bin/toto`
+- From source: `/home/sam/coding/toto/toto`
+
+**Key Concept:** Run commands from your project directory. Toto automatically creates and links todos to that location.
+
+## Quick Start
+
+```bash
+# Navigate to your project
+cd ~/my-project
+
+# Add a todo (creates project automatically if needed)
+toto add -t "Implement user authentication" -d "Add JWT-based auth system"
+
+# List todos for current project
+toto ls
+
+# Mark todo as complete
+toto comp -i 1
+
+# Remove completed todos and view remaining
+toto clean
+```
+
+## Core Commands
+
+### Adding Todos
+**Command:** `toto add -t "title" -d "description"`
+
+**Aliases:** `add`, `a`
+
+**Flags:**
+- `-t, --title` (required) - Todo title
+- `-d, --description` (optional) - Detailed description
+
+**Examples:**
+```bash
+toto add -t "Fix login bug"
+toto add -t "Add dark mode" -d "Implement theme toggle with localStorage persistence"
+toto a -t "Write tests" -d "Add unit tests for auth module"
+```
+
+**Behavior:**
+- If no project exists for current directory, prompts to create one
+- Sanitizes input (prevents ANSI escape sequences)
+- Returns the new todo ID
+
+### Listing Todos
+
+#### Simple List
+**Command:** `toto ls` or `toto list`
+
+**Flags:**
+- `-C` - Clear terminal before listing
+- `-r` - Reverse order (newest first)
+- `-A` - Show all todos from all projects
+
+**Output:** 3 columns (ID | Todo | Status)
+
+**Examples:**
+```bash
+toto ls              # Basic list
+toto ls -C           # Clear screen first
+toto list -r         # Reverse order
+toto ls -A           # All projects
+```
+
+#### Long List
+**Command:** `toto lsl` or `toto list-long`
+
+**Flags:**
+- `-C` - Clear terminal before listing
+- `-r` - Reverse order
+- `-A` - Show all todos regardless of project
+- `-D` - Show full date timestamps (not relative)
+
+**Output:** 8 columns (ID | Todo | Status | Created | Updated | Completed | Jira Key | Description)
+
+**Examples:**
+```bash
+toto lsl             # Detailed view
+toto lsl -D          # Full timestamps
+toto list-long -C -r # Clear screen, reverse order
+toto lsl -A -D       # All projects with full dates
+```
+
+#### List All Projects
+**Command:** `toto lsla`
+
+**Description:** Lists all todos from all projects with full details. Equivalent to `toto lsl -A`.
+
+### Completing Todos
+
+**Command:** `toto comp -i <id>` or `toto toggle-complete -i <id>`
+
+**Flags:**
+- `-i, --id` - Single todo ID to toggle
+- `-I, --ids` - Bulk operation (comma-separated IDs)
+
+**Examples:**
+```bash
+toto comp -i 5              # Toggle single todo
+toto comp -I 1,2,3,4        # Toggle multiple todos
+toto toggle-complete -i 2   # Verbose command name
+```
+
+**Behavior:**
+- Toggles between complete/incomplete
+- Sets/unsets `completed_at` timestamp
+- Can be run multiple times to toggle back
+
+### Deleting Todos
+
+**Command:** `toto del -i <id>` or `toto delete -i <id>`
+
+**Flags:**
+- `-i, --id` - Single todo ID to delete
+- `-I, --ids` - Bulk operation (comma-separated IDs)
+
+**Examples:**
+```bash
+toto del -i 3           # Delete single todo
+toto del -I 5,6,7       # Delete multiple todos
+toto delete -i 1        # Verbose command name
+```
+
+**Behavior:**
+- Permanent deletion (no undo)
+- Prompts for confirmation on bulk operations
+
+### Editing Todos
+
+**Command:** `toto edit -i <id> -t "new title" -d "new description"`
+
+**Flags:**
+- `-i, --id` (required) - Todo ID to edit
+- `-t, --title` (optional) - New title
+- `-d, --description` (optional) - New description
+
+**Examples:**
+```bash
+toto edit -i 2 -t "Updated title"
+toto edit -i 3 -d "More detailed description here"
+toto edit -i 1 -t "New title" -d "New description"
+```
+
+**Behavior:**
+- Can update title, description, or both
+- Must provide at least one of `-t` or `-d`
+
+### Getting Todo Description
+
+**Command:** `toto desc -i <id>` or `toto description -i <id>`
+
+**Flags:**
+- `-i, --id` (required) - Todo ID
+
+**Example:**
+```bash
+toto desc -i 5
+```
+
+**Output:** Displays the full description for the specified todo.
+
+### Cleaning Up
+
+**Command:** `toto clean`
+
+**Aliases:** `clean`, `cls`
+
+**Flags:**
+- `-r` - Reverse order in final list
+
+**Behavior:**
+1. Clears the terminal screen
+2. Removes all completed todos for current project
+3. Lists remaining todos
+
+**Example:**
+```bash
+toto clean       # Clean and show remaining
+toto clean -r    # Clean and show in reverse
+```
+
+### Removing Completed Todos
+
+**Command:** `toto cls-comp` or `toto remove-complete`
+
+**Description:** Removes all completed todos for the current project (without clearing screen or listing).
+
+**Example:**
+```bash
+toto cls-comp
+toto remove-complete
+```
+
+## Project Management
+
+### Adding Projects
+
+**Command:** `toto proj-add -t "title" -d "description"` or `toto project-add -t "title" -d "description"`
+
+**Flags:**
+- `-t, --title` (required) - Project title
+- `-d, --description` (optional) - Project description
+
+**Examples:**
+```bash
+toto proj-add -t "My Web App" -d "React frontend with Go backend"
+toto project-add -t "CLI Tool"
+```
+
+**Behavior:**
+- Associates project with current directory
+- Can also be triggered automatically when adding first todo
+
+### Listing Projects
+
+**Command:** `toto proj-ls` or `toto project-list`
+
+**Output:** Table showing all projects with ID, title, description, and filepath.
+
+**Example:**
+```bash
+toto proj-ls
+toto project-list
+```
+
+### Editing Projects
+
+**Command:** `toto proj-edit -i <id> -t "new title" -d "new description"`
+
+**Flags:**
+- `-i, --id` (required) - Project ID to edit
+- `-t, --title` (optional) - New title
+- `-d, --description` (optional) - New description
+
+**Examples:**
+```bash
+toto proj-edit -i 1 -t "Updated Project Name"
+toto proj-edit -i 2 -t "New Title" -d "New Description"
+```
+
+### Deleting Projects
+
+**Command:** `toto proj-del -i <id>` or `toto project-delete -i <id>`
+
+**Flags:**
+- `-i, --id` (required) - Project ID to delete
+
+**Example:**
+```bash
+toto proj-del -i 3
+```
+
+**Behavior:**
+- Deletes project and all associated todos
+- Prompts for confirmation
+
+### Setting Project-Specific Jira URL
+
+**Command:** `toto project-set-jira-url -p <project-id> -u <url>`
+
+**Flags:**
+- `-p, --project` (required) - Project ID
+- `-u, --url` (required) - Jira URL (e.g., mycompany.atlassian.net)
+
+**Example:**
+```bash
+toto project-set-jira-url -p 3 -u custom.atlassian.net
+```
+
+**Behavior:**
+- Sets project-specific Jira URL (overrides global default)
+- Automatically adds `https://` if not present
+
+## Jira Integration
+
+### Authentication
+
+**Command:** `toto jira-auth`
+
+**Interactive Flow:**
+1. Prompts for Jira URL (e.g., mycompany.atlassian.net)
+2. Prompts for email address
+3. Prompts for API token (create at https://id.atlassian.com/manage-profile/security/api-tokens)
+4. Validates credentials with test API call
+5. Stores securely in OS keyring
+
+**Example:**
+```bash
+toto jira-auth
+# Follow prompts...
+```
+
+**Keyring Storage:**
+- Service: `toto-cli`
+- Keys: `jiraURL`, `jiraEmail`, `jiraApiKey`
+
+### Setting Default Jira URL
+
+**Command:** `toto jira-set-default-url -u <url>`
+
+**Flags:**
+- `-u, --url` (required) - Default Jira URL for all projects
+
+**Example:**
+```bash
+toto jira-set-default-url -u mycompany.atlassian.net
+```
+
+**Behavior:**
+- Updates the global default Jira URL in keyring
+- Used as fallback for projects without specific URL
+
+### Jira URL Fallback Logic
+
+**Two-tier system:**
+1. **Project-specific URL** (database: `projects.jira_url`) - Highest priority
+2. **Global default URL** (keyring: `jiraURL`) - Fallback
+
+**First-time flow:**
+- If no project URL set → checks keyring for default
+- If default found → prompts "Use default [URL]? (y/n)"
+- If no default → prompts for URL, saves as both project-specific AND global default
+
+### Pulling Jira Tickets
+
+**Command:** `toto jira-pull -i <issue-key>` or `toto jp -i <issue-key>`
+
+**Flags:**
+- `-i, --issue` (required) - Jira issue key (e.g., PROJ-123)
+
+**Examples:**
+```bash
+toto jira-pull -i PROJ-123
+toto jp -i DEV-456      # Short alias
+```
+
+**Behavior:**
+1. Fetches ticket from Jira API
+2. Saves to `jira_tickets` table (or updates if exists)
+3. Creates a new todo linked to the Jira ticket
+4. Parses Atlassian Document Format (ADF) descriptions
+
+### Pulling with AI Breakdown
+
+**Command:** `toto jira-pull-claude -i <issue-key>` or `toto jpc -i <issue-key>`
+
+**Flags:**
+- `-i, --issue` (required) - Jira issue key
+
+**Requirements:**
+- `CLAUDE_API_KEY` environment variable must be set
+
+**Examples:**
+```bash
+export CLAUDE_API_KEY=your-key-here
+toto jira-pull-claude -i PROJ-123
+toto jpc -i DEV-456     # Short alias
+```
+
+**Behavior:**
+1. Fetches ticket from Jira API
+2. Uses Claude AI (Sonnet 4.5) to intelligently break down the ticket
+3. Creates multiple todos based on AI analysis:
+   - If ticket has explicit task list → extracts each item
+   - If high-level description → breaks into 3-8 logical subtasks
+4. All created todos are linked to the Jira ticket
+
+**AI Prompt Strategy:**
+- Detects explicit bullet/numbered lists and preserves them
+- For complex descriptions, breaks into actionable subtasks
+- Focuses on technical implementation steps
+- Returns JSON array of tasks with titles and descriptions
+
+### Jira Data Model
+
+**jira_tickets table:**
+- `id` - Primary key
+- `jira_key` - Unique issue key (e.g., "PROJ-123")
+- `title` - Issue summary
+- `status` - Issue status (e.g., "To Do", "In Progress")
+- `project_key` - Jira project key
+- `issue_type` - Type (e.g., "Story", "Bug", "Task")
+- `url` - Full Jira URL
+- `last_synced_at` - Last sync timestamp
+- `created_at`, `updated_at` - Timestamps
+
+**Relationship:**
+- One Jira ticket can have multiple todos
+- `todos.jira_ticket_id` foreign key → `jira_tickets.id`
+
+## Utility Commands
+
+### Reset Database
+
+**Command:** `toto reset`
+
+**Description:** Completely resets the database (deletes todo.db file and recreates schema).
+
+**Warning:** This is destructive and irreversible!
+
+**Example:**
+```bash
+toto reset
+# Confirm when prompted
+```
+
+### LLM Help (This Document)
+
+**Command:** `toto llm-help`
+
+**Description:** Outputs this complete usage guide for LLMs.
+
+**Examples:**
+```bash
+toto llm-help                    # Display in terminal
+toto llm-help > ~/toto-guide.txt # Save to file
+```
+
+**Also Available At:** `~/.config/toto/LLMs.txt` (auto-generated on first run)
+
+## Common Workflows
+
+### Starting a New Project
+```bash
+cd ~/new-project
+toto add -t "Initial setup" -d "Set up project structure"
+toto add -t "Add README"
+toto add -t "Configure CI/CD"
+toto ls
+```
+
+### Daily Workflow
+```bash
+cd ~/my-project
+toto ls -C              # Clear screen and see current todos
+# Work on todos...
+toto comp -i 3          # Mark completed
+toto clean              # Remove completed, see what's left
+```
+
+### Bulk Operations
+```bash
+# Complete multiple todos at once
+toto comp -I 1,2,3,4
+
+# Delete multiple todos
+toto del -I 5,6,7,8
+
+# Add multiple todos
+toto add -t "Task 1" -d "Description 1"
+toto add -t "Task 2" -d "Description 2"
+toto add -t "Task 3" -d "Description 3"
+```
+
+### Jira Integration Workflow
+```bash
+# One-time setup
+toto jira-auth
+# Enter credentials...
+
+# Pull a Jira ticket as a single todo
+toto jp -i PROJ-123
+
+# Pull a Jira ticket and break it down with AI
+toto jpc -i PROJ-456
+
+# View all todos (including Jira-linked ones)
+toto lsl
+
+# The Jira Key column shows which todos are linked
+```
+
+### Multi-Project Management
+```bash
+# Check all projects
+toto proj-ls
+
+# View all todos across all projects
+toto lsla
+
+# Work in specific project
+cd ~/project-a
+toto ls
+
+# Switch to another project
+cd ~/project-b
+toto ls
+```
+
+### Reviewing and Refining Todos with Claude Code
+```bash
+# Pull Jira ticket with AI breakdown
+toto jpc -i PROJ-789
+
+# View the created todos
+toto lsl
+
+# In Claude Code: "Review all todos from current project, improve titles and descriptions"
+# Claude Code will:
+# 1. Run: toto lsl
+# 2. Read each todo's full details
+# 3. Use: toto edit -i <id> -t "better title" -d "improved description"
+# 4. Remove redundant todos: toto del -i <id>
+# 5. Add missing todos: toto add -t "..." -d "..."
+```
+
+## Output Format Interpretation
+
+### Simple List (ls)
+```
++----+---------------------------+--------+
+| ID |           Todo            | Status |
++----+---------------------------+--------+
+|  1 | Implement authentication  |   ☐    |
+|  2 | Add unit tests            |   ☑    |
++----+---------------------------+--------+
+```
+
+**Status Symbols:**
+- `☐` - Incomplete
+- `☑` - Complete
+
+### Long List (lsl)
+```
++----+---------------+--------+---------+---------+-----------+-----------+----------------+
+| ID |     Todo      | Status | Created | Updated | Completed | Jira Key  | Description    |
++----+---------------+--------+---------+---------+-----------+-----------+----------------+
+|  1 | Fix bug       |   ☐    | 2 days  | 1 hour  |    --     | PROJ-123  | Details here   |
+|  2 | Add feature   |   ☑    | 5 days  | 3 days  | 3 days    |    --     | More info      |
++----+---------------+--------+---------+---------+-----------+-----------+----------------+
+```
+
+**Date Formats:**
+- Default: Relative (e.g., "2 days ago", "3 hours ago")
+- With `-D` flag: Full timestamps (e.g., "2024-01-15 14:30:22")
+
+**Jira Key Column:**
+- Shows issue key if todo is linked to Jira ticket
+- `--` if not linked
+
+## Database & Storage
+
+**Database Location:** `todo.db` in project root (SQLite3)
+
+**Schema:**
+- `todos` - Todo items with title, description, status, timestamps
+- `projects` - Project definitions with filepath associations
+- `jira_tickets` - Cached Jira ticket data
+
+**Auto-Timestamps:**
+- `created_at` - Set on creation
+- `updated_at` - Automatically updated by trigger on any change
+- `completed_at` - Set when todo marked complete, NULL when incomplete
+
+**Config Directory:** `~/.config/toto/`
+- Contains auto-generated LLMs.txt copy
+- May contain additional config in future releases
+
+**Keyring Storage:**
+- Jira credentials stored in OS keyring
+- Service: `toto-cli`
+- Keys: `jiraURL`, `jiraEmail`, `jiraApiKey`
+
+## Tips for LLMs Working with Toto
+
+1. **Always check current location:** Run `toto ls` to see context
+2. **Use lsl for full details:** When you need descriptions, dates, or Jira links
+3. **Bulk operations are your friend:** Use `-I` flag for multiple IDs
+4. **Jira + Claude combo:** `jpc` command is powerful for ticket breakdown
+5. **Clean up regularly:** Use `toto clean` to remove completed items
+6. **Check all projects:** Use `toto lsla` or `toto proj-ls` for overview
+7. **Edit for clarity:** Don't hesitate to improve todo titles/descriptions
+8. **Delete duplicates:** Remove redundant todos after Jira pulls
+
+## Flags Reference
+
+**Global Flags:**
+- `-h, --help` - Show help for any command
+
+**List Flags:**
+- `-C` - Clear terminal before output
+- `-r` - Reverse order (newest first)
+- `-A` - All todos (ignore project context)
+- `-D` - Full date timestamps (long lists only)
+
+**ID Flags:**
+- `-i, --id` - Single ID for operations
+- `-I, --ids` - Bulk comma-separated IDs
+- `-p, --project` - Project ID
+
+**Content Flags:**
+- `-t, --title` - Todo/project title
+- `-d, --description` - Todo/project description
+- `-u, --url` - Jira URL
+
+**Jira Flags:**
+- `-i, --issue` - Jira issue key (e.g., PROJ-123)
+
+## Version Information
+
+**Current Features:**
+- Directory-based project management
+- SQLite storage with auto-timestamps
+- Jira API integration (API token auth)
+- Claude AI ticket breakdown
+- Bulk operations
+- Project-specific and global Jira URLs
+- ADF (Atlassian Document Format) parsing
+
+**Future Enhancements:**
+- TUI (Terminal User Interface) with Bubbletea
+- Priority/criticality management (field exists, waiting for TUI)
+- Jira push (create tickets from todos)
+- Jira sync (bidirectional status updates)
+- Additional LLM integrations
+
+## Installation
+
+```bash
+# From GitHub
+go install github.com/samhodg1993/toto@latest
+
+# From source
+cd /path/to/toto
+go build -o toto .
+sudo mv toto /usr/local/bin/  # Or add to PATH
+```
+
+## Getting Help
+
+```bash
+toto --help                # General help
+toto [command] --help      # Command-specific help
+toto llm-help              # This comprehensive guide
+```
+
+---
+
+**Document Version:** 1.0
+**Last Updated:** 2025-11-10
+**Toto Version:** Latest (main branch)

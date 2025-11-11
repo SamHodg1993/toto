@@ -35,9 +35,14 @@ Toto is a command-line todo application written in Go that manages tasks based o
 │   └── utilityCommands/
 │       ├── clean.go            # Clean command (clear, remove completed, list)
 │       ├── reset.go            # Database reset command
+│       ├── llmHelp.go          # LLM documentation command
+│       ├── defaultJiraUrl.go   # Set default Jira URL
 │       └── utilityCommands.go  # Utility service setup
 ├── internal/
 │   ├── db/db.go               # Database initialization with auto-timestamp triggers
+│   ├── embedded/              # Embedded files (go:embed)
+│   │   ├── llms.go            # Embeds LLMs.txt
+│   │   └── LLMs.txt           # Comprehensive usage guide for LLMs
 │   ├── service/               # Business logic (refactored to sub-packages)
 │   │   ├── todo/              # Todo service package
 │   │   │   ├── service.go     # Service struct + interfaces
@@ -87,6 +92,7 @@ Toto is a command-line todo application written in Go that manages tasks based o
 - `proj-ls`/`project-list` - List all projects
 - `proj-edit` - Edit project details
 - `reset` - Reset database
+- `llm-help`/`llm` - Display comprehensive LLM-focused usage documentation
 
 ### Recent Fixes
 1. ~~**Project creation prompt bug**: Fixed - now properly calls AddNewProjectWithPrompt() when user selects option 2~~
@@ -237,8 +243,9 @@ cd test-directory
 - Provide suggestions on how to fix issues (file locations, code patterns, etc.)
 - Help manage the todo list and project organization
 - Analyze code structure and identify root causes
-- Keep this file up to date, command, bugs etc...
-- Keep the README file up to date, commands, instructions etc...
+- Keep this file (CLAUDE.md) up to date, commands, bugs etc...
+- Keep the README.md file up to date, commands, instructions etc...
+- Keep the LLMs.txt file (internal/embedded/LLMs.txt) up to date with new commands, workflows, and usage patterns
 - Any testing of command should be done in the ./test-directory/
 
 ## Quick Start for Claude Code Sessions
@@ -421,6 +428,62 @@ Prompt for URL, save as both project-specific AND default (for first-time setup)
 - `jira-pull` (no ID) - Opens interactive browser
 - `jira-browse` - Dedicated ticket browser with filtering
 - Built with [Bubbletea](https://github.com/charmbracelet/bubbletea) for cross-platform support
+
+## LLM Documentation & AI Assistant Support
+
+### Overview
+Toto includes comprehensive documentation specifically designed for Large Language Models and AI assistants. This makes it easy for AI tools like Claude Code, GitHub Copilot, and ChatGPT to effectively use toto commands.
+
+### Implementation (Completed ✅)
+
+**Hybrid Approach:**
+1. **Embedded in binary** - LLMs.txt file is embedded using `go:embed` directive
+2. **Command access** - `toto llm-help` (alias: `toto llm`) outputs the full documentation
+3. **Auto-updated file** - Every time toto runs, it updates `~/.config/toto/LLMs.txt` with the latest version
+
+**File Locations:**
+- **Source:** `/internal/embedded/LLMs.txt` (embedded via `/internal/embedded/llms.go`)
+- **User system:** `~/.config/toto/LLMs.txt` (auto-updated on every run in `cmd/root.go`)
+- **Command:** `cmd/utilityCommands/llmHelp.go`
+
+**Documentation Contents:**
+- Complete command reference with examples
+- Common workflows and usage patterns
+- All flags and their combinations
+- Jira integration workflows (including `jpc` AI breakdown)
+- Tips for AI assistants working with toto
+- Output format interpretation guide
+- Database schema and relationships
+
+**Architecture:**
+```
+internal/embedded/
+├── llms.go           # Embeds LLMs.txt using go:embed
+└── LLMs.txt          # Comprehensive usage guide
+
+cmd/root.go           # ensureLLMUsageFile() - auto-generates ~/.config/toto/LLMs.txt
+cmd/utilityCommands/
+└── llmHelp.go        # Command implementation (uses embedded.LLMUsageDoc)
+```
+
+**Usage:**
+```bash
+# Display in terminal
+toto llm-help
+
+# Save to file
+toto llm-help > toto-guide.txt
+
+# Access auto-generated copy
+cat ~/.config/toto/LLMs.txt
+```
+
+**Benefits:**
+- AI assistants can quickly understand all toto capabilities
+- Works immediately after `go install` (embedded in binary)
+- Persistent reference available at `~/.config/toto/LLMs.txt`
+- Reduces need for AI to search documentation or guess command syntax
+- Particularly powerful with `jpc` command for Jira ticket breakdown + refinement workflows
 
 ## Future Enhancements
 
