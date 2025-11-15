@@ -67,7 +67,7 @@ This makes toto particularly powerful when combined with AI assistants - they ca
 ```bash
 # Install directly with Go (requires Go 1.21+)
 # Works on Windows, Mac, and Linux
-go install github.com/ODGY8/toto@latest
+go install github.com/odgy8/toto@latest
 ```
 
 ### Ensuring `toto` is in your PATH
@@ -107,7 +107,7 @@ The `toto` command will now be available globally.
 
 ```bash
 # Clone the repository
-git clone https://github.com/ODGY8/toto.git
+git clone https://github.com/odgy8/toto.git
 
 # Navigate to the directory
 cd toto
@@ -410,7 +410,7 @@ Contributions are welcome! Please feel free to submit a Pull Request.
 
 ## Author
 
-Sam Hodgkinson- [ODGY8](https://github.com/ODGY8)
+Sam Hodgkinson- [odgy8](https://github.com/odgy8)
 
 ## Contributors 
 

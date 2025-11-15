@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/ODGY8/toto/internal/models"
+	"github.com/odgy8/toto/internal/models"
 )
 
 // InsertJiraTicket inserts or updates a Jira ticket in the database

@@ -2,7 +2,7 @@ package main
 
 import (
 	"github.com/joho/godotenv"
-	"github.com/ODGY8/toto/cmd"
+	"github.com/odgy8/toto/cmd"
 )
 
 func main() {

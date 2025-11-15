@@ -1,4 +1,4 @@
-module github.com/ODGY8/toto
+module github.com/odgy8/toto
 
 go 1.23.4
 

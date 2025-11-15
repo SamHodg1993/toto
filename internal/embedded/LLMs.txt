@@ -4,7 +4,7 @@
 Toto is a directory-based CLI todo manager written in Go. It automatically associates todos with the current working directory, creating project context without manual configuration.
 
 **Binary Location:**
-- After `go install github.com/ODGY8/toto@latest`: `~/go/bin/toto`
+- After `go install github.com/odgy8/toto@latest`: `~/go/bin/toto`
 - From source: `/home/sam/coding/toto/toto`
 
 **Key Concept:** Run commands from your project directory. Toto automatically creates and links todos to that location.
@@ -627,7 +627,7 @@ toto lsl
 
 ```bash
 # From GitHub
-go install github.com/ODGY8/toto@latest
+go install github.com/odgy8/toto@latest
 
 # From source
 cd /path/to/toto

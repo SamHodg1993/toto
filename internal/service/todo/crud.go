@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/ODGY8/toto/internal/utilities"
+	"github.com/odgy8/toto/internal/utilities"
 )
 
 // AddTodo adds a new todo

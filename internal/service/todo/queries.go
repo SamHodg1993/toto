@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/ODGY8/toto/internal/models"
+	"github.com/odgy8/toto/internal/models"
 )
 
 // GetTodosForFilepath gets todos for the current directory's project

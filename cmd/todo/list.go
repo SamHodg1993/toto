@@ -5,9 +5,9 @@ import (
 	"os"
 	"slices"
 
-	"github.com/ODGY8/toto/internal/models"
-	todoHelper "github.com/ODGY8/toto/internal/service/todo"
-	"github.com/ODGY8/toto/internal/utilities"
+	"github.com/odgy8/toto/internal/models"
+	todoHelper "github.com/odgy8/toto/internal/service/todo"
+	"github.com/odgy8/toto/internal/utilities"
 
 	"github.com/fatih/color"
 	"github.com/olekukonko/tablewriter"

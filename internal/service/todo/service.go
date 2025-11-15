@@ -3,7 +3,7 @@ package todo
 import (
 	"database/sql"
 
-	"github.com/ODGY8/toto/internal/models"
+	"github.com/odgy8/toto/internal/models"
 )
 
 // ProjectServiceInterface defines methods needed from project service

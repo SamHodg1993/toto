@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/ODGY8/toto/internal/service/database"
+	"github.com/odgy8/toto/internal/service/database"
 
 	"github.com/spf13/cobra"
 )

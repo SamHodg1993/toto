@@ -6,12 +6,12 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/ODGY8/toto/cmd/jira"
-	"github.com/ODGY8/toto/cmd/projects"
-	"github.com/ODGY8/toto/cmd/todo"
-	"github.com/ODGY8/toto/cmd/utilityCommands"
-	"github.com/ODGY8/toto/internal/db"
-	"github.com/ODGY8/toto/internal/embedded"
+	"github.com/odgy8/toto/cmd/jira"
+	"github.com/odgy8/toto/cmd/projects"
+	"github.com/odgy8/toto/cmd/todo"
+	"github.com/odgy8/toto/cmd/utilityCommands"
+	"github.com/odgy8/toto/internal/db"
+	"github.com/odgy8/toto/internal/embedded"
 
 	"github.com/spf13/cobra"
 )

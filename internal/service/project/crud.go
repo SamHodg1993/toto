@@ -8,8 +8,8 @@ import (
 	"strings"
 	"time"
 
-	"github.com/ODGY8/toto/internal/models"
-	"github.com/ODGY8/toto/internal/utilities"
+	"github.com/odgy8/toto/internal/models"
+	"github.com/odgy8/toto/internal/utilities"
 	"github.com/zalando/go-keyring"
 )
 

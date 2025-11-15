@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/ODGY8/toto/internal/utilities"
+	"github.com/odgy8/toto/internal/utilities"
 
 	"github.com/fatih/color"
 	"github.com/olekukonko/tablewriter"

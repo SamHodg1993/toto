@@ -3,7 +3,7 @@ package jira
 import (
 	"database/sql"
 
-	"github.com/ODGY8/toto/internal/service/jira"
+	"github.com/odgy8/toto/internal/service/jira"
 
 	"github.com/spf13/cobra"
 )

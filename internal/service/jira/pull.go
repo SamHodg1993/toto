@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/ODGY8/toto/internal/models"
-	"github.com/ODGY8/toto/internal/service/claude"
+	"github.com/odgy8/toto/internal/models"
+	"github.com/odgy8/toto/internal/service/claude"
 )
 
 // TodoServiceInterface defines methods needed from todo service
