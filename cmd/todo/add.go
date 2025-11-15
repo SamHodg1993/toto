@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/samhodg1993/toto/cmd/projects"
+	"github.com/ODGY8/toto/cmd/projects"
 
 	"github.com/spf13/cobra"
 )

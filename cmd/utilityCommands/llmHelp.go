@@ -3,7 +3,7 @@ package utilityCommands
 import (
 	"fmt"
 
-	"github.com/samhodg1993/toto/internal/embedded"
+	"github.com/ODGY8/toto/internal/embedded"
 	"github.com/spf13/cobra"
 )
 

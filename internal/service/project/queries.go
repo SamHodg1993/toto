@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/samhodg1993/toto/internal/models"
+	"github.com/ODGY8/toto/internal/models"
 )
 
 // ListProjects returns all projects as a slice of Project models

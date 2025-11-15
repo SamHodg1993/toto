@@ -5,7 +5,7 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/samhodg1993/toto/internal/models"
+	"github.com/ODGY8/toto/internal/models"
 )
 
 func FormatTodoTableRow(todo models.Todo, strikethrough func(a ...interface{}) string) []string {

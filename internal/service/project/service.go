@@ -3,7 +3,7 @@ package project
 import (
 	"database/sql"
 
-	"github.com/samhodg1993/toto/internal/models"
+	"github.com/ODGY8/toto/internal/models"
 )
 
 var sql_insert_project string = `

@@ -3,7 +3,7 @@ package todo
 import (
 	"database/sql"
 
-	"github.com/samhodg1993/toto/internal/service/todo"
+	"github.com/ODGY8/toto/internal/service/todo"
 
 	"github.com/spf13/cobra"
 )

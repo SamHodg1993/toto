@@ -8,9 +8,9 @@ import (
 
 	"github.com/fatih/color"
 	"github.com/olekukonko/tablewriter"
-	"github.com/samhodg1993/toto/internal/models"
-	todoHelper "github.com/samhodg1993/toto/internal/service/todo"
-	"github.com/samhodg1993/toto/internal/utilities"
+	"github.com/ODGY8/toto/internal/models"
+	todoHelper "github.com/ODGY8/toto/internal/service/todo"
+	"github.com/ODGY8/toto/internal/utilities"
 )
 
 // TodoServiceInterface defines methods needed from todo service

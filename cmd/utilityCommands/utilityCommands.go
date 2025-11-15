@@ -3,7 +3,7 @@ package utilityCommands
 import (
 	"database/sql"
 
-	"github.com/samhodg1993/toto/internal/service/utility"
+	"github.com/ODGY8/toto/internal/service/utility"
 )
 
 var UtilityService *utility.Service

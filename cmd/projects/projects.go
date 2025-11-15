@@ -3,7 +3,7 @@ package projects
 import (
 	"database/sql"
 
-	"github.com/samhodg1993/toto/internal/service/project"
+	"github.com/ODGY8/toto/internal/service/project"
 
 	"github.com/spf13/cobra"
 )
