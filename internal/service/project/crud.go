@@ -25,15 +25,16 @@ func (s *Service) HandleSetProjectJiraURL(projectID int) string {
 	jiraURL, _ := keyring.Get("toto-cli", "jiraURL")
 
 	if jiraURL != "" {
-		fmt.Printf("Default jira URL found. Would you like to set `%s` as the jiraURL for this project?\n0: No, let me paste a new one in\n1: Yes\n", jiraURL)
+		fmt.Printf("Default jira URL found. Would you like to set `%s` as the jiraURL for this project?\n0: No, let me paste a new one in\n1: No, I don't want to link this project to Jira \n2: Yes\n\n", jiraURL)
 		userChoice, _ := reader.ReadString('\n')
 		userChoice = strings.TrimSpace(userChoice)
 
 		if userChoice == "1" {
+			jiraUrlString = ""
+		} else if userChoice == "2" {
 			jiraUrlString = jiraURL
 		} else {
-			fmt.Println("This will be stored securely in the system keyring as the default for the next time you need it.")
-			fmt.Println("It can be overwritten using toto jira-set-default-url")
+			fmt.Println("This URL will be used for this project only. Your default Jira URL remains unchanged.")
 			fmt.Println("Please enter your jira url. e.g. `https://mycompany.atlassian.net`: ")
 			usersJiraURL, _ := reader.ReadString('\n')
 			jiraUrlString = strings.TrimSpace(usersJiraURL)
@@ -110,12 +111,12 @@ func (s *Service) AddNewProjectWithPrompt() error {
 		reader  = bufio.NewReader(os.Stdin)
 	)
 
-	fmt.Println("Please enter the title of your new project...")
+	fmt.Println("Please enter the title of your new project...\n")
 	projectTitle, _ := reader.ReadString('\n')
 	sanitisedTitle := utilities.SanitizeInput(projectTitle, "title")
 	project.Title = strings.TrimSpace(sanitisedTitle)
 
-	fmt.Println("Please enter the description of your new project...")
+	fmt.Println("Please enter the description of your new project...\n")
 	projectDescription, _ := reader.ReadString('\n')
 	sanitisedDesc := utilities.SanitizeInput(projectDescription, "description")
 	project.Description = strings.TrimSpace(sanitisedDesc)
@@ -129,7 +130,7 @@ func (s *Service) HandleAddNewProject(projectTitle string, projectDescription st
 	var reader = bufio.NewReader(os.Stdin)
 
 	if projectTitle == "" {
-		fmt.Println("Please enter the title of your new project...")
+		fmt.Println("Please enter the title of your new project...\n")
 		input, _ := reader.ReadString('\n')
 		project.Title = strings.TrimSpace(input)
 	} else {
@@ -137,7 +138,7 @@ func (s *Service) HandleAddNewProject(projectTitle string, projectDescription st
 	}
 
 	if projectDescription == "" {
-		fmt.Println("Please enter the description of your new project...")
+		fmt.Println("Please enter the description of your new project...\n")
 		input, _ := reader.ReadString('\n')
 		project.Description = strings.TrimSpace(input)
 	} else {

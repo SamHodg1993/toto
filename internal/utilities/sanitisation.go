@@ -1,7 +1,6 @@
 package utilities
 
 import (
-	"fmt"
 	"regexp"
 	"strings"
 	"unicode"
@@ -40,10 +39,11 @@ func SanitizeInput(input string, fieldName string) string {
 
 	sanitisedInput := strings.TrimSpace(result.String())
 
-	if sanitisedInput != input {
-		fmt.Printf("Banned characters were detected in the %s. They have been removed.", fieldName)
-		fmt.Println("To see the full list of banned characters, please view the documentation at github.com/odgy8/toto")
-	}
+	// Removing this for now as it was having an unwanted effect
+	// if sanitisedInput != input {
+	// 	fmt.Printf("Banned characters were detected in the %s. They have been removed.", fieldName)
+	// 	fmt.Println("To see the full list of banned characters, please view the documentation at github.com/samhodg1993/toto")
+	// }
 
 	return sanitisedInput
 }

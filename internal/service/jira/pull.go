@@ -17,6 +17,7 @@ type TodoServiceInterface interface {
 type ProjectServiceInterface interface {
 	GetProjectIdByFilepath() (int, error)
 	GetProjectJiraURL() (string, error)
+	HandleNoExistingProject() (int, error)
 }
 
 // SetDependencies allows injecting todo and project services
@@ -80,6 +81,14 @@ func (s *Service) HandlePullTicketWithClaude(ticketId string) error {
 		return fmt.Errorf("You must provide a jira ticket id")
 	}
 
+	projectId, err := s.projectService.GetProjectIdByFilepath()
+	if err != nil {
+		projectId, err = s.projectService.HandleNoExistingProject()
+		if err != nil {
+			return err
+		}
+	}
+
 	// Fetch Jira ticket
 	fmt.Printf("Fetching Jira ticket %s...\n", ticketId)
 	ticket, err := s.GetSingleJiraTicket(ticketId)
@@ -103,7 +112,7 @@ func (s *Service) HandlePullTicketWithClaude(ticketId string) error {
 	}
 
 	// Get project ID
-	projectId, err := s.projectService.GetProjectIdByFilepath()
+	projectId, err = s.projectService.GetProjectIdByFilepath()
 	if err != nil {
 		return fmt.Errorf("Error getting project by filepath: %v", err)
 	}
