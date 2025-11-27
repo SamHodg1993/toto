@@ -9,8 +9,9 @@ import (
 )
 
 var (
-	completeSelectedId      int    = 0
-	bulkCompleteSelectedIds string = ""
+	completeSelectedId           int    = 0
+	bulkCompleteSelectedIds      string = ""
+	rangeBulkCompleteSelectedIds string = ""
 )
 
 var ToggleComplete = &cobra.Command{
@@ -20,10 +21,26 @@ var ToggleComplete = &cobra.Command{
 	Args:  cobra.NoArgs,
 	Run: func(cmd *cobra.Command, args []string) {
 		var ids []int
+		bulkCompleteLen := 0
+		if len(bulkCompleteSelectedIds) > 0 {
+			bulkArray :=
+				strings.Split(bulkCompleteSelectedIds, ",")
+			bulkCompleteLen = len(bulkArray)
+		}
+		rangeBulkCompleteLen := 0
+		if len(rangeBulkCompleteSelectedIds) > 0 {
+			rangeArray :=
+				strings.Split(rangeBulkCompleteSelectedIds, ",")
+			rangeBulkCompleteLen = len(rangeArray)
+		}
 
-		if len(bulkCompleteSelectedIds) < 1 {
-			ids = append(ids, completeSelectedId)
-		} else {
+		if bulkCompleteLen > 0 && rangeBulkCompleteLen > 0 {
+			fmt.Println(`Unable to complete bulk operations with range set and integer set.
+				Please pick either the range or the integer list.`)
+			return
+		}
+
+		if bulkCompleteLen > 0 && rangeBulkCompleteLen < 1 {
 			allIds := strings.Split(bulkCompleteSelectedIds, ",")
 
 			for _, id := range allIds {
@@ -37,6 +54,34 @@ var ToggleComplete = &cobra.Command{
 
 				ids = append(ids, asInt)
 			}
+		} else if bulkCompleteLen < 1 && rangeBulkCompleteLen > 0 {
+			allRanges := strings.Split(rangeBulkCompleteSelectedIds, ",")
+
+			for _, rng := range allRanges {
+				perimiters := strings.Split(rng, "-")
+
+				start, err := strconv.Atoi(perimiters[0])
+				if err != nil {
+					fmt.Printf("Invalid start range %s", err)
+				}
+
+				end, err := strconv.Atoi(perimiters[len(perimiters)-1])
+				if err != nil {
+					fmt.Printf("Invalid end range %s", err)
+				}
+
+				if start == 0 || end == 0 {
+					fmt.Println("Unable to find start and end of range. Aborting operation.")
+					continue
+				}
+
+				for start < end+1 {
+					ids = append(ids, start)
+					start++
+				}
+			}
+		} else {
+			ids = append(ids, completeSelectedId)
 		}
 
 		TodoService.ToggleComplete(ids)
@@ -55,10 +100,26 @@ var ToggleComp = &cobra.Command{
 	Args:  cobra.NoArgs,
 	Run: func(cmd *cobra.Command, args []string) {
 		var ids []int
+		bulkCompleteLen := 0
+		if len(bulkCompleteSelectedIds) > 0 {
+			bulkArray :=
+				strings.Split(bulkCompleteSelectedIds, ",")
+			bulkCompleteLen = len(bulkArray)
+		}
+		rangeBulkCompleteLen := 0
+		if len(rangeBulkCompleteSelectedIds) > 0 {
+			rangeArray :=
+				strings.Split(rangeBulkCompleteSelectedIds, ",")
+			rangeBulkCompleteLen = len(rangeArray)
+		}
 
-		if len(bulkCompleteSelectedIds) < 1 {
-			ids = append(ids, completeSelectedId)
-		} else {
+		if bulkCompleteLen > 0 && rangeBulkCompleteLen > 0 {
+			fmt.Println(`Unable to complete bulk operations with range set and integer set.
+				Please pick either the range or the integer list.`)
+			return
+		}
+
+		if bulkCompleteLen > 0 && rangeBulkCompleteLen < 1 {
 			allIds := strings.Split(bulkCompleteSelectedIds, ",")
 
 			for _, id := range allIds {
@@ -72,9 +133,42 @@ var ToggleComp = &cobra.Command{
 
 				ids = append(ids, asInt)
 			}
+		} else if bulkCompleteLen < 1 && rangeBulkCompleteLen > 0 {
+			allRanges := strings.Split(rangeBulkCompleteSelectedIds, ",")
+
+			for _, rng := range allRanges {
+				perimiters := strings.Split(rng, "-")
+
+				start, err := strconv.Atoi(perimiters[0])
+				if err != nil {
+					fmt.Printf("Invalid start range %s", err)
+				}
+
+				end, err := strconv.Atoi(perimiters[len(perimiters)-1])
+				if err != nil {
+					fmt.Printf("Invalid end range %s", err)
+				}
+
+				if start == 0 || end == 0 {
+					fmt.Println("Unable to find start and end of range. Aborting operation.")
+					continue
+				}
+
+				for start < end+1 {
+					ids = append(ids, start)
+					start++
+				}
+			}
+		} else {
+			ids = append(ids, completeSelectedId)
 		}
 
 		TodoService.ToggleComplete(ids)
+		if len(ids) < 2 {
+			fmt.Printf("Successfully toggled the todo!\n")
+		} else {
+			fmt.Printf("Successfully toggled %d todos!\n", len(ids))
+		}
 	},
 }
 
@@ -83,4 +177,6 @@ func init() {
 	ToggleComplete.Flags().IntVarP(&completeSelectedId, "Todo ID", "i", 0, "The target todos ID")
 	ToggleComp.Flags().StringVarP(&bulkCompleteSelectedIds, "Todo IDS", "I", "", "The target todos ID's separated with commas")
 	ToggleComplete.Flags().StringVarP(&bulkCompleteSelectedIds, "Todo IDS", "I", "", "The target todos ID's separated with commas")
+	ToggleComp.Flags().StringVarP(&rangeBulkCompleteSelectedIds, "Todo Range IDS", "R", "", "The target todos ID ranges separated with commas")
+	ToggleComplete.Flags().StringVarP(&rangeBulkCompleteSelectedIds, "Todo Range IDS", "R", "", "The target todos ID ranges separated with commas")
 }
