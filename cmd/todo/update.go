@@ -2,6 +2,7 @@ package todo
 
 import (
 	"fmt"
+	"strconv"
 
 	"github.com/spf13/cobra"
 )
@@ -16,8 +17,15 @@ var EditTodo = &cobra.Command{
 	Use:   "edit",
 	Short: "Update a todo",
 	Long:  "Update a todo's title or description",
-	Args:  cobra.NoArgs,
+	Args:  cobra.ExactArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {
+		targetIdString := args[0]
+		targetId, err := strconv.Atoi(targetIdString)
+		if err != nil {
+			fmt.Printf("Unable to parse input ID to integer type. Error: %s", err)
+			return
+		}
+
 		// Check if ID is provided
 		if targetId == 0 {
 			fmt.Println("-i is a required flag.")
@@ -44,7 +52,6 @@ var EditTodo = &cobra.Command{
 }
 
 func init() {
-	EditTodo.Flags().IntVarP(&targetId, "id", "i", 0, "Todo id")
 	EditTodo.Flags().StringVarP(&newTitle, "title", "t", "", "Todo title")
 	EditTodo.Flags().StringVarP(&newDescription, "description", "d", "", "Todo description")
 

@@ -166,16 +166,21 @@ toto lsl
 # OR for all todos regardless of project 
 toto lsla
 
+# Get todo description
+toto desc <todo-id>
+
 # Edit a todo
-toto edit -i <todo-id (required)> -t <"New title" (optional)> -d <"New description" (optional)> 
+toto edit <todo-id> -t <"New title" (optional)> -d <"New description" (optional)>
 
 # Mark task as complete (single)
-toto toggle-complete -i <task-id>
+toto toggle-complete <task-id>
 # Or the shorthand
-toto comp -i <task-id>
+toto comp <task-id>
 
-# Mark multiple tasks as complete (bulk)
-toto comp -I 1,2,3,4
+# Mark multiple tasks as complete (ranges/bulk)
+toto comp -R 1,2,3,4        # Simple list
+toto comp -R 1-5            # Range
+toto comp -R 1-5,10,20-23   # Mixed ranges and singles
 
 # Clear the completed todos for the current project
 toto remove-complete
@@ -188,12 +193,13 @@ toto clean
 toto clean -r
 
 # Delete a task (single)
-toto delete -i <task-id>
+toto delete <task-id>
 # Or the shorthand
-toto del -i <task-id>
+toto del <task-id>
 
-# Delete multiple tasks (bulk)
-toto del -I 1,2,3,4
+# Delete multiple tasks (ranges/bulk)
+toto del -R 1,2,3,4      # Simple list
+toto del -R 1-10         # Range
 
 # Reset the database
 # the confirm flag is optional, if it does not exist, you will be prompted to confirm the action
@@ -221,22 +227,22 @@ toto --help
 | `list`            | `ls`        | Show all tasks                                     | `-C`: clear terminal before render, `-r`: reverse list order, `-A`: show all projects |
 | `list-long`       | `lsl`       | Show detailed task list                            | `-D`: get full date, `-C`: clear terminal before render, `-r`: reverse list order, `-A`: show all projects |
 | -                 | `lsla`      | Show detailed task list for all projects          | `-D`: get full date, `-C`: clear terminal before render, `-r`: reverse list order |
-| `edit`            | -           | Edit an existing task's title or description       | `-t`: text for title update, `-d`: description for update, `-i`: target todo id |
-| `description`     | `desc`      | Get description for a single todo                  | `-i`: target todo id                                        |
-| `toggle-complete` | `comp`      | Mark a task as complete                            | `-i`: single todo id, `-I`: comma-separated todo ids for bulk operations |
+| `edit`            | -           | Edit an existing task's title or description       | Positional: `<todo-id>`, `-t`: text for title update, `-d`: description for update |
+| `description`     | `desc`      | Get description for a single todo                  | Positional: `<todo-id>`                                     |
+| `toggle-complete` | `comp`      | Mark a task as complete                            | Positional: `<todo-id>` for single, `-R`: ranges/bulk (e.g., `1-5,10`) |
 | `remove-complete` | `cls-comp`  | Remove all completed todos for the current project |                                                              |
 | `clean`           | -           | Clear screen, remove completed todos, and show remaining | `-r`: reverse list order                                    |
-| `delete`          | `del`       | Remove a task                                      | `-i`: single todo id, `-I`: comma-separated todo ids for bulk operations |
+| `delete`          | `del`       | Remove a task                                      | Positional: `<todo-id>` for single, `-R`: ranges/bulk (e.g., `1-10`) |
 | `help`            | -           | Show help information                              |                                                              |
 | `reset`           | -           | Reset the database to its initial state            |                                                              |
 | `project-list`    | `proj-ls`   | Show all projects                                  | `-C`: clear terminal before render                          |
 | `project-add`     | `proj-add`  | Add a new project                                  | `-t`: specify title, `-d`: specify description, `-f`: specify project filepath |
-| `project-delete`  | `proj-del`  | Delete an existing project                         | `-i`: target project id                                     |
-| -                 | `proj-edit` | Update a single project                            | `-t`: text for title update, `-f`: text for filepath update , `-i`: target project id, `-d`: text for description update |
+| `project-delete`  | `proj-del`  | Delete an existing project                         | Positional: `<project-id>`                                  |
+| -                 | `proj-edit` | Update a single project                            | Positional: `<project-id>`, `-t`: title update, `-f`: filepath update, `-d`: description update |
 | **Jira Integration** | -         | **Jira ticket management**                        | -                                                            |
 | `jira-auth`       | -           | Authenticate with Jira using API token            | Prompts for Jira URL, email, and API token. Stores securely in OS keyring |
-| `jira-pull`       | `jp`        | Pull a Jira ticket and create a linked todo       | `-i`: Jira ticket ID (e.g., PROJ-123)                       |
-| `jira-pull-claude` | `jpc`      | Pull Jira ticket and break it into subtasks with AI | `-i`: Jira ticket ID (e.g., PROJ-123)                       |
+| `jira-pull`       | `jp`        | Pull a Jira ticket and create a linked todo       | Positional: `<ticket-id>` (e.g., PROJ-123)                  |
+| `jira-pull-claude` | `jpc`      | Pull Jira ticket and break it into subtasks with AI | Positional: `<ticket-id>` (e.g., PROJ-123)                  |
 | `jira-set-default-url` | -       | Update the global default Jira URL               | `-u`: Jira URL (e.g., mycompany.atlassian.net). Stored in keyring as fallback for all projects |
 | `project-set-jira-url` | -       | Set project-specific Jira URL                    | `-p`: project ID, `-u`: Jira URL. Overrides default for specific project |
 | `completion`      | -           | Generate autocompletion script for specified shell | Run `toto completion --help` for shell options               |

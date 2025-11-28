@@ -22,7 +22,7 @@ toto add -t "Implement user authentication" -d "Add JWT-based auth system"
 toto ls
 
 # Mark todo as complete
-toto comp -i 1
+toto comp 1
 
 # Remove completed todos and view remaining
 toto clean
@@ -97,37 +97,41 @@ toto lsl -A -D       # All projects with full dates
 
 ### Completing Todos
 
-**Command:** `toto comp -i <id>` or `toto toggle-complete -i <id>`
+**Command:** `toto comp <id>` or `toto toggle-complete <id>` (single) / `toto comp -R <range>` (bulk)
 
-**Flags:**
-- `-i, --id` - Single todo ID to toggle
-- `-I, --ids` - Bulk operation (comma-separated IDs)
+**Arguments:**
+- Positional: `<id>` - Single todo ID to toggle
+- `-R, --range` - Range/bulk operation (ranges or comma-separated IDs)
 
 **Examples:**
 ```bash
-toto comp -i 5              # Toggle single todo
-toto comp -I 1,2,3,4        # Toggle multiple todos
-toto toggle-complete -i 2   # Verbose command name
+toto comp 5                 # Toggle single todo
+toto comp -R 1,2,3,4        # Toggle multiple todos (list)
+toto comp -R 1-5            # Toggle range of todos
+toto comp -R 1-5,10,20-23   # Toggle mixed ranges and singles
+toto toggle-complete 2      # Verbose command name
 ```
 
 **Behavior:**
 - Toggles between complete/incomplete
 - Sets/unsets `completed_at` timestamp
 - Can be run multiple times to toggle back
+- Range syntax supports both simple lists and ranges
 
 ### Deleting Todos
 
-**Command:** `toto del -i <id>` or `toto delete -i <id>`
+**Command:** `toto del <id>` or `toto delete <id>` (single) / `toto del -R <range>` (bulk)
 
-**Flags:**
-- `-i, --id` - Single todo ID to delete
-- `-I, --ids` - Bulk operation (comma-separated IDs)
+**Arguments:**
+- Positional: `<id>` - Single todo ID to delete
+- `-R, --range` - Range/bulk operation (ranges or comma-separated IDs)
 
 **Examples:**
 ```bash
-toto del -i 3           # Delete single todo
-toto del -I 5,6,7       # Delete multiple todos
-toto delete -i 1        # Verbose command name
+toto del 3              # Delete single todo
+toto del -R 5,6,7       # Delete multiple todos (list)
+toto del -R 1-10        # Delete range of todos
+toto delete 1           # Verbose command name
 ```
 
 **Behavior:**
@@ -136,18 +140,18 @@ toto delete -i 1        # Verbose command name
 
 ### Editing Todos
 
-**Command:** `toto edit -i <id> -t "new title" -d "new description"`
+**Command:** `toto edit <id> -t "new title" -d "new description"`
 
-**Flags:**
-- `-i, --id` (required) - Todo ID to edit
+**Arguments:**
+- Positional: `<id>` (required) - Todo ID to edit
 - `-t, --title` (optional) - New title
 - `-d, --description` (optional) - New description
 
 **Examples:**
 ```bash
-toto edit -i 2 -t "Updated title"
-toto edit -i 3 -d "More detailed description here"
-toto edit -i 1 -t "New title" -d "New description"
+toto edit 2 -t "Updated title"
+toto edit 3 -d "More detailed description here"
+toto edit 1 -t "New title" -d "New description"
 ```
 
 **Behavior:**
@@ -156,14 +160,14 @@ toto edit -i 1 -t "New title" -d "New description"
 
 ### Getting Todo Description
 
-**Command:** `toto desc -i <id>` or `toto description -i <id>`
+**Command:** `toto desc <id>` or `toto description <id>`
 
-**Flags:**
-- `-i, --id` (required) - Todo ID
+**Arguments:**
+- Positional: `<id>` (required) - Todo ID
 
 **Example:**
 ```bash
-toto desc -i 5
+toto desc 5
 ```
 
 **Output:** Displays the full description for the specified todo.
@@ -234,29 +238,30 @@ toto project-list
 
 ### Editing Projects
 
-**Command:** `toto proj-edit -i <id> -t "new title" -d "new description"`
+**Command:** `toto proj-edit <id> -t "new title" -d "new description"`
 
-**Flags:**
-- `-i, --id` (required) - Project ID to edit
+**Arguments:**
+- Positional: `<id>` (required) - Project ID to edit
 - `-t, --title` (optional) - New title
 - `-d, --description` (optional) - New description
+- `-f, --filepath` (optional) - New filepath
 
 **Examples:**
 ```bash
-toto proj-edit -i 1 -t "Updated Project Name"
-toto proj-edit -i 2 -t "New Title" -d "New Description"
+toto proj-edit 1 -t "Updated Project Name"
+toto proj-edit 2 -t "New Title" -d "New Description"
 ```
 
 ### Deleting Projects
 
-**Command:** `toto proj-del -i <id>` or `toto project-delete -i <id>`
+**Command:** `toto proj-del <id>` or `toto project-delete <id>`
 
-**Flags:**
-- `-i, --id` (required) - Project ID to delete
+**Arguments:**
+- Positional: `<id>` (required) - Project ID to delete
 
 **Example:**
 ```bash
-toto proj-del -i 3
+toto proj-del 3
 ```
 
 **Behavior:**
@@ -332,15 +337,15 @@ toto jira-set-default-url -u mycompany.atlassian.net
 
 ### Pulling Jira Tickets
 
-**Command:** `toto jira-pull -i <issue-key>` or `toto jp -i <issue-key>`
+**Command:** `toto jira-pull <issue-key>` or `toto jp <issue-key>`
 
-**Flags:**
-- `-i, --issue` (required) - Jira issue key (e.g., PROJ-123)
+**Arguments:**
+- Positional: `<issue-key>` (required) - Jira issue key (e.g., PROJ-123)
 
 **Examples:**
 ```bash
-toto jira-pull -i PROJ-123
-toto jp -i DEV-456      # Short alias
+toto jira-pull PROJ-123
+toto jp DEV-456         # Short alias
 ```
 
 **Behavior:**
@@ -351,10 +356,10 @@ toto jp -i DEV-456      # Short alias
 
 ### Pulling with AI Breakdown
 
-**Command:** `toto jira-pull-claude -i <issue-key>` or `toto jpc -i <issue-key>`
+**Command:** `toto jira-pull-claude <issue-key>` or `toto jpc <issue-key>`
 
-**Flags:**
-- `-i, --issue` (required) - Jira issue key
+**Arguments:**
+- Positional: `<issue-key>` (required) - Jira issue key
 
 **Requirements:**
 - `CLAUDE_API_KEY` environment variable must be set
@@ -362,8 +367,8 @@ toto jp -i DEV-456      # Short alias
 **Examples:**
 ```bash
 export CLAUDE_API_KEY=your-key-here
-toto jira-pull-claude -i PROJ-123
-toto jpc -i DEV-456     # Short alias
+toto jira-pull-claude PROJ-123
+toto jpc DEV-456        # Short alias
 ```
 
 **Behavior:**

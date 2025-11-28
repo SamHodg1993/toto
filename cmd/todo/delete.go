@@ -10,7 +10,6 @@ import (
 )
 
 var (
-	deleteSelectedId       int    = 0
 	bulkDeleteSelectedIds  string = ""
 	rangeDeleteSelectedIds string = ""
 )
@@ -18,9 +17,16 @@ var (
 var DeleteTodo = &cobra.Command{
 	Use:   "delete",
 	Short: "Delete a todo",
-	Long:  "Delete a single todo from the database by referencing the todo id using the -i flag",
-	Args:  cobra.NoArgs,
+	Long:  "Delete a single todo from the database by referencing the todo id",
+	Args:  cobra.ExactArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {
+		inputIdString := args[0]
+		inputId, err := strconv.Atoi(inputIdString)
+		if err != nil {
+			fmt.Printf("Unable to parse input ID to integer type. Error: %s", err)
+			return
+		}
+
 		var ids []int
 		bulkDeleteLen := 0
 		if len(bulkDeleteSelectedIds) > 0 {
@@ -83,7 +89,7 @@ var DeleteTodo = &cobra.Command{
 				}
 			}
 		} else {
-			ids = append(ids, deleteSelectedId)
+			ids = append(ids, inputId)
 		}
 
 		TodoService.DeleteTodo(ids)
@@ -98,9 +104,16 @@ var DeleteTodo = &cobra.Command{
 var DelTodo = &cobra.Command{
 	Use:   "del",
 	Short: "Delete a todo",
-	Long:  "Delete a single todo from the database by referencing the todo id using the -i flag",
-	Args:  cobra.NoArgs,
+	Long:  "Delete a single todo from the database by referencing the todo id",
+	Args:  cobra.ExactArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {
+		inputIdString := args[0]
+		inputId, err := strconv.Atoi(inputIdString)
+		if err != nil {
+			fmt.Printf("Unable to parse input ID to integer type. Error: %s", err)
+			return
+		}
+
 		var ids []int
 		bulkDeleteLen := 0
 		if len(bulkDeleteSelectedIds) > 0 {
@@ -166,7 +179,7 @@ var DelTodo = &cobra.Command{
 				}
 			}
 		} else {
-			ids = append(ids, deleteSelectedId)
+			ids = append(ids, inputId)
 		}
 
 		TodoService.DeleteTodo(ids)
@@ -179,8 +192,6 @@ var DelTodo = &cobra.Command{
 }
 
 func init() {
-	DeleteTodo.Flags().IntVarP(&deleteSelectedId, "Todo ID", "i", 0, "The target todos ID")
-	DelTodo.Flags().IntVarP(&deleteSelectedId, "Todo ID", "i", 0, "The target todos ID")
 	DeleteTodo.Flags().StringVarP(&bulkDeleteSelectedIds, "Todo IDs", "I", "", "The comma separated list of todo IDs")
 	DelTodo.Flags().StringVarP(&bulkDeleteSelectedIds, "Todo IDs", "I", "", "The comma separated list of todo IDs")
 	DeleteTodo.Flags().StringVarP(&rangeDeleteSelectedIds, "Todo Range IDs", "R", "", "The comma separated list of todo IDs")

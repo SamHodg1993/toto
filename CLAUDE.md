@@ -82,15 +82,15 @@ Toto is a command-line todo application written in Go that manages tasks based o
 - `ls`/`list` - Basic todo list for current project
 - `lsl`/`list-long` - Detailed todo list with dates, descriptions
 - `lsla` - All todos regardless of project
-- `comp`/`toggle-complete` - Mark todos complete/incomplete with -i (single id) or -I (bulk comma-separated ids)
-- `edit` - Update todo with -i (id), -t (title), -d (description)
-- `del`/`delete` - Delete specific todo with -i (single id) or -I (bulk comma-separated ids)
+- `comp`/`toggle-complete` - Mark todo complete/incomplete (positional id for single, -R for ranges/bulk)
+- `edit` - Update todo (positional id, -t for title, -d for description)
+- `del`/`delete` - Delete todo (positional id for single, -R for ranges/bulk)
 - `cls-comp`/`remove-complete` - Remove completed todos for project
-- `description`/`desc` - Get description for single todo with -i (id)
+- `description`/`desc` - Get description for single todo (positional id)
 - `clean` - Clear screen, remove completed todos, and display remaining todos
 - `proj-add`/`project-add` - Add new project
 - `proj-ls`/`project-list` - List all projects
-- `proj-edit` - Edit project details
+- `proj-edit` - Edit project details (positional id, -t/-d/-f for fields)
 - `reset` - Reset database
 - `llm-help`/`llm` - Display comprehensive LLM-focused usage documentation
 
@@ -106,6 +106,8 @@ Toto is a command-line todo application written in Go that manages tasks based o
 9. ~~**Clean command refactoring**: Updated clean command to use FormatTodoTableRow helper and support -r flag for reverse order~~
 10. ~~**Bulk operations**: Added -I flag for bulk complete and delete operations with comma-separated IDs~~
 11. ~~**Jira command aliases**: Added `jp` (jira-pull) and `jpc` (jira-pull-claude) shorthand commands~~
+12. ~~**Range support**: Added -R flag for range syntax supporting both simple lists (1,2,3) and ranges (1-5,10,20-23) for comp and del commands~~
+13. ~~**Positional arguments refactor**: Removed -i flag in favor of positional arguments for single ID operations (desc, edit, comp, del, proj-edit, jp, jpc) - more intuitive CLI UX~~
 
 ### Known Issues (as of analysis)
 - All major known issues have been resolved
@@ -160,15 +162,21 @@ cd /home/sam/coding/toto && go build -o toto .
 /home/sam/coding/toto/toto clean        # Clear, remove completed, list remaining
 /home/sam/coding/toto/toto clean -r     # Same but in reverse order
 
-# Bulk operations:
-/home/sam/coding/toto/toto comp -i 1    # Toggle single todo
-/home/sam/coding/toto/toto comp -I 1,2,3,4 # Toggle multiple todos
-/home/sam/coding/toto/toto del -i 1     # Delete single todo
-/home/sam/coding/toto/toto del -I 1,2,3,4  # Delete multiple todos
+# Single ID operations (positional arguments):
+/home/sam/coding/toto/toto comp 1      # Toggle single todo
+/home/sam/coding/toto/toto del 1       # Delete single todo
+/home/sam/coding/toto/toto desc 5      # Get description for todo 5
+/home/sam/coding/toto/toto edit 3 -t "New title"  # Edit todo 3's title
 
-# Jira shortcuts:
-/home/sam/coding/toto/toto jp -i PROJ-123    # Same as jira-pull
-/home/sam/coding/toto/toto jpc -i PROJ-123   # Same as jira-pull-claude
+# Range operations (-R flag):
+/home/sam/coding/toto/toto comp -R 1,2,3,4    # Toggle multiple todos (list)
+/home/sam/coding/toto/toto comp -R 1-5        # Toggle range of todos
+/home/sam/coding/toto/toto comp -R 1-5,10,20-23  # Toggle mixed ranges and singles
+/home/sam/coding/toto/toto del -R 1-10        # Delete range of todos
+
+# Jira shortcuts (positional ticket key):
+/home/sam/coding/toto/toto jp PROJ-123       # Pull Jira ticket
+/home/sam/coding/toto/toto jpc PROJ-123      # Pull Jira ticket with Claude AI breakdown
 
 # Jira URL management:
 /home/sam/coding/toto/toto jira-set-default-url -u sta2020.atlassian.net  # Set global default

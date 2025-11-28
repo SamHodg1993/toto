@@ -9,7 +9,6 @@ import (
 )
 
 var (
-	completeSelectedId           int    = 0
 	bulkCompleteSelectedIds      string = ""
 	rangeBulkCompleteSelectedIds string = ""
 )
@@ -18,8 +17,15 @@ var ToggleComplete = &cobra.Command{
 	Use:   "toggle-complete",
 	Short: "Toggle a todos status between complete and pending.",
 	Long:  "Toggle an exising todos status between complete and pending.",
-	Args:  cobra.NoArgs,
+	Args:  cobra.ExactArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {
+		inputIdString := args[0]
+		inputId, err := strconv.Atoi(inputIdString)
+		if err != nil {
+			fmt.Printf("Unable to parse input ID to integer type. Error: %s", err)
+			return
+		}
+
 		var ids []int
 		bulkCompleteLen := 0
 		if len(bulkCompleteSelectedIds) > 0 {
@@ -81,7 +87,7 @@ var ToggleComplete = &cobra.Command{
 				}
 			}
 		} else {
-			ids = append(ids, completeSelectedId)
+			ids = append(ids, inputId)
 		}
 
 		TodoService.ToggleComplete(ids)
@@ -97,8 +103,15 @@ var ToggleComp = &cobra.Command{
 	Use:   "comp",
 	Short: "Toggle a todos status between complete and pending.",
 	Long:  "Toggle an exising todos status between complete and pending.",
-	Args:  cobra.NoArgs,
+	Args:  cobra.ExactArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {
+		inputIdString := args[0]
+		inputId, err := strconv.Atoi(inputIdString)
+		if err != nil {
+			fmt.Printf("Unable to parse input ID to integer type. Error: %s", err)
+			return
+		}
+
 		var ids []int
 		bulkCompleteLen := 0
 		if len(bulkCompleteSelectedIds) > 0 {
@@ -160,7 +173,7 @@ var ToggleComp = &cobra.Command{
 				}
 			}
 		} else {
-			ids = append(ids, completeSelectedId)
+			ids = append(ids, inputId)
 		}
 
 		TodoService.ToggleComplete(ids)
@@ -173,8 +186,6 @@ var ToggleComp = &cobra.Command{
 }
 
 func init() {
-	ToggleComp.Flags().IntVarP(&completeSelectedId, "Todo ID", "i", 0, "The target todos ID")
-	ToggleComplete.Flags().IntVarP(&completeSelectedId, "Todo ID", "i", 0, "The target todos ID")
 	ToggleComp.Flags().StringVarP(&bulkCompleteSelectedIds, "Todo IDS", "I", "", "The target todos ID's separated with commas")
 	ToggleComplete.Flags().StringVarP(&bulkCompleteSelectedIds, "Todo IDS", "I", "", "The target todos ID's separated with commas")
 	ToggleComp.Flags().StringVarP(&rangeBulkCompleteSelectedIds, "Todo Range IDS", "R", "", "The target todos ID ranges separated with commas")
