@@ -17,13 +17,16 @@ var ToggleComplete = &cobra.Command{
 	Use:   "toggle-complete",
 	Short: "Toggle a todos status between complete and pending.",
 	Long:  "Toggle an exising todos status between complete and pending.",
-	Args:  cobra.ExactArgs(1),
+	Args:  cobra.MinimumNArgs(0),
 	Run: func(cmd *cobra.Command, args []string) {
-		inputIdString := args[0]
-		inputId, err := strconv.Atoi(inputIdString)
-		if err != nil {
-			fmt.Printf("Unable to parse input ID to integer type. Error: %s", err)
-			return
+		var inputId int
+		if len(args) > 0 {
+			var err error
+			inputId, err = strconv.Atoi(args[0])
+			if err != nil {
+				fmt.Printf("Unable to parse input ID to integer type. Error: %s", err)
+				return
+			}
 		}
 
 		var ids []int
@@ -86,7 +89,7 @@ var ToggleComplete = &cobra.Command{
 					start++
 				}
 			}
-		} else {
+		} else if inputId != 0 {
 			ids = append(ids, inputId)
 		}
 
@@ -103,13 +106,16 @@ var ToggleComp = &cobra.Command{
 	Use:   "comp",
 	Short: "Toggle a todos status between complete and pending.",
 	Long:  "Toggle an exising todos status between complete and pending.",
-	Args:  cobra.ExactArgs(1),
+	Args:  cobra.MinimumNArgs(0),
 	Run: func(cmd *cobra.Command, args []string) {
-		inputIdString := args[0]
-		inputId, err := strconv.Atoi(inputIdString)
-		if err != nil {
-			fmt.Printf("Unable to parse input ID to integer type. Error: %s", err)
-			return
+		var inputId int
+		if len(args) > 0 {
+			var err error
+			inputId, err = strconv.Atoi(args[0])
+			if err != nil {
+				fmt.Printf("Unable to parse input ID to integer type. Error: %s", err)
+				return
+			}
 		}
 
 		var ids []int
@@ -172,7 +178,7 @@ var ToggleComp = &cobra.Command{
 					start++
 				}
 			}
-		} else {
+		} else if inputId != 0 {
 			ids = append(ids, inputId)
 		}
 

@@ -18,13 +18,16 @@ var DeleteTodo = &cobra.Command{
 	Use:   "delete",
 	Short: "Delete a todo",
 	Long:  "Delete a single todo from the database by referencing the todo id",
-	Args:  cobra.ExactArgs(1),
+	Args:  cobra.MaximumNArgs(0),
 	Run: func(cmd *cobra.Command, args []string) {
-		inputIdString := args[0]
-		inputId, err := strconv.Atoi(inputIdString)
-		if err != nil {
-			fmt.Printf("Unable to parse input ID to integer type. Error: %s", err)
-			return
+		var inputId int
+		if len(args) > 0 {
+			var err error
+			inputId, err = strconv.Atoi(args[0])
+			if err != nil {
+				fmt.Printf("Unable to parse input ID to integer type. Error: %s", err)
+				return
+			}
 		}
 
 		var ids []int
@@ -88,7 +91,7 @@ var DeleteTodo = &cobra.Command{
 					start++
 				}
 			}
-		} else {
+		} else if inputId != 0 {
 			ids = append(ids, inputId)
 		}
 
@@ -105,13 +108,16 @@ var DelTodo = &cobra.Command{
 	Use:   "del",
 	Short: "Delete a todo",
 	Long:  "Delete a single todo from the database by referencing the todo id",
-	Args:  cobra.ExactArgs(1),
+	Args:  cobra.MinimumNArgs(0),
 	Run: func(cmd *cobra.Command, args []string) {
-		inputIdString := args[0]
-		inputId, err := strconv.Atoi(inputIdString)
-		if err != nil {
-			fmt.Printf("Unable to parse input ID to integer type. Error: %s", err)
-			return
+		var inputId int
+		if len(args) > 0 {
+			var err error
+			inputId, err = strconv.Atoi(args[0])
+			if err != nil {
+				fmt.Printf("Unable to parse input ID to integer type. Error: %s", err)
+				return
+			}
 		}
 
 		var ids []int
@@ -178,7 +184,7 @@ var DelTodo = &cobra.Command{
 					start++
 				}
 			}
-		} else {
+		} else if inputId != 0 { // Checking for 0 as there doesn't need to be a positional argument for id
 			ids = append(ids, inputId)
 		}
 
