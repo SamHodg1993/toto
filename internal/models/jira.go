@@ -11,6 +11,7 @@ type JiraTicket struct {
 	ID           int          `db:"id" json:"id"`
 	JiraKey      string       `db:"jira_key" json:"jiraKey"` // e.g., "PROJ-123"
 	Title        string       `db:"title" json:"title"`
+	Description  string       `db:"description" json:"description"`
 	Status       string       `db:"status" json:"status"`          // e.g., "To Do", "In Progress", "Done"
 	ProjectKey   string       `db:"project_key" json:"projectKey"` // e.g., "PROJ"
 	IssueType    string       `db:"issue_type" json:"issueType"`   // e.g., "Story", "Bug", "Task"

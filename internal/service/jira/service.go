@@ -9,6 +9,7 @@ type Service struct {
 	db             *sql.DB
 	todoService    TodoServiceInterface
 	projectService ProjectServiceInterface
+	jiraService    JiraServiceInterface
 }
 
 // New creates a new Jira service

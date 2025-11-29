@@ -89,6 +89,8 @@ func Execute() {
 	RootCmd.AddCommand(jira.JP)
 	RootCmd.AddCommand(jira.JiraPullClaude)
 	RootCmd.AddCommand(jira.JPC)
+	RootCmd.AddCommand(jira.JL)
+	RootCmd.AddCommand(jira.JiraList)
 
 	// Add todo commands
 	RootCmd.AddCommand(todo.AddCmd)

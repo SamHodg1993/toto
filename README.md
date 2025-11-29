@@ -243,6 +243,7 @@ toto --help
 | `jira-auth`       | -           | Authenticate with Jira using API token            | Prompts for Jira URL, email, and API token. Stores securely in OS keyring |
 | `jira-pull`       | `jp`        | Pull a Jira ticket and create a linked todo       | Positional: `<ticket-id>` (e.g., PROJ-123)                  |
 | `jira-pull-claude` | `jpc`      | Pull Jira ticket and break it into subtasks with AI | Positional: `<ticket-id>` (e.g., PROJ-123)                  |
+| `jira-list`       | `jl`        | List all pulled Jira tickets from database        | No flags                                                     |
 | `jira-set-default-url` | -       | Update the global default Jira URL               | `-u`: Jira URL (e.g., mycompany.atlassian.net). Stored in keyring as fallback for all projects |
 | `project-set-jira-url` | -       | Set project-specific Jira URL                    | `-p`: project ID, `-u`: Jira URL. Overrides default for specific project |
 | `completion`      | -           | Generate autocompletion script for specified shell | Run `toto completion --help` for shell options               |
@@ -299,14 +300,19 @@ You'll be prompted to enter your Jira URL, email, and API token (create one at h
 
 Pull a Jira ticket and create a todo:
 ```bash
-toto jira-pull -i PROJ-123
+toto jp PROJ-123
 ```
 
 Pull a Jira ticket and break it into subtasks with AI:
 ```bash
-toto jira-pull-claude -i PROJ-123
+toto jpc PROJ-123
 ```
 This uses Claude AI to intelligently break down the ticket into actionable subtasks. If the description contains a bulleted list, it extracts each item. Otherwise, it analyzes the ticket and creates 3-8 subtasks.
+
+List all pulled Jira tickets:
+```bash
+toto jl
+```
 
 Set a global default Jira URL (used as fallback for all projects):
 ```bash

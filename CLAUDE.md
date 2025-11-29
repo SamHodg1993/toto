@@ -93,6 +93,7 @@ Toto is a command-line todo application written in Go that manages tasks based o
 - `proj-edit` - Edit project details (positional id, -t/-d/-f for fields)
 - `reset` - Reset database
 - `llm-help`/`llm` - Display comprehensive LLM-focused usage documentation
+- `jira-list`/`jl` - List all Jira tickets stored in database
 
 ### Recent Fixes
 1. ~~**Project creation prompt bug**: Fixed - now properly calls AddNewProjectWithPrompt() when user selects option 2~~
@@ -177,6 +178,7 @@ cd /home/sam/coding/toto && go build -o toto .
 # Jira shortcuts (positional ticket key):
 /home/sam/coding/toto/toto jp PROJ-123       # Pull Jira ticket
 /home/sam/coding/toto/toto jpc PROJ-123      # Pull Jira ticket with Claude AI breakdown
+/home/sam/coding/toto/toto jl                # List all pulled Jira tickets
 
 # Jira URL management:
 /home/sam/coding/toto/toto jira-set-default-url -u sta2020.atlassian.net  # Set global default
@@ -336,8 +338,9 @@ cd test-directory
 
 4. **Commands** (`cmd/jira/`)
    - `jira-auth` - API token authentication
-   - `jira-pull` / `jp -i <issue-key>` - Pull Jira ticket, save to database, create linked todo
-   - `jira-pull-claude` / `jpc -i <issue-key>` - Pull Jira ticket and use Claude AI to break it into subtasks
+   - `jira-pull` / `jp <issue-key>` - Pull Jira ticket, save to database, create linked todo
+   - `jira-pull-claude` / `jpc <issue-key>` - Pull Jira ticket and use Claude AI to break it into subtasks
+   - `jira-list` / `jl` - List all Jira tickets stored in database
 
 5. **Claude AI Integration** (`internal/service/claude/service.go`)
    - `BreakdownJiraTicketWithClaude()` - Uses Claude Sonnet to intelligently break down Jira tickets
@@ -427,9 +430,10 @@ Prompt for URL, save as both project-specific AND default (for first-time setup)
 
 ### Implementation Strategy
 **Phase 1 (Completed):** Simple CLI commands with ticket ID flags
-- ✅ `jira-pull -i TICKET-123` - Pull specific ticket by ID
-- ✅ `jira-pull-claude -i TICKET-123` - Pull ticket and break down with Claude AI
-- 🚧 `jira-push -i <todo-id>` - Push todo to Jira (pending)
+- ✅ `jira-pull TICKET-123` / `jp TICKET-123` - Pull specific ticket by ID
+- ✅ `jira-pull-claude TICKET-123` / `jpc TICKET-123` - Pull ticket and break down with Claude AI
+- ✅ `jira-list` / `jl` - List all pulled Jira tickets from database
+- 🚧 `jira-push <todo-id>` - Push todo to Jira (pending)
 - 🚧 `jira-sync` - Sync all linked tickets (pending)
 
 **Phase 2 (Future):** Interactive TUI for browsing and managing

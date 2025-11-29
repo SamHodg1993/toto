@@ -74,6 +74,7 @@ func InitDB() (*sql.DB, error) {
 		id INTEGER PRIMARY KEY,
 		jira_key VARCHAR(50) NOT NULL UNIQUE,
 		title VARCHAR(500) NOT NULL,
+		description TEXT NOT NULL DEFAULT "",
 		status VARCHAR(50) NOT NULL,
 		project_key VARCHAR(50),
 		issue_type VARCHAR(50) NOT NULL,

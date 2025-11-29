@@ -20,6 +20,11 @@ type ProjectServiceInterface interface {
 	HandleNoExistingProject() (int, error)
 }
 
+// ProjectServiceInterface defines methods needed from project service
+type JiraServiceInterface interface {
+	HandleListJiraTickets() ([]models.JiraTicket, error)
+}
+
 // SetDependencies allows injecting todo and project services
 func (s *Service) SetDependencies(todoService TodoServiceInterface, projectService ProjectServiceInterface) {
 	s.todoService = todoService
@@ -40,12 +45,13 @@ func (s *Service) HandlePullTicket(ticketId string) error {
 
 	// Save to database
 	jiraTicket := &models.JiraTicket{
-		JiraKey:    ticket.Key,
-		Title:      ticket.Fields.Summary,
-		Status:     ticket.Fields.Status.Name,
-		ProjectKey: ticket.Fields.Project.Key,
-		IssueType:  ticket.Fields.IssueType.Name,
-		URL:        ticket.Self,
+		JiraKey:     ticket.Key,
+		Title:       ticket.Fields.Summary,
+		Description: ticket.GetDescriptionText(),
+		Status:      ticket.Fields.Status.Name,
+		ProjectKey:  ticket.Fields.Project.Key,
+		IssueType:   ticket.Fields.IssueType.Name,
+		URL:         ticket.Self,
 	}
 
 	jiraInsertId, err := s.InsertJiraTicket(jiraTicket)
@@ -98,12 +104,13 @@ func (s *Service) HandlePullTicketWithClaude(ticketId string) error {
 
 	// Save Jira ticket to database
 	jiraTicket := &models.JiraTicket{
-		JiraKey:    ticket.Key,
-		Title:      ticket.Fields.Summary,
-		Status:     ticket.Fields.Status.Name,
-		ProjectKey: ticket.Fields.Project.Key,
-		IssueType:  ticket.Fields.IssueType.Name,
-		URL:        ticket.Self,
+		JiraKey:     ticket.Key,
+		Title:       ticket.Fields.Summary,
+		Description: ticket.GetDescriptionText(),
+		Status:      ticket.Fields.Status.Name,
+		ProjectKey:  ticket.Fields.Project.Key,
+		IssueType:   ticket.Fields.IssueType.Name,
+		URL:         ticket.Self,
 	}
 
 	jiraInsertId, err := s.InsertJiraTicket(jiraTicket)

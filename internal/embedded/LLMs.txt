@@ -385,6 +385,30 @@ toto jpc DEV-456        # Short alias
 - Focuses on technical implementation steps
 - Returns JSON array of tasks with titles and descriptions
 
+### Listing Jira Tickets
+
+**Command:** `toto jira-list` or `toto jl`
+
+**Examples:**
+```bash
+toto jira-list
+toto jl            # Short alias
+```
+
+**Behavior:**
+- Displays all Jira tickets stored in the local database
+- Shows ID, Jira Key, Title, Status, and Type in a table format
+- Ordered by creation date (newest first)
+
+**Output Format:**
+```
++----+----------+------------------+------------+--------+
+| ID | JIRA KEY | TITLE            | STATUS     | TYPE   |
++----+----------+------------------+------------+--------+
+|  1 | PROJ-123 | Add new feature  | In Progress| Story  |
++----+----------+------------------+------------+--------+
+```
+
 ### Jira Data Model
 
 **jira_tickets table:**
@@ -473,10 +497,13 @@ toto jira-auth
 # Enter credentials...
 
 # Pull a Jira ticket as a single todo
-toto jp -i PROJ-123
+toto jp PROJ-123
 
 # Pull a Jira ticket and break it down with AI
-toto jpc -i PROJ-456
+toto jpc PROJ-456
+
+# List all pulled Jira tickets
+toto jl
 
 # View all todos (including Jira-linked ones)
 toto lsl
@@ -504,7 +531,7 @@ toto ls
 ### Reviewing and Refining Todos with Claude Code
 ```bash
 # Pull Jira ticket with AI breakdown
-toto jpc -i PROJ-789
+toto jpc PROJ-789
 
 # View the created todos
 toto lsl

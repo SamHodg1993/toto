@@ -17,9 +17,10 @@ func (s *Service) InsertJiraTicket(ticket *models.JiraTicket) (int64, error) {
 		// Ticket exists, update it and return existing ID
 		_, updateErr := s.db.Exec(
 			`UPDATE jira_tickets
-			SET title = ?, status = ?, project_key = ?, issue_type = ?, url = ?, last_synced_at = ?
+			SET title = ?, description = ?, status = ?, project_key = ?, issue_type = ?, url = ?, last_synced_at = ?
 			WHERE jira_key = ?`,
 			ticket.Title,
+			ticket.Description,
 			ticket.Status,
 			ticket.ProjectKey,
 			ticket.IssueType,
@@ -36,10 +37,11 @@ func (s *Service) InsertJiraTicket(ticket *models.JiraTicket) (int64, error) {
 	// Ticket doesn't exist, insert new one
 	result, err := s.db.Exec(
 		`INSERT INTO jira_tickets (
-		  jira_key, title, status, project_key, issue_type, url, last_synced_at
-		) VALUES (?,?,?,?,?,?,?)`,
+		  jira_key, title, description, status, project_key, issue_type, url, last_synced_at
+		) VALUES (?,?,?,?,?,?,?,?)`,
 		ticket.JiraKey,
 		ticket.Title,
+		ticket.Description,
 		ticket.Status,
 		ticket.ProjectKey,
 		ticket.IssueType,
