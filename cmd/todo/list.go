@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 	"slices"
+	"strconv"
 
 	"github.com/odgy8/toto/internal/models"
 	todoHelper "github.com/odgy8/toto/internal/service/todo"
@@ -15,10 +16,11 @@ import (
 )
 
 var (
-	fullDate    bool = false
-	allTodos    bool = false
-	clearTerm   bool = false
-	reverseList bool = false
+	fullDate        bool   = false
+	allTodos        bool   = false
+	clearTerm       bool   = false
+	reverseList     bool   = false
+	projectIdString string = "0"
 )
 
 var GetCmd = &cobra.Command{
@@ -31,13 +33,20 @@ var GetCmd = &cobra.Command{
 			utilities.ClearScreen()
 		}
 
-		var todos []models.Todo
 		var err error
+
+		projectId, err := strconv.Atoi(projectIdString)
+		if err != nil {
+			fmt.Printf("Unable to parse input project ID into integer. Please check the input ID. Error: %s", err)
+			return
+		}
+
+		var todos []models.Todo
 
 		if allTodos {
 			todos, err = TodoService.GetAllTodos()
 		} else {
-			todos, err = TodoService.GetTodosForFilepath()
+			todos, err = TodoService.GetTodosForFilepath(projectId)
 		}
 
 		if err != nil {
@@ -70,17 +79,24 @@ var GetCmdLong = &cobra.Command{
 	Long:  "Get a more detailed list of all the todo's for the current project (defined by the current directory)",
 	Args:  cobra.NoArgs,
 	Run: func(cmd *cobra.Command, args []string) {
+		var err error
+
 		if clearTerm {
 			utilities.ClearScreen()
 		}
 
+		projectId, err := strconv.Atoi(projectIdString)
+		if err != nil {
+			fmt.Printf("Unable to parse input project ID into integer. Please check the input ID. Error: %s", err)
+			return
+		}
+
 		var todos []models.Todo
-		var err error
 
 		if allTodos {
 			todos, err = TodoService.GetAllTodos_LONG()
 		} else {
-			todos, err = TodoService.GetTodosForFilepath_LONG()
+			todos, err = TodoService.GetTodosForFilepath_LONG(projectId)
 		}
 
 		if err != nil {
@@ -113,17 +129,24 @@ var LsCmd = &cobra.Command{
 	Long:  "Get a list of all the todo titles that are outstanding",
 	Args:  cobra.NoArgs,
 	Run: func(cmd *cobra.Command, args []string) {
+		var err error
+
 		if clearTerm {
 			utilities.ClearScreen()
 		}
 
+		projectId, err := strconv.Atoi(projectIdString)
+		if err != nil {
+			fmt.Printf("Unable to parse input project ID into integer. Please check the input ID. Error: %s", err)
+			return
+		}
+
 		var todos []models.Todo
-		var err error
 
 		if allTodos {
 			todos, err = TodoService.GetAllTodos()
 		} else {
-			todos, err = TodoService.GetTodosForFilepath()
+			todos, err = TodoService.GetTodosForFilepath(projectId)
 		}
 
 		if err != nil {
@@ -156,17 +179,24 @@ var LsCmdLong = &cobra.Command{
 	Long:  "Get a more detailed list of all the todo's for the current project (defined by the current directory)",
 	Args:  cobra.NoArgs,
 	Run: func(cmd *cobra.Command, args []string) {
+		var err error
+
 		if clearTerm {
 			utilities.ClearScreen()
 		}
 
+		projectId, err := strconv.Atoi(projectIdString)
+		if err != nil {
+			fmt.Printf("Unable to parse input project ID into integer. Please check the input ID. Error: %s", err)
+			return
+		}
+
 		var todos []models.Todo
-		var err error
 
 		if allTodos {
 			todos, err = TodoService.GetAllTodos_LONG()
 		} else {
-			todos, err = TodoService.GetTodosForFilepath_LONG()
+			todos, err = TodoService.GetTodosForFilepath_LONG(projectId)
 		}
 
 		if err != nil {
@@ -230,24 +260,29 @@ var LslCmdLong = &cobra.Command{
 
 func init() {
 	// Full date
-	LsCmdLong.Flags().BoolVarP(&fullDate, "Full-Date", "D", false, "Return the dates as full timestamps")
-	GetCmdLong.Flags().BoolVarP(&fullDate, "Full-Date", "D", false, "Return the dates as full timestamps")
-	LslCmdLong.Flags().BoolVarP(&fullDate, "Full-Date", "D", false, "Return the dates as full timestamps")
+	LsCmdLong.Flags().BoolVarP(&fullDate, "full-date", "D", false, "Return the dates as full timestamps")
+	GetCmdLong.Flags().BoolVarP(&fullDate, "full-date", "D", false, "Return the dates as full timestamps")
+	LslCmdLong.Flags().BoolVarP(&fullDate, "full-date", "D", false, "Return the dates as full timestamps")
 	// All todos
-	GetCmd.Flags().BoolVarP(&allTodos, "All-Todos", "A", false, "Return all todo's regardless of project")
-	GetCmdLong.Flags().BoolVarP(&allTodos, "All-Todos", "A", false, "Return all todo's regardless of project")
-	LsCmd.Flags().BoolVarP(&allTodos, "All-Todos", "A", false, "Return all todo's regardless of project")
-	LsCmdLong.Flags().BoolVarP(&allTodos, "All-Todos", "A", false, "Return all todo's regardless of project")
+	GetCmd.Flags().BoolVarP(&allTodos, "all", "A", false, "Return all todo's regardless of project")
+	GetCmdLong.Flags().BoolVarP(&allTodos, "all", "A", false, "Return all todo's regardless of project")
+	LsCmd.Flags().BoolVarP(&allTodos, "all", "A", false, "Return all todo's regardless of project")
+	LsCmdLong.Flags().BoolVarP(&allTodos, "all", "A", false, "Return all todo's regardless of project")
 	// Clear before print
-	GetCmd.Flags().BoolVarP(&clearTerm, "Clear terminal first", "C", false, "Clear the terminal before listing the todos")
-	LsCmd.Flags().BoolVarP(&clearTerm, "Clear terminal first", "C", false, "Clear the terminal before listing the todos")
-	LsCmdLong.Flags().BoolVarP(&clearTerm, "Clear terminal first", "C", false, "Clear the terminal before listing the todos")
-	GetCmdLong.Flags().BoolVarP(&clearTerm, "Clear terminal first", "C", false, "Clear the terminal before listing the todos")
-	LslCmdLong.Flags().BoolVarP(&clearTerm, "Clear terminal first", "C", false, "Clear the terminal before listing the todos")
-	// Reversr order (userful for when there are laods of todo's and they were created important to least important)
-	GetCmd.Flags().BoolVarP(&reverseList, "Reverse the todo order", "r", false, "Reverse the list of todo's. Useful when you created todos most important -> least important")
-	LsCmd.Flags().BoolVarP(&reverseList, "Reverse the todo order", "r", false, "Reverse the list of todo's. Useful when you created todos most important -> least important")
-	LsCmdLong.Flags().BoolVarP(&reverseList, "Reverse the todo order", "r", false, "Reverse the list of todo's. Useful when you created todos most important -> least important")
-	GetCmdLong.Flags().BoolVarP(&reverseList, "Reverse the todo order", "r", false, "Reverse the list of todo's. Useful when you created todos most important -> least important")
-	LslCmdLong.Flags().BoolVarP(&reverseList, "Reverse the todo order", "r", false, "Reverse the list of todo's. Useful when you created todos most important -> least important")
+	GetCmd.Flags().BoolVarP(&clearTerm, "clear", "C", false, "Clear the terminal before listing the todos")
+	LsCmd.Flags().BoolVarP(&clearTerm, "clear", "C", false, "Clear the terminal before listing the todos")
+	LsCmdLong.Flags().BoolVarP(&clearTerm, "clear", "C", false, "Clear the terminal before listing the todos")
+	GetCmdLong.Flags().BoolVarP(&clearTerm, "clear", "C", false, "Clear the terminal before listing the todos")
+	LslCmdLong.Flags().BoolVarP(&clearTerm, "clear", "C", false, "Clear the terminal before listing the todos")
+	// Reverse order (userful for when there are laods of todo's and they were created important to least important)
+	GetCmd.Flags().BoolVarP(&reverseList, "reverse", "r", false, "Reverse the list of todo's. Useful when you created todos most important -> least important")
+	LsCmd.Flags().BoolVarP(&reverseList, "reverse", "r", false, "Reverse the list of todo's. Useful when you created todos most important -> least important")
+	LsCmdLong.Flags().BoolVarP(&reverseList, "reverse", "r", false, "Reverse the list of todo's. Useful when you created todos most important -> least important")
+	GetCmdLong.Flags().BoolVarP(&reverseList, "reverse", "r", false, "Reverse the list of todo's. Useful when you created todos most important -> least important")
+	LslCmdLong.Flags().BoolVarP(&reverseList, "reverse", "r", false, "Reverse the list of todo's. Useful when you created todos most important -> least important")
+	// Get all todos for a specific project
+	LsCmd.Flags().StringVarP(&projectIdString, "project", "p", "0", "List all of the current todos for a single project regardless of the current working directory")
+	GetCmd.Flags().StringVarP(&projectIdString, "project", "p", "0", "List all of the current todos for a single project regardless of the current working directory")
+	GetCmdLong.Flags().StringVarP(&projectIdString, "project", "p", "0", "List all of the current todos for a single project regardless of the current working directory")
+	LsCmdLong.Flags().StringVarP(&projectIdString, "project", "p", "0", "List all of the current todos for a single project regardless of the current working directory")
 }

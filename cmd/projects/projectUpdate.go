@@ -66,6 +66,4 @@ func init() {
 	EditProject.Flags().StringVarP(&newProjectTitle, "title", "t", "", "New title for the project")
 	EditProject.Flags().StringVarP(&newProjectDescription, "description", "d", "", "New description for the project")
 	EditProject.Flags().StringVarP(&newFilepath, "filepath", "f", "", "New filepath for the project")
-
-	EditProject.MarkFlagRequired("id")
 }

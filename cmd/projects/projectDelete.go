@@ -55,6 +55,6 @@ var DelProj = &cobra.Command{
 }
 
 func init() {
-	DeleteProject.Flags().IntVarP(&deleteSelectedProjectId, "Project ID", "i", 0, "The target project's ID")
-	DelProj.Flags().IntVarP(&deleteSelectedProjectId, "Project ID", "i", 0, "The target project's ID")
+	DeleteProject.Flags().IntVarP(&deleteSelectedProjectId, "id", "i", 0, "The target project's ID")
+	DelProj.Flags().IntVarP(&deleteSelectedProjectId, "id", "i", 0, "The target project's ID")
 }

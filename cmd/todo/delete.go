@@ -198,8 +198,8 @@ var DelTodo = &cobra.Command{
 }
 
 func init() {
-	DeleteTodo.Flags().StringVarP(&bulkDeleteSelectedIds, "Todo IDs", "I", "", "The comma separated list of todo IDs")
-	DelTodo.Flags().StringVarP(&bulkDeleteSelectedIds, "Todo IDs", "I", "", "The comma separated list of todo IDs")
-	DeleteTodo.Flags().StringVarP(&rangeDeleteSelectedIds, "Todo Range IDs", "R", "", "The comma separated list of todo IDs")
-	DelTodo.Flags().StringVarP(&rangeDeleteSelectedIds, "Todo Range IDs", "R", "", "The comma separated list of todo IDs")
+	DeleteTodo.Flags().StringVarP(&bulkDeleteSelectedIds, "ids", "I", "", "The comma separated list of todo IDs")
+	DelTodo.Flags().StringVarP(&bulkDeleteSelectedIds, "ids", "I", "", "The comma separated list of todo IDs")
+	DeleteTodo.Flags().StringVarP(&rangeDeleteSelectedIds, "range", "R", "", "The comma separated list of todo IDs")
+	DelTodo.Flags().StringVarP(&rangeDeleteSelectedIds, "range", "R", "", "The comma separated list of todo IDs")
 }

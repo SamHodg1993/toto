@@ -98,7 +98,7 @@ func init() {
 	AddCmd.PersistentFlags().StringVarP(&todoDescription, "description", "d", "", "Description of the todo")
 	AddCmd.PersistentFlags().StringVarP(&todoCreatedAt, "created-at", "c", "", "Todo creation time")
 	AddCmd.PersistentFlags().StringVarP(&todoUpdatedAt, "updated-at", "u", "", "Todo last updated time")
-	AddCmd.PersistentFlags().IntVarP(&todoProjectId, "project-id", "p", 0, "Relevent Project Id")
+	AddCmd.PersistentFlags().IntVarP(&todoProjectId, "project", "p", 0, "Relevent Project Id")
 
 	AddCmd.MarkFlagRequired("title")
 }

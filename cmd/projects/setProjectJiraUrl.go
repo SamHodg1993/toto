@@ -49,5 +49,5 @@ var SetProjectsJiraUrl = &cobra.Command{
 
 func init() {
 	SetProjectsJiraUrl.Flags().StringVarP(&jiraUrlString, "jira-url", "u", "", "Jira URL for this project.")
-	SetProjectsJiraUrl.Flags().IntVarP(&projectID, "project-id", "p", 0, "Project ID which is to be updated.")
+	SetProjectsJiraUrl.Flags().IntVarP(&projectID, "project", "p", 0, "Project ID which is to be updated.")
 }

@@ -1,6 +1,7 @@
 package todo
 
 import (
+	"database/sql"
 	"fmt"
 	"os"
 
@@ -8,26 +9,31 @@ import (
 )
 
 // GetTodosForFilepath gets todos for the current directory's project
-func (s *Service) GetTodosForFilepath() ([]models.Todo, error) {
-	var projectId int = 0
-
+//
+// Takes in projectId, but if 0 then will use the project for the current working directory
+func (s *Service) GetTodosForFilepath(projectId int) ([]models.Todo, error) {
 	currentDir, err := os.Getwd()
+	var row *sql.Row
+
 	if err != nil {
 		fmt.Printf("%v\n", err)
 		return nil, err
 	}
 
-	row := s.db.QueryRow("SELECT id FROM projects WHERE filepath = ?", currentDir)
+	// If no projectId was provided, then revert to the current working directory
+	if projectId == 0 {
+		row = s.db.QueryRow("SELECT id FROM projects WHERE filepath = ?", currentDir)
 
-	err = row.Scan(&projectId)
-	if err != nil {
-		choice, err := s.projectService.HandleNoExistingProject()
+		err = row.Scan(&projectId)
 		if err != nil {
-			return nil, err
-		}
-		if choice == 2 {
-			s.projectService.AddNewProjectWithPrompt()
-			return s.GetTodosForFilepath()
+			choice, err := s.projectService.HandleNoExistingProject()
+			if err != nil {
+				return nil, err
+			}
+			if choice == 2 {
+				s.projectService.AddNewProjectWithPrompt()
+				return s.GetTodosForFilepath(projectId)
+			}
 		}
 	}
 
@@ -130,30 +136,30 @@ func (s *Service) GetAllTodos() ([]models.Todo, error) {
 }
 
 // GetTodosForFilepath_LONG gets detailed todos for the current directory's project
-func (s *Service) GetTodosForFilepath_LONG() ([]models.Todo, error) {
-	var projectId int = 0
-
+func (s *Service) GetTodosForFilepath_LONG(projectId int) ([]models.Todo, error) {
 	currentDir, err := os.Getwd()
 	if err != nil {
 		fmt.Printf("%v\n", err)
 		return nil, err
 	}
 
-	row := s.db.QueryRow("SELECT id FROM projects WHERE filepath = ?", currentDir)
+	if projectId == 0 {
+		row := s.db.QueryRow("SELECT id FROM projects WHERE filepath = ?", currentDir)
 
-	err = row.Scan(&projectId)
-	if err != nil {
-		choice, err := s.projectService.HandleNoExistingProject()
+		err = row.Scan(&projectId)
 		if err != nil {
-			return nil, err
-		}
-		if choice == 1 {
-			projectId = 1
-		} else if choice == 2 {
-			s.projectService.AddNewProjectWithPrompt()
-			return s.GetTodosForFilepath_LONG()
-		} else {
-			return nil, fmt.Errorf("operation cancelled by user")
+			choice, err := s.projectService.HandleNoExistingProject()
+			if err != nil {
+				return nil, err
+			}
+			if choice == 1 {
+				projectId = 1
+			} else if choice == 2 {
+				s.projectService.AddNewProjectWithPrompt()
+				return s.GetTodosForFilepath_LONG(projectId)
+			} else {
+				return nil, fmt.Errorf("operation cancelled by user")
+			}
 		}
 	}
 

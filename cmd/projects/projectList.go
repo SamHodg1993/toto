@@ -110,6 +110,6 @@ var ProjectListCmd = &cobra.Command{
 }
 
 func init() {
-	ProjectLsCmd.Flags().BoolVarP(&clearTerm, "Clear terminal first", "C", false, "Clear the terminal before listing the project list")
-	ProjectListCmd.Flags().BoolVarP(&clearTerm, "Clear terminal first", "C", false, "Clear the terminal before listing the project list")
+	ProjectLsCmd.Flags().BoolVarP(&clearTerm, "clear", "C", false, "Clear the terminal before listing the project list")
+	ProjectListCmd.Flags().BoolVarP(&clearTerm, "clear", "C", false, "Clear the terminal before listing the project list")
 }

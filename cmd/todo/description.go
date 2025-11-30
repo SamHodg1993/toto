@@ -66,6 +66,6 @@ var GetTodoDesc = &cobra.Command{
 }
 
 func init() {
-	GetTodoDescription.Flags().BoolVarP(&clearScreen, "Clear terminal first", "C", false, "Clear the terminal before listing the todos")
-	GetTodoDesc.Flags().BoolVarP(&clearScreen, "Clear terminal first", "C", false, "Clear the terminal before listing the todos")
+	GetTodoDescription.Flags().BoolVarP(&clearScreen, "clear", "C", false, "Clear the terminal before listing the todos")
+	GetTodoDesc.Flags().BoolVarP(&clearScreen, "clear", "C", false, "Clear the terminal before listing the todos")
 }

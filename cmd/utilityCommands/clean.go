@@ -26,5 +26,5 @@ var CleanUtility = &cobra.Command{
 
 func init() {
 	// Full date
-	CleanUtility.Flags().BoolVarP(&reverseList, "Reverse the todo order", "r", false, "Reverse the list of todo's. Useful when you created todos most important -> least important")
+	CleanUtility.Flags().BoolVarP(&reverseList, "reverse", "r", false, "Reverse the list of todo's. Useful when you created todos most important -> least important")
 }

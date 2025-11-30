@@ -192,8 +192,8 @@ var ToggleComp = &cobra.Command{
 }
 
 func init() {
-	ToggleComp.Flags().StringVarP(&bulkCompleteSelectedIds, "Todo IDS", "I", "", "The target todos ID's separated with commas")
-	ToggleComplete.Flags().StringVarP(&bulkCompleteSelectedIds, "Todo IDS", "I", "", "The target todos ID's separated with commas")
-	ToggleComp.Flags().StringVarP(&rangeBulkCompleteSelectedIds, "Todo Range IDS", "R", "", "The target todos ID ranges separated with commas")
-	ToggleComplete.Flags().StringVarP(&rangeBulkCompleteSelectedIds, "Todo Range IDS", "R", "", "The target todos ID ranges separated with commas")
+	ToggleComp.Flags().StringVarP(&bulkCompleteSelectedIds, "ids", "I", "", "The target todos ID's separated with commas")
+	ToggleComplete.Flags().StringVarP(&bulkCompleteSelectedIds, "ids", "I", "", "The target todos ID's separated with commas")
+	ToggleComp.Flags().StringVarP(&rangeBulkCompleteSelectedIds, "range", "R", "", "The target todos ID ranges separated with commas")
+	ToggleComplete.Flags().StringVarP(&rangeBulkCompleteSelectedIds, "range", "R", "", "The target todos ID ranges separated with commas")
 }

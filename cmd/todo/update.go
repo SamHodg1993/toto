@@ -54,6 +54,4 @@ var EditTodo = &cobra.Command{
 func init() {
 	EditTodo.Flags().StringVarP(&newTitle, "title", "t", "", "Todo title")
 	EditTodo.Flags().StringVarP(&newDescription, "description", "d", "", "Todo description")
-
-	EditTodo.MarkFlagRequired("id")
 }
