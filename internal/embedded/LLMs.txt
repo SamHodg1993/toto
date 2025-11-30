@@ -100,13 +100,13 @@ toto lsl -A -D       # All projects with full dates
 **Command:** `toto comp <id>` or `toto toggle-complete <id>` (single) / `toto comp -R <range>` (bulk)
 
 **Arguments:**
-- Positional: `<id>` - Single todo ID to toggle
-- `-R, --range` - Range/bulk operation (ranges or comma-separated IDs)
+- Positional: `<id>` - Single todo ID to toggle (no flag needed)
+- `-R, --range` - Range/bulk operation (supports ranges like "1-5" and comma-separated IDs like "1,2,3,4")
 
 **Examples:**
 ```bash
-toto comp 5                 # Toggle single todo
-toto comp -R 1,2,3,4        # Toggle multiple todos (list)
+toto comp 5                 # Toggle single todo (positional argument)
+toto comp -R 1,2,3,4        # Toggle multiple todos (comma-separated list)
 toto comp -R 1-5            # Toggle range of todos
 toto comp -R 1-5,10,20-23   # Toggle mixed ranges and singles
 toto toggle-complete 2      # Verbose command name
@@ -123,13 +123,13 @@ toto toggle-complete 2      # Verbose command name
 **Command:** `toto del <id>` or `toto delete <id>` (single) / `toto del -R <range>` (bulk)
 
 **Arguments:**
-- Positional: `<id>` - Single todo ID to delete
-- `-R, --range` - Range/bulk operation (ranges or comma-separated IDs)
+- Positional: `<id>` - Single todo ID to delete (no flag needed)
+- `-R, --range` - Range/bulk operation (supports ranges like "1-10" and comma-separated IDs like "5,6,7")
 
 **Examples:**
 ```bash
-toto del 3              # Delete single todo
-toto del -R 5,6,7       # Delete multiple todos (list)
+toto del 3              # Delete single todo (positional argument)
+toto del -R 5,6,7       # Delete multiple todos (comma-separated list)
 toto del -R 1-10        # Delete range of todos
 toto delete 1           # Verbose command name
 ```
@@ -472,17 +472,20 @@ toto ls
 cd ~/my-project
 toto ls -C              # Clear screen and see current todos
 # Work on todos...
-toto comp -i 3          # Mark completed
+toto comp 3             # Mark todo 3 as completed
 toto clean              # Remove completed, see what's left
 ```
 
 ### Bulk Operations
 ```bash
 # Complete multiple todos at once
-toto comp -I 1,2,3,4
+toto comp -R 1,2,3,4
+toto comp -R 1-10           # Range of todos
+toto comp -R 1-5,10,20-23   # Mixed ranges and singles
 
 # Delete multiple todos
-toto del -I 5,6,7,8
+toto del -R 5,6,7,8
+toto del -R 1-10            # Range of todos
 
 # Add multiple todos
 toto add -t "Task 1" -d "Description 1"
@@ -540,8 +543,8 @@ toto lsl
 # Claude Code will:
 # 1. Run: toto lsl
 # 2. Read each todo's full details
-# 3. Use: toto edit -i <id> -t "better title" -d "improved description"
-# 4. Remove redundant todos: toto del -i <id>
+# 3. Use: toto edit <id> -t "better title" -d "improved description"
+# 4. Remove redundant todos: toto del <id>
 # 5. Add missing todos: toto add -t "..." -d "..."
 ```
 
@@ -606,12 +609,12 @@ toto lsl
 
 1. **Always check current location:** Run `toto ls` to see context
 2. **Use lsl for full details:** When you need descriptions, dates, or Jira links
-3. **Bulk operations are your friend:** Use `-I` flag for multiple IDs
+3. **Bulk operations are your friend:** Use `-R` flag for ranges (e.g., `toto comp -R 1-5,10,20-23`)
 4. **Jira + Claude combo:** `jpc` command is powerful for ticket breakdown
 5. **Clean up regularly:** Use `toto clean` to remove completed items
 6. **Check all projects:** Use `toto lsla` or `toto proj-ls` for overview
-7. **Edit for clarity:** Don't hesitate to improve todo titles/descriptions
-8. **Delete duplicates:** Remove redundant todos after Jira pulls
+7. **Edit for clarity:** Don't hesitate to improve todo titles/descriptions (e.g., `toto edit 5 -t "Better title"`)
+8. **Delete duplicates:** Remove redundant todos after Jira pulls (e.g., `toto del 3`)
 
 ## Flags Reference
 
@@ -624,18 +627,19 @@ toto lsl
 - `-A` - All todos (ignore project context)
 - `-D` - Full date timestamps (long lists only)
 
-**ID Flags:**
-- `-i, --id` - Single ID for operations
-- `-I, --ids` - Bulk comma-separated IDs
+**Operation Flags:**
+- `-R, --range` - Range/bulk operations (e.g., "1-5,10,20-23" for comp and del commands)
 - `-p, --project` - Project ID
 
 **Content Flags:**
 - `-t, --title` - Todo/project title
 - `-d, --description` - Todo/project description
+- `-f, --filepath` - Project filepath
 - `-u, --url` - Jira URL
 
-**Jira Flags:**
-- `-i, --issue` - Jira issue key (e.g., PROJ-123)
+**Note on Positional Arguments:**
+- Single ID operations (comp, del, desc, edit, jp, jpc, proj-edit) use positional arguments, not flags
+- Example: `toto comp 5` not `toto comp -i 5`
 
 ## Version Information
 

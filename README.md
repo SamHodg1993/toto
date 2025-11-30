@@ -272,12 +272,14 @@ toto lsl -D
 
 Mark task as complete:
 ```bash
-toto comp -i 1
+toto comp 1
 ```
 
-Mark multiple tasks as complete (bulk):
+Mark multiple tasks as complete (ranges/bulk):
 ```bash
-toto comp -I 1,2,3,4
+toto comp -R 1,2,3,4        # Simple list
+toto comp -R 1-5            # Range
+toto comp -R 1-5,10,20-23   # Mixed ranges and singles
 ```
 
 Clean up completed tasks and display remaining:
@@ -300,14 +302,20 @@ You'll be prompted to enter your Jira URL, email, and API token (create one at h
 
 Pull a Jira ticket and create a todo:
 ```bash
+toto jira-pull PROJ-123
+# Or use the shorthand
 toto jp PROJ-123
 ```
 
 Pull a Jira ticket and break it into subtasks with AI:
 ```bash
+toto jira-pull-claude PROJ-123
+# Or use the shorthand
 toto jpc PROJ-123
 ```
 This uses Claude AI to intelligently break down the ticket into actionable subtasks. If the description contains a bulleted list, it extracts each item. Otherwise, it analyzes the ticket and creates 3-8 subtasks.
+
+**Note:** Requires `CLAUDE_API_KEY` environment variable.
 
 List all pulled Jira tickets:
 ```bash
@@ -387,13 +395,17 @@ Jira integration is fully functional with simple API token authentication and AI
 
 3. **Pull a Jira ticket:**
    ```bash
-   toto jira-pull -i PROJ-123
+   toto jira-pull PROJ-123
+   # Or use shorthand
+   toto jp PROJ-123
    ```
    Fetches the ticket from Jira, saves it to the database, and creates a linked todo.
 
 4. **Pull a Jira ticket with AI breakdown:**
    ```bash
-   toto jira-pull-claude -i PROJ-123
+   toto jira-pull-claude PROJ-123
+   # Or use shorthand
+   toto jpc PROJ-123
    ```
    Uses Claude AI to intelligently break down the ticket into multiple subtasks.
 
